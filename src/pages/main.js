@@ -7,6 +7,7 @@ import Offers from '../components/offers';
 import Users from '../components/users/Users';
 import Documents from '../components/documents/Documents';
 import Orders from '../components/orders';
+import Customers from '../components/customers/Customers';
 
 class Main extends Component {
     render() {
@@ -17,6 +18,7 @@ class Main extends Component {
                 <Route exact path="/orders" component={Orders}/>
                 <Route exact path="/users" component={Users}/>
                 <Route exact path="/documents" component={Documents}/>
+                <Route exact path="/customers" component={Customers}/>
             </Container>
         );
     }

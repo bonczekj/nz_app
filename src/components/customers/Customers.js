@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
-import UserDetail from './UserDetail';
+import CustomerDetail from './CustomerDetail';
 
-class Users extends Component {
+class Customers extends Component {
 
     texts = {
-        newItem: 'Nový uživatel',
-        header: 'Uživatelé'
+        newItem: 'Nový subjekt',
+        header: 'Subjekty'
     };
 
     constructor(){
@@ -15,7 +15,7 @@ class Users extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
+            showData: {ico: '', name: '', profession: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -31,7 +31,7 @@ class Users extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/users', {
+        fetch('http://localhost/nz_rest_api_slim/customers', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -64,7 +64,7 @@ class Users extends Component {
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
             }else{
-                items = this.state.tableData[this.state.tableData.findIndex(el => el.email === item.email)] = item;
+                items = this.state.tableData[this.state.tableData.findIndex(el => el.ico === item.ico)] = item;
             }
             this.setState({
                 showData: items
@@ -78,7 +78,7 @@ class Users extends Component {
             newItem: false,
             showData: item
         });
-        console.log('Edit item '+ item.id + this.state.showModal);
+        console.log('Edit item '+ item.ico + this.state.showModal);
     }
 
     newItem(){
@@ -91,7 +91,7 @@ class Users extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/userdelete', {
+        fetch('http://localhost/nz_rest_api_slim/customers/delete', {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify(item),
@@ -102,7 +102,7 @@ class Users extends Component {
             if (res.status === 0){
             };
             this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.email == item.email; })}
+                tableData: _.reject(this.state.tableData, function(el) { return el.ico == item.ico; })}
             );
             console.log(res.toString());
         }).catch(err => {
@@ -134,11 +134,10 @@ class Users extends Component {
 
     items(item, i){
         return(
-            <Table.Row key={item.email}>
-                <Table.Cell>{item.username}</Table.Cell>
-                <Table.Cell>{item.email}</Table.Cell>
-                <Table.Cell>{item.firstname}</Table.Cell>
-                <Table.Cell>{item.lastname}</Table.Cell>
+            <Table.Row key={item.ico}>
+                <Table.Cell>{item.ico}</Table.Cell>
+                <Table.Cell>{item.name}</Table.Cell>
+                <Table.Cell>{item.profession}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -147,6 +146,11 @@ class Users extends Component {
             </Table.Row>
         )
     }
+
+    // Capturing redux form values from redux form store (pay attention to the name we defined in the previous component)
+    onSubmit = values => {(
+            values.ico
+    )};
 
     render(){
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
@@ -165,14 +169,12 @@ class Users extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'username' && direction} onClick={this.handleSort('username')}>
-                                ID</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'email' && direction} onClick={this.handleSort('email')}>
-                                Typ</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'firstname' && direction} onClick={this.handleSort('firstname')}>
-                                Popis</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'lastname' && direction} onClick={this.handleSort('lastname')}>
-                                Platnost</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>
+                                IČO</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>
+                                Název</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'profession' && direction} onClick={this.handleSort('profession')}>
+                                Profese</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
@@ -199,12 +201,17 @@ class Users extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <UserDetail showData={this.state.showData} showModal={this.state.showModal} newItem={this.state.newItem} onClose={this.closeEdit}/>
+                <CustomerDetail showData={this.state.showData}
+                                showModal={this.state.showModal}
+                                newItem={this.state.newItem}
+                                onClose={this.closeEdit}
+                                onSubmit={this.onSubmit}
+                />
             </div>
         )
     }
 }
 
-export default Users;
+export default Customers;
 
 

@@ -38,12 +38,12 @@ class Header2 extends Component {
                     Evidence nabídek
                     <Menu.Item as={NavLink} to="/offers">Nabídky</Menu.Item>
                     <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
-
                     <Dropdown item simple text='Čísleníky'>
                         <Dropdown.Menu>
                             <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>
-                            <Dropdown.Divider />
                             <Dropdown.Item as={NavLink} to="/documents">Dokumenty</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item as={NavLink} to="/customers">Subjekty</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Container>

@@ -106,7 +106,8 @@ class DocumentDetail extends Component {
             //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             this.closeEdit();
         }).catch(err => {
-            console.log(err.toString())
+            console.log(err.toString());
+            this.closeEdit();
         });
         /*this.fileUpload(this.state.file).then((response)=>{
             console.log(response.data);

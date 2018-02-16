@@ -190,7 +190,7 @@ class Documents extends Component {
                     <Table.Footer fullWidth >
                         <Table.Row >
                             <Table.HeaderCell >
-                                <Button icon labelPosition='left' pozitive size='small' onClick={this.newItem.bind(this)}>
+                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
