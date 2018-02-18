@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
-import DocumentDetail from './DocumentDetail';
+import OffersDetail from './OffersDetail';
+import {optionYesNo, optionDeliveryType} from "../constants";
 
-class Documents extends Component {
+class Offers extends Component {
 
     texts = {
-        newItem: 'Nový dokument',
-        header: 'Dokumenty'
+        newItem: 'Nová nabídka',
+        header: 'Nabídky'
     };
 
     constructor(){
@@ -15,7 +16,7 @@ class Documents extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {type: '', description: '', expiration: '', filename: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -23,8 +24,7 @@ class Documents extends Component {
             rowsPerPage: 10,
             totalPages: 10,
             column: '',
-            direction: 'ascending',
-            saved: false,
+            direction: 'ascending'
         }
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -32,7 +32,7 @@ class Documents extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/documents', {
+        fetch('http://localhost/nz_rest_api_slim/offers', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -43,7 +43,6 @@ class Documents extends Component {
                 console.log('response');
                 return response.json();
             }).then(json => {
-                //console.log('then data' + json);
                 this.setState({tableData : json});
                 this.setState({ isLoading: false });
                 this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
@@ -59,9 +58,9 @@ class Documents extends Component {
         this.setState({ rowsPerPage: value })
     }
 
-    closeEdit(item){
+    closeEdit(item, saved){
         this.setState({showModal: false});
-        if (this.state.saved === true){
+        if (saved === true){
             let items = [];
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
@@ -78,22 +77,22 @@ class Documents extends Component {
         this.setState({
             showModal: true,
             newItem: false,
-            showData: item,
-            saved: false,
+            showData: item
         });
+        console.log('Edit item '+ item.id + this.state.showModal);
     }
 
     newItem(){
         this.setState({
             showModal: true,
             newItem: true,
-            showData: [],
-            saved: false,
-        });
+            showData: []}
+            );
+        console.log('New item '+ this.state.showModal);
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/documentdelete', {
+        fetch('http://localhost/nz_rest_api_slim/offers/delete', {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify(item),
@@ -111,48 +110,6 @@ class Documents extends Component {
             console.log(err.toString())
         });
     }
-
-    onSubmitDocument = (e, item) => {
-        e.preventDefault(); // Stop form submit
-
-        let fetchUrl = '';
-        if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/documentcreate';
-        }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/document';
-        }
-
-        fetch(fetchUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(item),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then((res) => {
-            if (res.status === 0){
-                //console.log(res.toString());
-                this.setState({ saved: true });
-                //let item = res.json();
-                let body = res.json();
-                return body;
-                //this.closeEdit();
-            }
-        }).then(json => {
-            console.log('then data' + json);
-            //this.setState({tableData : json});
-            //this.setState({ isLoading: false });
-            //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-            this.closeEdit();
-        }).catch(err => {
-            console.log(err.toString());
-            this.closeEdit();
-        });
-        /*this.fileUpload(this.state.file).then((response)=>{
-            console.log(response.data);
-        })*/
-    }
-
 
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
@@ -176,14 +133,23 @@ class Documents extends Component {
         })
     }
 
+    decodeOptionValue(value, optionArray) {
+        let optionItem = optionArray.find(item => item.value === value);
+        return optionItem.text;
+    }
+
     items(item, i){
         return(
             <Table.Row key={item.id}>
                 <Table.Cell>{item.id}</Table.Cell>
-                <Table.Cell>{item.type}</Table.Cell>
-                <Table.Cell>{item.description}</Table.Cell>
-                <Table.Cell>{item.filename}</Table.Cell>
-                <Table.Cell>{item.expiration}</Table.Cell>
+                <Table.Cell>{item.name}</Table.Cell>
+                <Table.Cell>{item.customer}</Table.Cell>
+                <Table.Cell>{item.processdate}</Table.Cell>
+                <Table.Cell>{item.processtime}</Table.Cell>
+                <Table.Cell>{this.decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
+                <Table.Cell>{this.decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
+                <Table.Cell>{item.price}</Table.Cell>
+                <Table.Cell>{item.winprice}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -192,12 +158,12 @@ class Documents extends Component {
             </Table.Row>
         )
     }
-/*
-                    <Button.Group>
-                        <Button basic compact={true} icon={'edit'} size='mini' onClick={this.editItem.bind(this, item)}></Button>
-                        <Button basic compact={true} icon={'trash'} size='mini' onClick={this.deleteItem.bind(this, item.id)}></Button>
-                    </Button.Group>
- */
+
+    // Capturing redux form values from redux form store (pay attention to the name we defined in the previous component)
+    /*onSubmit = values => {(
+            values.id
+    )};*/
+
     render(){
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
@@ -207,6 +173,8 @@ class Documents extends Component {
             { key: 20, text: '20', value: 20 },
         ]
 
+        //id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''
+
         return (
             <div>
                 <Segment textAlign='center'>
@@ -215,16 +183,15 @@ class Documents extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('id')}>
-                                ID</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'type' && direction} onClick={this.handleSort('type')}>
-                                Typ</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'description' && direction} onClick={this.handleSort('description')}>
-                                Popis</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'filename' && direction} onClick={this.handleSort('filename')}>
-                                Soubor</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'expiration' && direction} onClick={this.handleSort('expiration')}>
-                                Platnost</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'processtime' && direction} onClick={this.handleSort('processtime')}>Hodina</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'winprice' && direction} onClick={this.handleSort('winprice')}>Vítězná cena</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
@@ -235,12 +202,12 @@ class Documents extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell >
+                            <Table.HeaderCell colSpan='2' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='5' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='8' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -251,17 +218,17 @@ class Documents extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <DocumentDetail
-                    showData={this.state.showData}
-                    showModal={this.state.showModal}
-                    newItem={this.state.newItem}
-                    onClose={this.closeEdit}
-                    onSubmit={this.onSubmitDocument}/>
+                <OffersDetail showData={this.state.showData}
+                                showModal={this.state.showModal}
+                                newItem={this.state.newItem}
+                                onClose={this.closeEdit}
+                                onSubmit={this.onSubmit}
+                />
             </div>
         )
     }
 }
 
-export default Documents;
+export default Offers;
 
 

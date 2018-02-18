@@ -22,7 +22,6 @@ class DocumentDetail extends Component {
         this.onFileChange = this.onFileChange.bind(this);
     };
 
-
     componentDidMount(){
         this.setState({ isLoading: true });
         fetch('http://localhost/nz_rest_api_slim/doctype', {
@@ -74,6 +73,8 @@ class DocumentDetail extends Component {
     }
 
     onSubmit = (e) => {
+        this.props.onSubmit(e, this.state.showData);
+        /*
         e.preventDefault(); // Stop form submit
 
         let fetchUrl = '';
@@ -109,6 +110,7 @@ class DocumentDetail extends Component {
             console.log(err.toString());
             this.closeEdit();
         });
+        */
         /*this.fileUpload(this.state.file).then((response)=>{
             console.log(response.data);
         })*/
@@ -127,7 +129,7 @@ class DocumentDetail extends Component {
     }*/
 
     closeEdit(){
-        this.props.onClose(this.state.showData, this.state.saved);
+        this.props.onClose(this.state.showData);
     }
 
     render() {
