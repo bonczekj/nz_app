@@ -42,17 +42,18 @@ class UserDetail extends Component {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/usercreate';
+            fetchUrl = 'http://localhost/nz_rest_api_slim/users/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/user';
+            fetchUrl = 'http://localhost/nz_rest_api_slim/users';
         }
 
-        fetch(fetchUrl, {
+        //fetch(fetchUrl, {
+        fetch('http://localhost/nz_rest_api_slim/users', {
             method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(this.state.showData),
+            //mode: 'no-cors',
+            //body: JSON.stringify(this.state.showData),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }
         }).then(res => {
             if (res.status === 0){

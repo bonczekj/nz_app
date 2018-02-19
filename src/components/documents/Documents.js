@@ -66,7 +66,8 @@ class Documents extends Component {
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
             }else{
-                items = this.state.tableData[this.state.tableData.findIndex(el => el.id === item.id)] = item;
+                items = this.state.tableData;
+                items = items[items.findIndex(el => el.id === item.id)] = item;
             }
             this.setState({
                 showData: items
@@ -93,7 +94,7 @@ class Documents extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/documentdelete', {
+        fetch('http://localhost/nz_rest_api_slim/documents/delete', {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify(item),
@@ -117,16 +118,17 @@ class Documents extends Component {
 
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/documentcreate';
+            fetchUrl = 'http://localhost/nz_rest_api_slim/documents/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/document';
+            fetchUrl = 'http://localhost/nz_rest_api_slim/documents';
         }
 
         fetch(fetchUrl, {
             method: 'POST',
-            mode: 'no-cors',
+           // mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         }).then((res) => {
@@ -146,7 +148,7 @@ class Documents extends Component {
             this.closeEdit();
         }).catch(err => {
             console.log(err.toString());
-            this.closeEdit();
+            this.closeEdit(item);
         });
         /*this.fileUpload(this.state.file).then((response)=>{
             console.log(response.data);

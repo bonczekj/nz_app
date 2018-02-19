@@ -31,6 +31,7 @@ class Users extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
+ //       fetch('http://localhost/nz_rest_api_slim/users/listlist', {
         fetch('http://localhost/nz_rest_api_slim/users', {
                 //mode: 'no-cors',
                 method: 'GET',
@@ -91,16 +92,15 @@ class Users extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/userdelete', {
+        fetch('http://localhost/nz_rest_api_slim/users/delete', {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then(res => {
-            if (res.status === 0){
-            };
+            if (res.status === 0){};
             this.setState({
                 tableData: _.reject(this.state.tableData, function(el) { return el.email == item.email; })}
             );
