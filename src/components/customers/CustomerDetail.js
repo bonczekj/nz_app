@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
+import { Button, Modal, Form} from 'semantic-ui-react'
 
 //import PropTypes from 'prop-types';
 //import { compose } from 'redux';
@@ -7,7 +7,7 @@ import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, 
 
 //import semanticFormField from '../semantic-ui-form';
 //import { required, number, email } from '../validation';
-import _ from 'lodash';
+//import _ from 'lodash';
 
 class CustomerDetail extends Component {
 
@@ -19,7 +19,7 @@ class CustomerDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {ico: '', name: '', profession: ''},
+            showData: {ico: '', name: '', profession: '', address: ''},
             newItem: false,
             saved: false
         };
@@ -51,14 +51,13 @@ class CustomerDetail extends Component {
 
         fetch(fetchUrl, {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(this.state.showData),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-                console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
             }
@@ -71,6 +70,30 @@ class CustomerDetail extends Component {
     closeEdit(){
         this.props.onClose(this.state.showData, this.state.saved);
     }
+
+    readAres = () => {
+        fetch('http://localhost/nz_rest_api_slim/customers/ares', {
+            method: 'POST',
+            body: JSON.stringify({ico: this.state.showData.ico}),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        }).then(response => {
+            if (response.status === 200){
+                return response.json();
+            }else {
+                throw new Error(response.statusText);
+            }
+        }).then(json => {
+            const newState1 = {...this.state.showData, name: json.name};
+            this.setState({ showData: newState1 });
+            const newState2 = {...this.state.showData, address: json.address};
+            this.setState({ showData: newState2 });
+        }).catch(err => {
+            console.log(err.toString())
+        });
+    };
 
     render() {
         return (
@@ -86,10 +109,16 @@ class CustomerDetail extends Component {
                         <Form.Field required>
                             <label>IČO</label>
                             <input placeholder='IČO' name='ico' value={this.state.showData.ico} onChange={ this.handleChange }/>
+                            <Button onClick={this.readAres.bind(this)}>ARES</Button>
+
                         </Form.Field>
                         <Form.Field required>
                             <label>Název</label>
                             <input placeholder='Název' name='name' value={this.state.showData.name} onChange={ this.handleChange }/>
+                        </Form.Field>
+                        <Form.Field required>
+                            <label>Adresa</label>
+                            <input placeholder='Adresa' name='address' value={this.state.showData.address} onChange={ this.handleChange }/>
                         </Form.Field>
                         <Form.Field>
                             <label>Profese</label>

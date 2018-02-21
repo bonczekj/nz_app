@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
-import _ from 'lodash';
+import { Button, Modal, Form } from 'semantic-ui-react'
+//import _ from 'lodash';
 
 class UserDetail extends Component {
 
@@ -47,17 +47,15 @@ class UserDetail extends Component {
             fetchUrl = 'http://localhost/nz_rest_api_slim/users';
         }
 
-        //fetch(fetchUrl, {
-        fetch('http://localhost/nz_rest_api_slim/users', {
+        fetch(fetchUrl, {
             method: 'POST',
             //mode: 'no-cors',
-            //body: JSON.stringify(this.state.showData),
+            body: JSON.stringify(this.state.showData),
             headers: {
                 'Content-Type': 'application/json',
             }
-        }).then(res => {
-            if (res.status === 0){
-                console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
             }

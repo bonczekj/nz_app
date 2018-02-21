@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import UserDetail from './UserDetail';
 
@@ -24,7 +24,7 @@ class Users extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending'
-        }
+        };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
@@ -40,23 +40,25 @@ class Users extends Component {
                 }
         })
             .then((response)  => {
-                console.log('response');
-                return response.json();
+                if (response.status === 200){
+                    console.log('response');
+                    return response.json();
+                }
             }).then(json => {
-                this.setState({tableData : json});
-                this.setState({ isLoading: false });
-                this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                    this.setState({tableData : json});
+                    this.setState({ isLoading: false });
+                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
-                this.setState({ error, isLoading: false })
+                this.setState({ error, isLoading: false });
                 console.log("error")
             });
     };
 
-    handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
+    handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
-    }
+    };
 
     closeEdit(item, saved){
         this.setState({showModal: false});
@@ -99,12 +101,13 @@ class Users extends Component {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){};
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.email == item.email; })}
-            );
-            console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
+                this.setState({
+                    tableData: _.reject(this.state.tableData, function(el) { return el.email === item.email; })}
+                );
+            };
+            console.log(response.toString());
         }).catch(err => {
             console.log(err.toString())
         });
@@ -117,8 +120,8 @@ class Users extends Component {
                 column: clickedColumn,
                 //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
-            })
-            if ((typeof tableData[0][clickedColumn]) == 'string'){
+            });
+            if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
@@ -130,7 +133,7 @@ class Users extends Component {
             tableData: tableData.reverse(),
             direction: direction === 'ascending' ? 'descending' : 'ascending',
         })
-    }
+    };
 
     items(item, i){
         return(
@@ -155,7 +158,7 @@ class Users extends Component {
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
-        ]
+        ];
 
         return (
             <div>

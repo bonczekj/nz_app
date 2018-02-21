@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import DocumentDetail from './DocumentDetail';
 
@@ -25,7 +25,7 @@ class Documents extends Component {
             column: '',
             direction: 'ascending',
             saved: false,
-        }
+        };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
@@ -40,24 +40,24 @@ class Documents extends Component {
                 }
         })
             .then((response)  => {
-                console.log('response');
-                return response.json();
+                if (response.status === 200){
+                    return response.json();
+                }
             }).then(json => {
-                //console.log('then data' + json);
-                this.setState({tableData : json});
-                this.setState({ isLoading: false });
-                this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                    this.setState({tableData : json});
+                    this.setState({ isLoading: false });
+                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
-                this.setState({ error, isLoading: false })
+                this.setState({ error, isLoading: false });
                 console.log("error")
             });
     };
 
-    handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
+    handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
-    }
+    };
 
     closeEdit(item){
         this.setState({showModal: false});
@@ -96,18 +96,17 @@ class Documents extends Component {
     deleteItem(item){
         fetch('http://localhost/nz_rest_api_slim/documents/delete', {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-            };
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.id == item.id; })}
-            );
-            console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
+                this.setState({
+                    tableData: _.reject(this.state.tableData, function(el) { return el.id === item.id; })}
+                );
+            }
         }).catch(err => {
             console.log(err.toString())
         });
@@ -131,12 +130,11 @@ class Documents extends Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        }).then((res) => {
-            if (res.status === 0){
-                //console.log(res.toString());
+        }).then((response) => {
+            if (response.status === 200){
                 this.setState({ saved: true });
                 //let item = res.json();
-                let body = res.json();
+                let body = response.json();
                 return body;
                 //this.closeEdit();
             }
@@ -153,7 +151,7 @@ class Documents extends Component {
         /*this.fileUpload(this.state.file).then((response)=>{
             console.log(response.data);
         })*/
-    }
+    };
 
 
     handleSort = clickedColumn => () => {
@@ -163,8 +161,8 @@ class Documents extends Component {
                 column: clickedColumn,
                 //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
-            })
-            if ((typeof tableData[0][clickedColumn]) == 'string'){
+            });
+            if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
@@ -176,7 +174,7 @@ class Documents extends Component {
             tableData: tableData.reverse(),
             direction: direction === 'ascending' ? 'descending' : 'ascending',
         })
-    }
+    };
 
     items(item, i){
         return(
@@ -207,7 +205,7 @@ class Documents extends Component {
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
-        ]
+        ];
 
         return (
             <div>

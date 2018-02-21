@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import CustomerDetail from './CustomerDetail';
 
@@ -15,7 +15,7 @@ class Customers extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {ico: '', name: '', profession: ''},
+            showData: {ico: '', name: '', profession: '', address: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -24,7 +24,7 @@ class Customers extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending'
-        }
+        };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
@@ -39,23 +39,24 @@ class Customers extends Component {
                 }
         })
             .then((response)  => {
-                console.log('response');
-                return response.json();
+                if (response.status === 200){
+                    return response.json();
+                }
             }).then(json => {
                 this.setState({tableData : json});
                 this.setState({ isLoading: false });
                 this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
-                this.setState({ error, isLoading: false })
+                this.setState({ error, isLoading: false });
                 console.log("error")
             });
     };
 
-    handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
+    handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
-    }
+    };
 
     closeEdit(item, saved){
         this.setState({showModal: false});
@@ -93,18 +94,17 @@ class Customers extends Component {
     deleteItem(item){
         fetch('http://localhost/nz_rest_api_slim/customers/delete', {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-            };
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.ico == item.ico; })}
-            );
-            console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
+                this.setState({
+                    tableData: _.reject(this.state.tableData, function(el) { return el.ico === item.ico; })}
+                );
+            }
         }).catch(err => {
             console.log(err.toString())
         });
@@ -117,8 +117,8 @@ class Customers extends Component {
                 column: clickedColumn,
                 //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
-            })
-            if ((typeof tableData[0][clickedColumn]) == 'string'){
+            });
+            if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
@@ -130,7 +130,7 @@ class Customers extends Component {
             tableData: tableData.reverse(),
             direction: direction === 'ascending' ? 'descending' : 'ascending',
         })
-    }
+    };
 
     items(item, i){
         return(
@@ -138,6 +138,7 @@ class Customers extends Component {
                 <Table.Cell>{item.ico}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.profession}</Table.Cell>
+                <Table.Cell>{item.address}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -159,7 +160,7 @@ class Customers extends Component {
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
-        ]
+        ];
 
         return (
             <div>
@@ -175,6 +176,8 @@ class Customers extends Component {
                                 Název</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'profession' && direction} onClick={this.handleSort('profession')}>
                                 Profese</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'address' && direction} onClick={this.handleSort('address')}>
+                                Adresa</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>

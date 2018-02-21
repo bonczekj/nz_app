@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Modal, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import OffersDetail from './OffersDetail';
 import {optionYesNo, optionDeliveryType} from "../constants";
@@ -25,7 +25,7 @@ class Offers extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending'
-        }
+        };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
@@ -40,14 +40,15 @@ class Offers extends Component {
                 }
         })
             .then((response)  => {
-                console.log('response');
-                return response.json();
+                if (response.status === 200){
+                    return response.json();
+                }
             }).then(json => {
-                this.setState({tableData : json});
-                this.setState({ isLoading: false });
-                this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                    this.setState({tableData : json});
+                    this.setState({ isLoading: false });
+                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
-                this.setState({ error, isLoading: false })
+                this.setState({ error, isLoading: false });
                 console.log("error")
             });
     };
@@ -56,7 +57,7 @@ class Offers extends Component {
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
-    }
+    };
 
     closeEdit(item, saved){
         this.setState({showModal: false});
@@ -94,18 +95,17 @@ class Offers extends Component {
     deleteItem(item){
         fetch('http://localhost/nz_rest_api_slim/offers/delete', {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-            };
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.id == item.id; })}
-            );
-            console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
+                this.setState({
+                    tableData: _.reject(this.state.tableData, function(el) { return el.id === item.id; })}
+                );
+            }
         }).catch(err => {
             console.log(err.toString())
         });
@@ -118,8 +118,8 @@ class Offers extends Component {
                 column: clickedColumn,
                 //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
-            })
-            if ((typeof tableData[0][clickedColumn]) == 'string'){
+            });
+            if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
@@ -131,7 +131,7 @@ class Offers extends Component {
             tableData: tableData.reverse(),
             direction: direction === 'ascending' ? 'descending' : 'ascending',
         })
-    }
+    };
 
     decodeOptionValue(value, optionArray) {
         let optionItem = optionArray.find(item => item.value === value);
@@ -171,7 +171,7 @@ class Offers extends Component {
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
-        ]
+        ];
 
         //id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''
 

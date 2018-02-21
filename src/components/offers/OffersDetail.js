@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown, Tab } from 'semantic-ui-react'
-import {optionYesNo, optionDeliveryType} from "../constants";
+import { Button, Modal, Tab } from 'semantic-ui-react'
+//import {optionYesNo, optionDeliveryType} from "../constants";
 import _ from 'lodash';
 import OffersDetailHeader from "./OffersDetailHeader";
 import OffersDetailDocuments from "./OffersDetailDocuments";
@@ -58,7 +58,7 @@ class OffersDetail extends Component {
     handleChangeDD = (e, { name, value }) => {
         const newState = {...this.state.showData, [name]: value};
         this.setState({ showData: newState });
-    }
+    };
 
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
@@ -71,14 +71,13 @@ class OffersDetail extends Component {
 
         fetch(fetchUrl, {
             method: 'POST',
-            mode: 'no-cors',
+            //mode: 'no-cors',
             body: JSON.stringify(this.state.showData),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-                console.log(res.toString());
+        }).then(response => {
+            if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
             }
@@ -95,7 +94,7 @@ class OffersDetail extends Component {
     deleteDocument = (item) => {
 //    deleteDocument(item){
         this.setState({
-            documents: _.reject(this.state.documents, function(el) { return el.iddocument == item.iddocument; })}
+            documents: _.reject(this.state.documents, function(el) { return el.iddocument === item.iddocument; })}
         );
         /*fetch('http://localhost/nz_rest_api_slim/offers/delete', {
             method: 'POST',
@@ -114,7 +113,7 @@ class OffersDetail extends Component {
         }).catch(err => {
             console.log(err.toString())
         });*/
-    }
+    };
 
     addDocument = (item) => {
         let items = [];
@@ -126,13 +125,13 @@ class OffersDetail extends Component {
         /*this.setState({
             documents: this.state.documents.push(item)
         })*/
-    }
+    };
 
     onSubmitDocument = (e, item) => {
         //e.preventDefault(); // Stop form submit
         this.addDocument(item)
 
-    }
+    };
 
     render() {
         const panes = [
@@ -140,7 +139,7 @@ class OffersDetail extends Component {
             { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments documents={this.state.documents} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
             { menuItem: 'Nabídkové dokumenty', pane: 'Tab 3333 Content' },
             { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
-        ]
+        ];
 
         return (
             <div>
