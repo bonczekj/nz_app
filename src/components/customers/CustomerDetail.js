@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form} from 'semantic-ui-react'
+import { Button, Modal, Form, Message, Icon} from 'semantic-ui-react';
+import MyMessage from "../MyMessage";
+//import MyComponent from '../MyComponent';
 
 //import PropTypes from 'prop-types';
 //import { compose } from 'redux';
@@ -10,6 +12,7 @@ import { Button, Modal, Form} from 'semantic-ui-react'
 //import _ from 'lodash';
 
 class CustomerDetail extends Component {
+//class CustomerDetail extends MyComponent {
 
     texts = {
         detail: 'Detail subjektu',
@@ -21,7 +24,8 @@ class CustomerDetail extends Component {
             file:null,
             showData: {ico: '', name: '', profession: '', address: ''},
             newItem: false,
-            saved: false
+            saved: false,
+            errorText: ''
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -62,6 +66,7 @@ class CustomerDetail extends Component {
                 this.closeEdit();
             }
         }).catch(err => {
+            this.setState({ errorText: err.toString() });
             console.log(err.toString())
         });
     };
@@ -86,12 +91,14 @@ class CustomerDetail extends Component {
                 throw new Error(response.statusText);
             }
         }).then(json => {
+            this.setState({ errorText: '' });
             const newState1 = {...this.state.showData, name: json.name};
             this.setState({ showData: newState1 });
             const newState2 = {...this.state.showData, address: json.address};
             this.setState({ showData: newState2 });
         }).catch(err => {
-            console.log(err.toString())
+            this.setState({ errorText: err.toString() });
+            console.log(err.toString());
         });
     };
 
@@ -105,6 +112,7 @@ class CustomerDetail extends Component {
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
                 <Modal.Content>
+                    <MyMessage msgText={this.state.errorText}/>
                     <Form>
                         <Form.Field required>
                             <label>IČO</label>
@@ -127,6 +135,7 @@ class CustomerDetail extends Component {
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                     </Form>
+
                 </Modal.Content>
             </Modal>
             </div>

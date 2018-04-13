@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Message} from 'semantic-ui-react'
 import _ from 'lodash';
 import CustomerDetail from './CustomerDetail';
+import  MyMessage from '../MyMessage';
 
 class Customers extends Component {
 
@@ -23,7 +24,8 @@ class Customers extends Component {
             rowsPerPage: 10,
             totalPages: 10,
             column: '',
-            direction: 'ascending'
+            direction: 'ascending',
+            errorText: ''
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -46,8 +48,10 @@ class Customers extends Component {
                 this.setState({tableData : json});
                 this.setState({ isLoading: false });
                 this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ error, isLoading: false });
+                this.setState({ errorText: error.toString() });
                 console.log("error")
             });
     };
@@ -104,13 +108,17 @@ class Customers extends Component {
                 this.setState({
                     tableData: _.reject(this.state.tableData, function(el) { return el.ico === item.ico; })}
                 );
+                this.setState({ errorText: '' });
             }
         }).catch(err => {
             console.log(err.toString())
+            this.setState({ errorText: err.toString() });
         });
     }
 
-    handleSort = clickedColumn => () => {
+    handleSort = clickedColumn => (e) => {
+        e.preventDefault();
+
         const { column, tableData, direction } = this.state;
         if (column !== clickedColumn) {
             this.setState({
@@ -164,6 +172,7 @@ class Customers extends Component {
 
         return (
             <div>
+                <MyMessage msgText={this.state.errorText}/>
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>
