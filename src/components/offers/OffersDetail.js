@@ -19,6 +19,7 @@ class OffersDetail extends Component {
             newItem: false,
             saved: false,
             documents: [],
+            documentsOffer: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -42,8 +43,15 @@ class OffersDetail extends Component {
                 .then((response)  => {
                     return response.json();
                 }).then(json => {
-                this.setState({documents : json});
-                //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                    //this.setState({documents : json});
+                const allDocuments = json;
+                this.setState({
+                    documents: _.reject(allDocuments, function(el) { return el.type === ''; })}
+                );
+                this.setState({
+                    documentsOffer: _.reject(allDocuments, function(el) { return el.type != ''; })}
+                );
+
             }).catch(error => {
             });
         }
@@ -115,16 +123,28 @@ class OffersDetail extends Component {
         });*/
     };
 
-    addDocument = (item) => {
+    addDocument = (documents) => {
         let items = [];
+        let item = [];
+        let file = '';
+
         items = this.state.documents;
-        items.push(item);
-        this.setState({
-            documents: items
-        });
-        /*this.setState({
-            documents: this.state.documents.push(item)
-        })*/
+        for (var i = 0; i < documents.files.length; i++) {
+            file = documents.files[i];
+            item.filename = file.name;
+            items.push(item);
+        }
+
+        if (documents.hasOwnProperty("type")) {
+            this.setState({
+                documents: items
+            });
+        }else {
+            this.setState({
+                documentsOffer: items
+            });
+
+        }
     };
 
     onSubmitDocument = (e, item) => {
@@ -136,8 +156,9 @@ class OffersDetail extends Component {
     render() {
         const panes = [
             { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD}/> },
-            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments documents={this.state.documents} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Nabídkové dokumenty', pane: 'Tab 3333 Content' },
+            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={false} documents={this.state.documents} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsOffer} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+//            { menuItem: 'Nabídkové dokumenty', pane: 'Tab 3333 Content' },
             { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
         ];
 

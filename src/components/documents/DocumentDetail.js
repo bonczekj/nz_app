@@ -11,11 +11,13 @@ class DocumentDetail extends Component {
     constructor(props){
         super(props);
         this.state = {
-            file:null,
-            showData: {type: '', description: '', expiration: '', filename: ''},
+            file: null,
+            files: [],
+            showData: {type: '', description: '', expiration: '', filename: '', files: []},
             types: [],
             newItem: false,
-            saved: false
+            saved: false,
+            shortVersion: false,
         }
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -51,6 +53,7 @@ class DocumentDetail extends Component {
         this.setState({
                 showData: nextProps.showData,
                 newItem: nextProps.newItem,
+                shortVersion: nextProps.shortVersion,
             },
         );
     }
@@ -69,7 +72,12 @@ class DocumentDetail extends Component {
         let newState = {...this.state.showData, filename: e.target.value};
         this.setState({ showData: newState });
 
-        this.setState({ file: e.target.files[0] })
+
+        let newStateFiles = {...this.state.showData, files: Array.from(e.target.files)};
+        this.setState({ showData: newStateFiles });
+
+        this.setState({ file: e.target.files[0]});
+        this.setState({ files: Array.from(e.target.files)});
     }
 
     onSubmit = (e) => {
@@ -135,40 +143,64 @@ class DocumentDetail extends Component {
     render() {
         //const { detailData, showModal } = this.state;
         //const { showData } = this.props;
-
-        return (
-            <div>
-            <Modal size={'small'}
-                   open={this.props.showModal}
-                   onClose={this.closeEdit.bind(this)}
-                   closeOnEscape={true}
-                   closeOnRootNodeClick={false}>
-                <Modal.Header>{this.texts.detail}</Modal.Header>
-                <Modal.Content>
-                    <Form>
-                        <Form.Field required>
-                            <label>Typ</label>
-                            <Dropdown selection placeholder='Typ' name='type' options={this.state.types} value={this.state.showData.type} onChange={this.handleChangeDD }/>
-                        </Form.Field>
-                        <Form.Field required>
-                            <label>Popis</label>
-                            <input placeholder='Popis' name='description' value={this.state.showData.description} onChange={ this.handleChange }/>
-                        </Form.Field>
-                        <Form.Field>
-                            <label>Platnost</label>
-                            <input placeholder='Platnost' name = 'expiration' value={this.state.showData.expiration} onChange={ this.handleChange }/>
-                        </Form.Field>
-                        <Form.Field required>
-                            <label>Dokument</label>
-                            <input type={"file"} onChange={this.onFileChange}/>
-                        </Form.Field>
-                        <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
-                        <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
-                    </Form>
-                </Modal.Content>
-            </Modal>
-            </div>
-        )
+        if (this.state.shortVersion == true){
+            return (
+                <div>
+                    <Modal size={'small'}
+                           open={this.props.showModal}
+                           onClose={this.closeEdit.bind(this)}
+                           closeOnEscape={true}
+                           closeOnRootNodeClick={false}>
+                        <Modal.Header>{this.texts.detail}</Modal.Header>
+                        <Modal.Content>
+                            <Form>
+                                <Form.Field required>
+                                    <label>Dokumenty</label>
+                                    <input type={"file"} onChange={this.onFileChange} multiple={true}/>
+                                </Form.Field>
+                                <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
+                                <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                            </Form>
+                        </Modal.Content>
+                    </Modal>
+                </div>
+            )
+        }
+        else {
+            return (
+                <div>
+                    <Modal size={'small'}
+                           open={this.props.showModal}
+                           onClose={this.closeEdit.bind(this)}
+                           closeOnEscape={true}
+                           closeOnRootNodeClick={false}>
+                        <Modal.Header>{this.texts.detail}</Modal.Header>
+                        <Modal.Content>
+                            <Form>
+                                <Form.Field required>
+                                    <label>Typ</label>
+                                    <Dropdown selection placeholder='Typ' name='type' options={this.state.types} value={this.state.showData.type} onChange={this.handleChangeDD }/>
+                                </Form.Field>
+                                <Form.Field required>
+                                    <label>Popis</label>
+                                    <input placeholder='Popis' name='description' value={this.state.showData.description} onChange={ this.handleChange }/>
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>Platnost</label>
+                                    <input placeholder='Platnost' name = 'expiration' value={this.state.showData.expiration} onChange={ this.handleChange }/>
+                                </Form.Field>
+                                <Form.Field required>
+                                    <label>Dokument</label>
+                                    <input type={"file"} onChange={this.onFileChange}/>
+                                </Form.Field>
+                                <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
+                                <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                            </Form>
+                        </Modal.Content>
+                    </Modal>
+                </div>
+            )
+        }
     }
 }
 

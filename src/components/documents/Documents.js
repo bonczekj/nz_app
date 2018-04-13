@@ -254,6 +254,7 @@ class Documents extends Component {
                 <DocumentDetail
                     showData={this.state.showData}
                     showModal={this.state.showModal}
+                    shortVersion={false}
                     newItem={this.state.newItem}
                     onClose={this.closeEdit}
                     onSubmit={this.onSubmitDocument}/>

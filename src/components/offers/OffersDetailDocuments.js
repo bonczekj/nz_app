@@ -13,12 +13,23 @@ class OffersDetailDocuments extends Component {
             newItem: false,
             showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: ''},
             saved: false,
+            shortVersion: false,
         }
     };
 
     texts = {
         newItem: 'Nový dokument',
     };
+
+    componentWillReceiveProps(nextProps){
+        this.setState({
+//                showData: nextProps.showData,
+//                newItem: nextProps.newItem,
+                shortVersion: nextProps.shortVersion,
+            },
+        );
+    }
+
 
     deleteDocument = (item) => {
         this.props.deleteDocument(item)
@@ -87,53 +98,103 @@ class OffersDetailDocuments extends Component {
     }
     */
     tabItems(item, i){
-        return(
-            <Table.Row key={item.iddocument}>
-                <Table.Cell>{item.type}</Table.Cell>
-                <Table.Cell>{item.description}</Table.Cell>
-                <Table.Cell>{item.filename}</Table.Cell>
-                <Table.Cell>
-                    <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
-                </Table.Cell>
-            </Table.Row>
-        )
+        if (this.state.shortVersion == true) {
+            return(
+                <Table.Row key={item.iddocument}>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>
+                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                    </Table.Cell>
+                </Table.Row>
+            )
+        }else{
+            return(
+                <Table.Row key={item.iddocument}>
+                    <Table.Cell>{item.type}</Table.Cell>
+                    <Table.Cell>{item.description}</Table.Cell>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>
+                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                    </Table.Cell>
+                </Table.Row>
+            )
+        }
+
     }
 
     render() {
-        return (
-            <div style={{paddingTop:'1em'}}>
-                <Table celled fixed={true} compact={true} selectable>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell>Typ</Table.HeaderCell>
-                            <Table.HeaderCell>Popis</Table.HeaderCell>
-                            <Table.HeaderCell>Dokument</Table.HeaderCell>
-                            <Table.HeaderCell />
-                        </Table.Row>
-                    </Table.Header>
+        if (this.state.shortVersion == true) {
+            return (
+                <div style={{paddingTop:'1em'}}>
+                    <Table celled fixed={true} compact={true} selectable>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>Popis</Table.HeaderCell>
+                                <Table.HeaderCell>Dokument</Table.HeaderCell>
+                                <Table.HeaderCell />
+                            </Table.Row>
+                        </Table.Header>
 
-                    <Table.Body>
-                        {this.props.documents.map(this.tabItems)}
-                    </Table.Body>
+                        <Table.Body>
+                            {this.props.documents.map(this.tabItems)}
+                        </Table.Body>
 
-                    <Table.Footer fullWidth >
-                        <Table.Row >
-                            <Table.HeaderCell colSpan='4' >
-                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
-                                    <Icon name='file' /> {this.texts.newItem}
-                                </Button>
-                            </Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Footer>
-                </Table>
-                <DocumentDetail
-                    showData={this.state.showData}
-                    showModal={this.state.showModal}
-                    newItem={this.state.newItem}
-                    onSubmit={this.onSubmitDocument}
-                    onClose={this.closeEdit}/>
-            </div>
-        )
+                        <Table.Footer fullWidth >
+                            <Table.Row >
+                                <Table.HeaderCell colSpan='3' >
+                                    <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
+                                        <Icon name='file' /> {this.texts.newItem}
+                                    </Button>
+                                </Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Footer>
+                    </Table>
+                    <DocumentDetail
+                        showData={this.state.showData}
+                        showModal={this.state.showModal}
+                        shortVersion={this.state.shortVersion}
+                        newItem={this.state.newItem}
+                        onSubmit={this.onSubmitDocument}
+                        onClose={this.closeEdit}/>
+                </div>
+            )
+        }else {
+            return (
+                <div style={{paddingTop:'1em'}}>
+                    <Table celled fixed={true} compact={true} selectable>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>Typ</Table.HeaderCell>
+                                <Table.HeaderCell>Popis</Table.HeaderCell>
+                                <Table.HeaderCell>Dokument</Table.HeaderCell>
+                                <Table.HeaderCell />
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {this.props.documents.map(this.tabItems)}
+                        </Table.Body>
+
+                        <Table.Footer fullWidth >
+                            <Table.Row >
+                                <Table.HeaderCell colSpan='4' >
+                                    <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
+                                        <Icon name='file' /> {this.texts.newItem}
+                                    </Button>
+                                </Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Footer>
+                    </Table>
+                    <DocumentDetail
+                        showData={this.state.showData}
+                        showModal={this.state.showModal}
+                        shortVersion={this.state.shortVersion}
+                        newItem={this.state.newItem}
+                        onSubmit={this.onSubmitDocument}
+                        onClose={this.closeEdit}/>
+                </div>
+            )
+        }
     }
 }
 
