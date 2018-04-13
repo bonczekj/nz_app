@@ -88,7 +88,14 @@ class CustomerDetail extends Component {
             if (response.status === 200){
                 return response.json();
             }else {
-                throw new Error(response.statusText);
+                //throw new Error(response.statusText);
+                return response.text().then(text => {
+                    if (text === ""){
+                        throw new Error(response.statusText);
+                    }else {
+                        throw new Error(text);
+                    }
+                })
             }
         }).then(json => {
             this.setState({ errorText: '' });
