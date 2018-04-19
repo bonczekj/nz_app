@@ -1,15 +1,7 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form, Message, Icon} from 'semantic-ui-react';
+import { Button, Modal, Form} from 'semantic-ui-react';
 import MyMessage from "../MyMessage";
-//import MyComponent from '../MyComponent';
-
-//import PropTypes from 'prop-types';
-//import { compose } from 'redux';
-//import { Field, reduxForm } from 'redux-form';
-
-//import semanticFormField from '../semantic-ui-form';
-//import { required, number, email } from '../validation';
-//import _ from 'lodash';
+import {PHP_url} from './../../PHP_Connector';
 
 class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
@@ -48,9 +40,9 @@ class CustomerDetail extends Component {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/customers/create';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/customers/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/customers';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/customers';
         }
 
         fetch(fetchUrl, {
@@ -77,7 +69,8 @@ class CustomerDetail extends Component {
     }
 
     readAres = () => {
-        fetch('http://localhost/nz_rest_api_slim/customers/ares', {
+        this.setState({ isLoading: true });
+        fetch(PHP_url+'/nz_rest_api_slim/customers/ares', {
             method: 'POST',
             body: JSON.stringify({ico: this.state.showData.ico}),
             headers: {
@@ -85,6 +78,7 @@ class CustomerDetail extends Component {
                 'Accept': 'application/json',
             }
         }).then(response => {
+            this.setState({ isLoading: false });
             if (response.status === 200){
                 return response.json();
             }else {
@@ -104,6 +98,7 @@ class CustomerDetail extends Component {
             const newState2 = {...this.state.showData, address: json.address};
             this.setState({ showData: newState2 });
         }).catch(err => {
+            this.setState({ isLoading: false });
             this.setState({ errorText: err.toString() });
             console.log(err.toString());
         });
@@ -119,7 +114,7 @@ class CustomerDetail extends Component {
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
                 <Modal.Content>
-                    <MyMessage msgText={this.state.errorText}/>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Form>
                         <Form.Field required>
                             <label>IČO</label>

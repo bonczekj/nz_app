@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import DocumentDetail from './DocumentDetail';
+import moment from 'moment';
+import MyMessage from '../MyMessage';
+import {PHP_url} from './../../PHP_Connector';
 
 class Documents extends Component {
 
@@ -32,7 +35,7 @@ class Documents extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/documents', {
+        fetch(PHP_url+'/nz_rest_api_slim/documents', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -94,7 +97,7 @@ class Documents extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/documents/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/documents/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -117,14 +120,13 @@ class Documents extends Component {
 
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/documents/create';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/documents/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/documents';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/documents';
         }
 
         fetch(fetchUrl, {
             method: 'POST',
-           // mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
                 'Accept': 'application/json',
@@ -133,10 +135,8 @@ class Documents extends Component {
         }).then((response) => {
             if (response.status === 200){
                 this.setState({ saved: true });
-                //let item = res.json();
                 let body = response.json();
                 return body;
-                //this.closeEdit();
             }
         }).then(json => {
             console.log('then data' + json);
@@ -153,6 +153,9 @@ class Documents extends Component {
         })*/
     };
 
+    getFormatDate = (date) => {
+        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
+    };
 
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
@@ -183,7 +186,7 @@ class Documents extends Component {
                 <Table.Cell>{item.type}</Table.Cell>
                 <Table.Cell>{item.description}</Table.Cell>
                 <Table.Cell>{item.filename}</Table.Cell>
-                <Table.Cell>{item.expiration}</Table.Cell>
+                <Table.Cell>{this.getFormatDate(item.expiration)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -209,6 +212,7 @@ class Documents extends Component {
 
         return (
             <div>
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>

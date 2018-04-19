@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {NavLink, Link} from "react-router-dom";
-import { Container, Divider, Dropdown, Grid, Header, Image, List, Menu, Segment } from 'semantic-ui-react'
+import { Container, Dropdown, Menu} from 'semantic-ui-react'
 
 class Header2 extends Component {
     constructor(props) {

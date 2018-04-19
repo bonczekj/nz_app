@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
-import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown } from 'semantic-ui-react'
-import _ from 'lodash';
+import { Button, Modal, Form, Dropdown } from 'semantic-ui-react'
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import {PHP_url} from './../../PHP_Connector';
+import  MyMessage from '../MyMessage';
+import 'react-datepicker/dist/react-datepicker.css';
 
 class DocumentDetail extends Component {
 
@@ -14,6 +18,7 @@ class DocumentDetail extends Component {
             file: null,
             files: [],
             showData: {type: '', description: '', expiration: '', filename: '', files: []},
+            expirationNumber: '',
             types: [],
             newItem: false,
             saved: false,
@@ -22,11 +27,12 @@ class DocumentDetail extends Component {
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onFileChange = this.onFileChange.bind(this);
+        //this.handleChangeDate = this.handleChangeDate.bind(this);
     };
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/doctype', {
+        fetch(PHP_url+'/nz_rest_api_slim/doctype', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -41,7 +47,6 @@ class DocumentDetail extends Component {
                 })
             });
 
-
             this.setState({ isLoading: false });
         }).catch(error => {
             this.setState({ error, isLoading: false })
@@ -54,13 +59,27 @@ class DocumentDetail extends Component {
                 showData: nextProps.showData,
                 newItem: nextProps.newItem,
                 shortVersion: nextProps.shortVersion,
+                expirationNumber: 0,
             },
         );
+        if (nextProps.showData.expiration !== null){
+            this.setState({ expirationNumber: moment(nextProps.showData.expiration) });
+        }
     }
 
     handleChange = (e) => {
         const newState = {...this.state.showData, [e.target.name]: e.target.value};
         this.setState({ showData: newState });
+    }
+
+//    handleChangeDate(date) {
+    handleChangeDate = (date) => {
+        //const selDate = moment(date).toJSON();
+        const selDate = moment(date).format('YYYY-MM-DD');
+        const newState = {...this.state.showData, ['expiration']: selDate};
+        this.setState({ showData: newState });
+//        const newStateNumber = {...this.state.showData, ['expirationNumber']: date};
+        this.setState({ expirationNumber: date });
     }
 
     handleChangeDD = (e, { name, value }) => {
@@ -143,7 +162,7 @@ class DocumentDetail extends Component {
     render() {
         //const { detailData, showModal } = this.state;
         //const { showData } = this.props;
-        if (this.state.shortVersion == true){
+        if (this.state.shortVersion === true){
             return (
                 <div>
                     <Modal size={'small'}
@@ -153,6 +172,7 @@ class DocumentDetail extends Component {
                            closeOnRootNodeClick={false}>
                         <Modal.Header>{this.texts.detail}</Modal.Header>
                         <Modal.Content>
+                            <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                             <Form>
                                 <Form.Field required>
                                     <label>Dokumenty</label>
@@ -187,7 +207,11 @@ class DocumentDetail extends Component {
                                 </Form.Field>
                                 <Form.Field>
                                     <label>Platnost</label>
-                                    <input placeholder='Platnost' name = 'expiration' value={this.state.showData.expiration} onChange={ this.handleChange }/>
+                                    <DatePicker
+                                        dateFormat="DD.MM.YYYY"
+                                        selected={this.state.expirationNumber}
+                                        onChange={this.handleChangeDate}
+                                    />
                                 </Form.Field>
                                 <Form.Field required>
                                     <label>Dokument</label>

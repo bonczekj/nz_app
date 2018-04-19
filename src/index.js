@@ -4,8 +4,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import { BrowserRouter } from 'react-router-dom'
-//import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import { BrowserRouter } from 'react-router-dom';
+import { PHP_url, set_PHP_url  } from './PHP_Connector';
+
+set_PHP_url();
 
 ReactDOM.render(
     <BrowserRouter>

@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Message} from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown} from 'semantic-ui-react'
 import _ from 'lodash';
 import CustomerDetail from './CustomerDetail';
 import  MyMessage from '../MyMessage';
+import {PHP_url} from './../../PHP_Connector';
 
 class Customers extends Component {
 
@@ -33,7 +34,8 @@ class Customers extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/customers', {
+        console.log(PHP_url);
+        fetch(PHP_url+'/nz_rest_api_slim/customers', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -96,7 +98,7 @@ class Customers extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/customers/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/customers/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -172,7 +174,7 @@ class Customers extends Component {
 
         return (
             <div>
-                <MyMessage msgText={this.state.errorText}/>
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>

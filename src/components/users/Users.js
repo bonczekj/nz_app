@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import UserDetail from './UserDetail';
+import  MyMessage from '../MyMessage';
+import {PHP_url} from './../../PHP_Connector';
 
 class Users extends Component {
 
@@ -32,7 +34,7 @@ class Users extends Component {
     componentDidMount(){
         this.setState({ isLoading: true });
  //       fetch('http://localhost/nz_rest_api_slim/users/listlist', {
-        fetch('http://localhost/nz_rest_api_slim/users', {
+        fetch(PHP_url+'/nz_rest_api_slim/users', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -94,7 +96,7 @@ class Users extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/users/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/users/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -162,6 +164,7 @@ class Users extends Component {
 
         return (
             <div>
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>

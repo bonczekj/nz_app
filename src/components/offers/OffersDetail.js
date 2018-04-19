@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
 import { Button, Modal, Tab } from 'semantic-ui-react'
 //import {optionYesNo, optionDeliveryType} from "../constants";
+import  MyMessage from '../MyMessage';
 import _ from 'lodash';
 import OffersDetailHeader from "./OffersDetailHeader";
 import OffersDetailDocuments from "./OffersDetailDocuments";
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import {PHP_url} from './../../PHP_Connector';
 
 class OffersDetail extends Component {
 
@@ -16,10 +20,11 @@ class OffersDetail extends Component {
         this.state = {
             file:null,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
+            processdateNumber: 0,
             newItem: false,
             saved: false,
-            documents: [],
-            documentsOffer: [],
+            documentsR: [],
+            documentsS: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -32,7 +37,14 @@ class OffersDetail extends Component {
             },
         );
         if (nextProps.showData.id > 0){
-            fetch('http://localhost/nz_rest_api_slim/offersdocuments', {
+            if (nextProps.showData.processdate !== null){
+                //const newState = {...this.state.showData, ['processdateNumber']: moment(nextProps.showData.processdate)};
+                //this.setState({ showData: newState });
+
+                this.setState({ processdateNumber: moment(nextProps.showData.processdate) });
+            };
+
+            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments', {
                 //mode: 'no-cors',
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
@@ -44,15 +56,17 @@ class OffersDetail extends Component {
                     return response.json();
                 }).then(json => {
                     //this.setState({documents : json});
+                this.setState({ errorText: '' });
                 const allDocuments = json;
                 this.setState({
-                    documents: _.reject(allDocuments, function(el) { return el.type === ''; })}
+                    documentsR: _.reject(allDocuments, function(el) { return el.typeRS !== 'R'; })}
                 );
                 this.setState({
-                    documentsOffer: _.reject(allDocuments, function(el) { return el.type != ''; })}
+                    documentsS: _.reject(allDocuments, function(el) { return el.typeRS !== 'S'; })}
                 );
 
             }).catch(error => {
+                this.setState({ errorText: error.toString() });
             });
         }
     }
@@ -63,6 +77,15 @@ class OffersDetail extends Component {
         this.setState({ showData: newState });
     };
 
+    handleChangeDate = (date) => {
+        const selDate = moment(date).format('YYYY-MM-DD');
+        const newState = {...this.state.showData, ['processdate']: selDate};
+        this.setState({ showData: newState });
+        this.setState({ processdateNumber: date });
+        //const newStateNum = {...this.state.showData, ['processdateNumber']: date};
+        //this.setState({ showData: newStateNum });
+    }
+
     handleChangeDD = (e, { name, value }) => {
         const newState = {...this.state.showData, [name]: value};
         this.setState({ showData: newState });
@@ -72,9 +95,9 @@ class OffersDetail extends Component {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/offers/create';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/offers/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/offers';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/offers';
         }
 
         fetch(fetchUrl, {
@@ -85,13 +108,50 @@ class OffersDetail extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(response => {
+            this.setState({ errorText: ''});
             if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
             }
-        }).catch(err => {
-            console.log(err.toString())
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
         });
+
+        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+            method: 'POST',
+            body: JSON.stringify(this.state.documentsR),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+
+        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+            method: 'POST',
+            body: JSON.stringify(this.state.documentsS),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+
     };
 
 
@@ -123,43 +183,43 @@ class OffersDetail extends Component {
         });*/
     };
 
-    addDocument = (documents) => {
-        let items = [];
-        let item = [];
-        let file = '';
+    addDocument = (documents, typeRS) => {
+        //let items = [];
 
-        items = this.state.documents;
+        //let file = '';
+
+        const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         for (var i = 0; i < documents.files.length; i++) {
-            file = documents.files[i];
+            const file = documents.files[i];
+            let item = [];
             item.filename = file.name;
             items.push(item);
         }
 
-        if (documents.hasOwnProperty("type")) {
+        if (typeRS === "R") {
             this.setState({
-                documents: items
+                documentsR: items
             });
         }else {
             this.setState({
-                documentsOffer: items
+                documentsS: items
             });
 
         }
     };
 
-    onSubmitDocument = (e, item) => {
+    onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
-        this.addDocument(item)
+        this.addDocument(item, typeRS)
 
     };
 
     render() {
         const panes = [
-            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD}/> },
-            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={false} documents={this.state.documents} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsOffer} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-//            { menuItem: 'Nabídkové dokumenty', pane: 'Tab 3333 Content' },
-            { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
+            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
+            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+//            { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
         ];
 
         return (

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Button, Modal, Form } from 'semantic-ui-react'
-//import _ from 'lodash';
+import {PHP_url} from './../../PHP_Connector';
+import  MyMessage from '../MyMessage';
 
 class UserDetail extends Component {
 
@@ -42,9 +43,9 @@ class UserDetail extends Component {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/users/create';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/users/create';
         }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/users';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/users';
         }
 
         fetch(fetchUrl, {

@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { Button, Checkbox, Icon, Table, Pagination, Modal, Header, Input, Form, Segment, Select, Dropdown, Tab } from 'semantic-ui-react'
+import { Button,Icon, Table} from 'semantic-ui-react'
 import DocumentDetail from '../documents/DocumentDetail';
-import {optionDeliveryType, optionYesNo} from "../constants";
+import {PHP_url} from './../../PHP_Connector';
+import  MyMessage from '../MyMessage';
 
 class OffersDetailDocuments extends Component {
 
@@ -11,9 +12,10 @@ class OffersDetailDocuments extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: ''},
+            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
             saved: false,
             shortVersion: false,
+            typeRS: ''
         }
     };
 
@@ -23,8 +25,7 @@ class OffersDetailDocuments extends Component {
 
     componentWillReceiveProps(nextProps){
         this.setState({
-//                showData: nextProps.showData,
-//                newItem: nextProps.newItem,
+                typeRS: nextProps.typeRS,
                 shortVersion: nextProps.shortVersion,
             },
         );
@@ -68,9 +69,8 @@ class OffersDetailDocuments extends Component {
 
     onSubmitDocument = (e, item) => {
         //e.preventDefault(); // Stop form submit
-        this.props.onSubmitDocument(e, item);
+        this.props.onSubmitDocument(e, item, this.state.typeRS);
         this.setState({showModal: false});
-
     }
 
     /*closeEditDocument(item){
@@ -98,7 +98,7 @@ class OffersDetailDocuments extends Component {
     }
     */
     tabItems(item, i){
-        if (this.state.shortVersion == true) {
+        if (this.state.shortVersion === true) {
             return(
                 <Table.Row key={item.iddocument}>
                     <Table.Cell>{item.filename}</Table.Cell>
@@ -123,7 +123,7 @@ class OffersDetailDocuments extends Component {
     }
 
     render() {
-        if (this.state.shortVersion == true) {
+        if (this.state.shortVersion === true) {
             return (
                 <div style={{paddingTop:'1em'}}>
                     <Table celled fixed={true} compact={true} selectable>

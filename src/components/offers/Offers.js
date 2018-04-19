@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Modal, Header, Segment, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import OffersDetail from './OffersDetail';
 import {optionYesNo, optionDeliveryType} from "../constants";
+import  MyMessage from '../MyMessage';
+import {PHP_url} from './../../PHP_Connector';
+import moment from "moment/moment";
 
 class Offers extends Component {
 
@@ -24,7 +27,8 @@ class Offers extends Component {
             rowsPerPage: 10,
             totalPages: 10,
             column: '',
-            direction: 'ascending'
+            direction: 'ascending',
+            errorText: ''
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -32,7 +36,8 @@ class Offers extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch('http://localhost/nz_rest_api_slim/offers', {
+        console.log(PHP_url);
+        fetch(PHP_url+'/nz_rest_api_slim/offers', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -47,8 +52,10 @@ class Offers extends Component {
                     this.setState({tableData : json});
                     this.setState({ isLoading: false });
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+                    this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ error, isLoading: false });
+                this.setState({ errorText: error.toString() });
                 console.log("error")
             });
     };
@@ -93,7 +100,7 @@ class Offers extends Component {
     }
 
     deleteItem(item){
-        fetch('http://localhost/nz_rest_api_slim/offers/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/offers/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -106,8 +113,10 @@ class Offers extends Component {
                     tableData: _.reject(this.state.tableData, function(el) { return el.id === item.id; })}
                 );
             }
-        }).catch(err => {
-            console.log(err.toString())
+            this.setState({ errorText: '' });
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+            console.log(error.toString())
         });
     }
 
@@ -138,14 +147,18 @@ class Offers extends Component {
         return optionItem.text;
     }
 
+    getFormatDate = (date) => {
+        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
+    };
+
+
     items(item, i){
         return(
             <Table.Row key={item.id}>
                 <Table.Cell>{item.id}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.customer}</Table.Cell>
-                <Table.Cell>{item.processdate}</Table.Cell>
-                <Table.Cell>{item.processtime}</Table.Cell>
+                <Table.Cell>{this.getFormatDate(item.processdate)}</Table.Cell>
                 <Table.Cell>{this.decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
                 <Table.Cell>{this.decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
                 <Table.Cell>{item.price}</Table.Cell>
@@ -160,6 +173,7 @@ class Offers extends Component {
     }
 
     // Capturing redux form values from redux form store (pay attention to the name we defined in the previous component)
+    // <Table.Cell>{item.processtime}</Table.Cell>
     /*onSubmit = values => {(
             values.id
     )};*/
@@ -174,9 +188,11 @@ class Offers extends Component {
         ];
 
         //id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''
+        //                            <Table.HeaderCell sorted={column === 'processtime' && direction} onClick={this.handleSort('processtime')}>Hodina</Table.HeaderCell>
 
         return (
             <div>
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>
@@ -187,7 +203,6 @@ class Offers extends Component {
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'processtime' && direction} onClick={this.handleSort('processtime')}>Hodina</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
@@ -207,7 +222,7 @@ class Offers extends Component {
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='8' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
