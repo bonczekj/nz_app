@@ -30,19 +30,17 @@ class OrdersDetailHeader extends Component {
                     <Form.Field control={Input} label='Investor' placeholder='Investor' name= 'customer' value={this.props.showData.customer} onChange={this.props.handleChange}/>
                     <Form.Group>
                         <Form.Field>
-                            <label>Termín podání</label>
+                            <label>Termín dokončení</label>
                             <DatePicker
                                 dateFormat="DD.MM.YYYY"
                                 selected={this.state.processdateNumber}
                                 onChange={this.props.handleChangeDate}
                             />
                         </Form.Field>
-                        <Form.Field control={Select} options={optionDeliveryType} label='Způsob podání' placeholder='Způsob podání' name = 'deliverytype' value={this.props.showData.deliverytype} onChange={this.props.handleChangeDD}/>
                         <Form.Field control={Select} options={optionYesNo} label='Pochůzka' placeholder='Pochůzka' name='errand' value={this.props.showData.errand} onChange={this.props.handleChangeDD }/>
                     </Form.Group>
                     <Form.Group>
                         <Form.Field control={Input} label='Cena' placeholder='Cena' name='price' value={this.props.showData.price} onChange={this.props.handleChange}/>
-                        <Form.Field control={Input} label='Výtězná cena' placeholder='Vítězní cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange}/>
                     </Form.Group>
                 </Form>
             </div>
@@ -55,6 +53,8 @@ export default OrdersDetailHeader;
 /*
                         <Form.Field control={Input} label='Termín podání' placeholder='Termín podání' name='processdate' value={this.props.showData.processdate} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Hodina' placeholder='Hodina' name='processtime' value={this.props.showData.processtime} onChange={this.props.handleChange}/>
+                        <Form.Field control={Select} options={optionDeliveryType} label='Způsob podání' placeholder='Způsob podání' name = 'deliverytype' value={this.props.showData.deliverytype} onChange={this.props.handleChangeDD}/>
+                        <Form.Field control={Input} label='Výtězná cena' placeholder='Vítězní cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange}/>
 
 
                 <Form.Group inline>
