@@ -1,17 +1,16 @@
 import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
-import OffersDetail from './OffersDetail';
-import {optionYesNo, optionDeliveryType} from "../constants";
-import  MyMessage from '../MyMessage';
+//import DocumentDetail from './DocumentDetail';
+import moment from 'moment';
+import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import moment from "moment/moment";
 
-class Offers extends Component {
+class Tasks extends Component {
 
     texts = {
-        newItem: 'Nová nabídka',
-        header: 'Nabídky'
+        newItem: 'Nový dokument',
+        header: 'Termíny'
     };
 
     constructor(){
@@ -19,7 +18,7 @@ class Offers extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
+            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -28,7 +27,7 @@ class Offers extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            errorText: ''
+            saved: false,
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -36,8 +35,7 @@ class Offers extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        console.log(PHP_url);
-        fetch(PHP_url+'/nz_rest_api_slim/offers', {
+        fetch(PHP_url+'/nz_rest_api_slim/tasks', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -52,28 +50,27 @@ class Offers extends Component {
                     this.setState({tableData : json});
                     this.setState({ isLoading: false });
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-                    this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ error, isLoading: false });
-                this.setState({ errorText: error.toString() });
                 console.log("error")
             });
     };
 
-    handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
+    handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
     };
 
-    closeEdit(item, saved){
+    closeEdit(item){
         this.setState({showModal: false});
-        if (saved === true){
+        if (this.state.saved === true){
             let items = [];
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
             }else{
-                items = this.state.tableData[this.state.tableData.findIndex(el => el.id === item.id)] = item;
+                items = this.state.tableData;
+                items = items[items.findIndex(el => el.id === item.id)] = item;
             }
             this.setState({
                 showData: items
@@ -85,22 +82,22 @@ class Offers extends Component {
         this.setState({
             showModal: true,
             newItem: false,
-            showData: item
+            showData: item,
+            saved: false,
         });
-        console.log('Edit item '+ item.id + this.state.showModal);
     }
 
     newItem(){
         this.setState({
             showModal: true,
             newItem: true,
-            showData: []}
-            );
-        console.log('New item '+ this.state.showModal);
+            showData: [],
+            saved: false,
+        });
     }
 
     deleteItem(item){
-        fetch(PHP_url+'/nz_rest_api_slim/offers/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/tasks/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -110,22 +107,58 @@ class Offers extends Component {
         }).then(response => {
             if (response.status === 200){
                 this.setState({
-                    tableData: _.reject(this.state.tableData, function(el) { return el.id === item.id; })}
+                    tableData: _.reject(this.state.tableData, function(el) { return el.idtask === item.idtask; })}
                 );
             }
-            this.setState({ errorText: '' });
         }).catch(error => {
-            this.setState({ errorText: error.toString() });
             console.log(error.toString())
         });
     }
+
+    /*onSubmitDocument = (e, item) => {
+        e.preventDefault(); // Stop form submit
+
+        let fetchUrl = '';
+        if (this.state.newItem === true){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/documents/create';
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/documents';
+        }
+
+        fetch(fetchUrl, {
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            if (response.status === 200){
+                this.setState({ saved: true });
+                let body = response.json();
+                return body;
+            }
+        }).then(json => {
+            console.log('then data' + json);
+            //this.setState({tableData : json});
+            //this.setState({ isLoading: false });
+            //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+            this.closeEdit();
+        }).catch(err => {
+            console.log(err.toString());
+            this.closeEdit(item);
+        });
+    };*/
+
+    getFormatDate = (date) => {
+        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
+    };
 
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
         if (column !== clickedColumn) {
             this.setState({
                 column: clickedColumn,
-                //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
             });
             if ((typeof tableData[0][clickedColumn]) === 'string'){
@@ -142,57 +175,37 @@ class Offers extends Component {
         })
     };
 
-    decodeOptionValue(value, optionArray) {
-        if (value === null) {
-            return ''
-        }else {
-            let optionItem = optionArray.find(item => item.value === value);
-            return optionItem.text;
-        }
-    }
-
-    getFormatDate = (date) => {
-        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };
-
-
     items(item, i){
         return(
-            <Table.Row key={item.id}>
-                <Table.Cell>{item.id}</Table.Cell>
-                <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>{item.customer}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.processdate)}</Table.Cell>
-                <Table.Cell>{this.decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
-                <Table.Cell>{this.decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
-                <Table.Cell>{item.price}</Table.Cell>
-                <Table.Cell>{item.winprice}</Table.Cell>
+            <Table.Row key={item.idtask}>
+                <Table.Cell>{item.idorder}</Table.Cell>
+                <Table.Cell>{this.getFormatDate(item.taskdate)}</Table.Cell>
+                <Table.Cell>{item.taskdesc}</Table.Cell>
+                <Table.Cell>{this.getFormatDate(item.finished)}</Table.Cell>
+            </Table.Row>
+        )
+    }
+/*
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
                     <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
                 </Table.Cell>
-            </Table.Row>
-        )
-    }
 
-    // Capturing redux form values from redux form store (pay attention to the name we defined in the previous component)
-    // <Table.Cell>{item.processtime}</Table.Cell>
-    /*onSubmit = values => {(
-            values.id
-    )};*/
 
+                    <Button.Group>
+                        <Button basic compact={true} icon={'edit'} size='mini' onClick={this.editItem.bind(this, item)}></Button>
+                        <Button basic compact={true} icon={'trash'} size='mini' onClick={this.deleteItem.bind(this, item.id)}></Button>
+                    </Button.Group>
+ */
     render(){
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
+        //const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
         ];
-
-        //id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''
-        //                            <Table.HeaderCell sorted={column === 'processtime' && direction} onClick={this.handleSort('processtime')}>Hodina</Table.HeaderCell>
 
         return (
             <div>
@@ -203,15 +216,14 @@ class Offers extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'winprice' && direction} onClick={this.handleSort('winprice')}>Vítězná cena</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell sorted={column === 'Zakázka' && direction} onClick={this.handleSort('idorder')}>
+                                ID</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'Termín' && direction} onClick={this.handleSort('taskdate')}>
+                                Typ</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'Popis' && direction} onClick={this.handleSort('taskdescr')}>
+                                Popis</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'Dokončeno' && direction} onClick={this.handleSort('finished')}>
+                                Soubor</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
@@ -221,12 +233,12 @@ class Offers extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='2' >
+                            <Table.HeaderCell >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -237,17 +249,20 @@ class Offers extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <OffersDetail showData={this.state.showData}
-                                showModal={this.state.showModal}
-                                newItem={this.state.newItem}
-                                onClose={this.closeEdit}
-                                onSubmit={this.onSubmit}
-                />
             </div>
         )
     }
 }
 
-export default Offers;
+export default Tasks;
+/*
+                <DocumentDetail
+                    showData={this.state.showData}
+                    showModal={this.state.showModal}
+                    shortVersion={false}
+                    newItem={this.state.newItem}
+                    onClose={this.closeEdit}
+                    onSubmit={this.onSubmitDocument}/>
 
+* */
 

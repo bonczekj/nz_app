@@ -3,16 +3,17 @@ import { Button, Modal, Tab } from 'semantic-ui-react'
 //import {optionYesNo, optionDeliveryType} from "../constants";
 import  MyMessage from '../MyMessage';
 import _ from 'lodash';
-import OffersDetailHeader from "./OffersDetailHeader";
-import OffersDetailDocuments from "./OffersDetailDocuments";
+import OrdersDetailHeader from "./OrdersDetailHeader";
+import OrdersDetailDocuments from "./OrdersDetailDocuments";
+import OrdersDetailTasks from "./OrdersDetailTasks";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 
-class OffersDetail extends Component {
+class OrdersDetail extends Component {
 
     texts = {
-        detail: 'Detail nabídky',
+        detail: 'Detail zakázky',
     };
 
     constructor(props){
@@ -25,6 +26,7 @@ class OffersDetail extends Component {
             saved: false,
             documentsR: [],
             documentsS: [],
+            tasks: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -44,7 +46,7 @@ class OffersDetail extends Component {
                 this.setState({ processdateNumber: moment(nextProps.showData.processdate) });
             };
 
-            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments', {
+            fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments', {
                 //mode: 'no-cors',
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
@@ -68,6 +70,24 @@ class OffersDetail extends Component {
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
             });
+
+            fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
+                //mode: 'no-cors',
+                method: 'POST',
+                body: JSON.stringify(nextProps.showData),
+                headers: {
+                    'Accept': 'application/json',
+                }
+            })
+                .then((response)  => {
+                    return response.json();
+                }).then(json => {
+                this.setState({tasks: json});
+                this.setState({ errorText: '' });
+            }).catch(error => {
+                this.setState({ errorText: error.toString() });
+            });
+
         }
     }
 
@@ -95,9 +115,9 @@ class OffersDetail extends Component {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
         if (this.state.newItem === true){
-            fetchUrl = PHP_url+'/nz_rest_api_slim/offers/create';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/offers';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orders';
         }
 
         fetch(fetchUrl, {
@@ -118,7 +138,7 @@ class OffersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
             method: 'POST',
             body: JSON.stringify(this.state.documentsR),
             headers: {
@@ -135,7 +155,7 @@ class OffersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
             method: 'POST',
             body: JSON.stringify(this.state.documentsS),
             headers: {
@@ -152,6 +172,22 @@ class OffersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
+        fetch(PHP_url+'/nz_rest_api_slim/orderstasks/create', {
+            method: 'POST',
+            body: JSON.stringify(this.state.tasks),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
 
@@ -160,34 +196,18 @@ class OffersDetail extends Component {
     }
 
     deleteDocument = (item) => {
-//    deleteDocument(item){
         this.setState({
             documents: _.reject(this.state.documents, function(el) { return el.iddocument === item.iddocument; })}
         );
-        /*fetch('http://localhost/nz_rest_api_slim/offers/delete', {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(item),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            if (res.status === 0){
-            };
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.id == item.id; })}
-            );
-            console.log(res.toString());
-        }).catch(err => {
-            console.log(err.toString())
-        });*/
+    };
+
+    deleteTask = (item) => {
+        this.setState({
+            tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
+        );
     };
 
     addDocument = (documents, typeRS) => {
-        //let items = [];
-
-        //let file = '';
-
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
@@ -208,18 +228,31 @@ class OffersDetail extends Component {
         }
     };
 
+    addTask = (task) => {
+        const items = this.state.tasks;
+        items.push(task);
+        this.setState({
+            tasks: items
+        });
+    };
+
+
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
         this.addDocument(item, typeRS)
+    };
 
+    onSubmitTask = (e, item) => {
+        //e.preventDefault(); // Stop form submit
+        this.addTask(item)
     };
 
     render() {
         const panes = [
-            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
-            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-//            { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
+            { menuItem: 'Parametry', render: () => <OrdersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
+            { menuItem: 'Zakázkové dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Podklady zakázky', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> },
         ];
 
         return (
@@ -288,6 +321,6 @@ export default compose(
  */
 
 
-export default OffersDetail;
+export default OrdersDetail;
 
 

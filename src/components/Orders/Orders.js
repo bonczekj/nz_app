@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
-import OffersDetail from './OffersDetail';
+import OrdersDetail from './OrdersDetail';
 import {optionYesNo, optionDeliveryType} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
 
-class Offers extends Component {
+class Orders extends Component {
 
     texts = {
-        newItem: 'Nová nabídka',
-        header: 'Nabídky'
+        newItem: 'Nová zakázka',
+        header: 'Zakázka'
     };
 
     constructor(){
@@ -37,7 +37,7 @@ class Offers extends Component {
     componentDidMount(){
         this.setState({ isLoading: true });
         console.log(PHP_url);
-        fetch(PHP_url+'/nz_rest_api_slim/offers', {
+        fetch(PHP_url+'/nz_rest_api_slim/orders', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -100,7 +100,7 @@ class Offers extends Component {
     }
 
     deleteItem(item){
-        fetch(PHP_url+'/nz_rest_api_slim/offers/delete', {
+        fetch(PHP_url+'/nz_rest_api_slim/orders/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
@@ -237,7 +237,7 @@ class Offers extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <OffersDetail showData={this.state.showData}
+                <OrdersDetail showData={this.state.showData}
                                 showModal={this.state.showModal}
                                 newItem={this.state.newItem}
                                 onClose={this.closeEdit}
@@ -248,6 +248,6 @@ class Offers extends Component {
     }
 }
 
-export default Offers;
+export default Orders;
 
 

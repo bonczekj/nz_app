@@ -38,6 +38,7 @@ class Header2 extends Component {
                     Evidence nabídek
                     <Menu.Item as={NavLink} to="/offers">Nabídky</Menu.Item>
                     <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
+                    <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
                     <Dropdown item simple text='Čísleníky'>
                         <Dropdown.Menu>
                             <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>

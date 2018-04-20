@@ -5,8 +5,9 @@ import { Container } from 'semantic-ui-react'
 import Offers from '../components/offers/Offers';
 import Users from '../components/users/Users';
 import Documents from '../components/documents/Documents';
-import Orders from '../components/orders';
+import Orders from '../components/Orders/Orders';
 import Customers from '../components/customers/Customers';
+import Tasks from '../components/tasks/Tasks';
 
 class Main extends Component {
     render() {
@@ -18,6 +19,7 @@ class Main extends Component {
                 <Route exact path="/users" component={Users}/>
                 <Route exact path="/documents" component={Documents}/>
                 <Route exact path="/customers" component={Customers}/>
+                <Route exact path="/tasks" component={Tasks}/>
             </Container>
         );
     }
