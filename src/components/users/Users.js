@@ -25,7 +25,8 @@ class Users extends Component {
             rowsPerPage: 10,
             totalPages: 10,
             column: '',
-            direction: 'ascending'
+            direction: 'ascending',
+            errorText: ''
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -34,6 +35,7 @@ class Users extends Component {
     componentDidMount(){
         this.setState({ isLoading: true });
  //       fetch('http://localhost/nz_rest_api_slim/users/listlist', {
+        this.setState({ errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/users', {
                 //mode: 'no-cors',
                 method: 'GET',
@@ -45,6 +47,8 @@ class Users extends Component {
                 if (response.status === 200){
                     console.log('response');
                     return response.json();
+                }else {
+                    throw new Error(response.body);
                 }
             }).then(json => {
                     this.setState({tableData : json});
@@ -52,6 +56,7 @@ class Users extends Component {
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
                 this.setState({ error, isLoading: false });
+                this.setState({ errorText: error.toString() });
                 console.log("error")
             });
     };
@@ -96,6 +101,7 @@ class Users extends Component {
     }
 
     deleteItem(item){
+        this.setState({ errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/users/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -108,10 +114,13 @@ class Users extends Component {
                 this.setState({
                     tableData: _.reject(this.state.tableData, function(el) { return el.email === item.email; })}
                 );
-            };
+            }else {
+                throw new Error(response.body);
+            }
             console.log(response.toString());
         }).catch(err => {
             console.log(err.toString())
+            this.setState({ errorText: err.toString() });
         });
     }
 

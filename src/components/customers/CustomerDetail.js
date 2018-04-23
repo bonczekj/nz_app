@@ -56,6 +56,8 @@ class CustomerDetail extends Component {
             if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
+            }else {
+                throw new Error(response.body);
             }
         }).catch(err => {
             this.setState({ errorText: err.toString() });

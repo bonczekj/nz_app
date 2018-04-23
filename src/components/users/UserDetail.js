@@ -15,7 +15,8 @@ class UserDetail extends Component {
             file:null,
             showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
             newItem: false,
-            saved: false
+            saved: false,
+            errorText: ''
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -26,6 +27,7 @@ class UserDetail extends Component {
         this.setState({
                 showData: nextProps.showData,
                 newItem: nextProps.newItem,
+                errorText: "",
             },
         );
     }
@@ -42,12 +44,14 @@ class UserDetail extends Component {
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
+        this.setState({ isLoading: true });
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/users/create';
         }else{
             fetchUrl = PHP_url+'/nz_rest_api_slim/users';
         }
 
+        this.setState({ errorText: "" });
         fetch(fetchUrl, {
             method: 'POST',
             //mode: 'no-cors',
@@ -56,12 +60,23 @@ class UserDetail extends Component {
                 'Content-Type': 'application/json',
             }
         }).then(response => {
+            this.setState({ isLoading: false });
             if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
+            }else {
+                return response.text().then(text => {
+                    if (text === ""){
+                        throw new Error(response.statusText);
+                    }else {
+                        throw new Error(text);
+                    }
+                })
             }
         }).catch(err => {
+            this.setState({ isLoading: false });
             console.log(err.toString())
+            this.setState({ errorText: err.toString() });
         });
     };
 
@@ -80,6 +95,7 @@ class UserDetail extends Component {
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
                 <Modal.Content>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Form>
                         <Form.Field required>
                             <label>Login</label>
