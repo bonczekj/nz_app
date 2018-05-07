@@ -5,6 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
+import {checkSalesRole, getFormatDate} from '../validation';
 
 class Tasks extends Component {
 
@@ -18,7 +19,7 @@ class Tasks extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: ''},
+            showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -28,9 +29,23 @@ class Tasks extends Component {
             column: '',
             direction: 'ascending',
             saved: false,
+            hasSalesRole: false,
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
+    };
+
+    componentWillMount(){
+        let role = checkSalesRole();
+        this.setState({
+            errorText: '',
+            hasSalesRole: role,
+        });
+        if(role === false){
+            this.setState({
+                    errorText: 'Nemáte oprávnění k prohlížení',
+            })
+        }
     };
 
     componentDidMount(){
@@ -150,9 +165,9 @@ class Tasks extends Component {
         });
     };*/
 
-    getFormatDate = (date) => {
+    /*getFormatDate = (date) => {
         return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };
+    };*/
 
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
@@ -176,12 +191,27 @@ class Tasks extends Component {
     };
 
     items(item, i){
+        let today = new Date();
+        let todayW = new Date();
+        todayW.setDate(todayW.getDate() + 7);
+        let taskDate = new Date(item.taskdate);
+        let flg_warning = false;
+        let flg_negative = false;
+
+        console.log(taskDate - today);
+        if (taskDate  < today){
+            flg_negative = true;
+        }else if (taskDate < todayW){
+            flg_warning = true;
+        };
         return(
-            <Table.Row key={item.idtask}>
+            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
                 <Table.Cell>{item.idorder}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.taskdate)}</Table.Cell>
+                <Table.Cell>{item.name}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
                 <Table.Cell>{item.taskdesc}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
             </Table.Row>
         )
     }
@@ -207,6 +237,14 @@ class Tasks extends Component {
             { key: 20, text: '20', value: 20 },
         ];
 
+        if (this.state.hasSalesRole === false){
+            return(
+                <div>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                </div>
+            )
+        }
+
         return (
             <div>
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
@@ -216,14 +254,18 @@ class Tasks extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'Zakázka' && direction} onClick={this.handleSort('idorder')}>
-                                ID</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'Termín' && direction} onClick={this.handleSort('taskdate')}>
-                                Typ</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'Popis' && direction} onClick={this.handleSort('taskdescr')}>
+                            <Table.HeaderCell sorted={column === 'idorder' && direction} onClick={this.handleSort('idorder')}>
+                                Zakázka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'orderdesc' && direction} onClick={this.handleSort('orderdesc')}>
+                                Název</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'taskdate' && direction} onClick={this.handleSort('taskdate')}>
+                                Termín</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'taskdescr' && direction} onClick={this.handleSort('taskdescr')}>
                                 Popis</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'Dokončeno' && direction} onClick={this.handleSort('finished')}>
-                                Soubor</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>
+                                Cena</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'finished' && direction} onClick={this.handleSort('finished')}>
+                                Dokončeno</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
@@ -233,12 +275,7 @@ class Tasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell >
-                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
-                                    <Icon name='file' /> {this.texts.newItem}
-                                </Button>
-                            </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='6' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

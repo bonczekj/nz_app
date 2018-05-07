@@ -5,6 +5,7 @@ import DocumentDetail from './DocumentDetail';
 import moment from 'moment';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
+import {getFormatDate} from '../validation';
 
 class Documents extends Component {
 
@@ -153,9 +154,9 @@ class Documents extends Component {
         })*/
     };
 
-    getFormatDate = (date) => {
+    /*getFormatDate = (date) => {
         return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };
+    };*/
 
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
@@ -186,7 +187,7 @@ class Documents extends Component {
                 <Table.Cell>{item.type}</Table.Cell>
                 <Table.Cell>{item.description}</Table.Cell>
                 <Table.Cell>{item.filename}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.expiration)}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.expiration)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -209,6 +210,7 @@ class Documents extends Component {
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
         ];
+
 
         return (
             <div>

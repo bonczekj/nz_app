@@ -8,6 +8,7 @@ import OffersDetailDocuments from "./OffersDetailDocuments";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
+import {arrToObject} from './../validation';
 
 class OffersDetail extends Component {
 
@@ -19,7 +20,7 @@ class OffersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idorder: '', idorderdesc: ''},
             processdateNumber: 0,
             newItem: false,
             saved: false,
@@ -77,6 +78,12 @@ class OffersDetail extends Component {
         this.setState({ showData: newState });
     };
 
+    handleChangeNum = (e) => {
+        let value = e.target.value.replace(/\s+/g, '');
+        const newState = {...this.state.showData, [e.target.name]: value};
+        this.setState({ showData: newState });
+    };
+
     handleChangeDate = (date) => {
         const selDate = moment(date).format('YYYY-MM-DD');
         const newState = {...this.state.showData, ['processdate']: selDate};
@@ -97,7 +104,7 @@ class OffersDetail extends Component {
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/offers/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/offers';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/offers/update';
         }
 
         fetch(fetchUrl, {
@@ -112,46 +119,81 @@ class OffersDetail extends Component {
             if (response.status === 200){
                 this.setState({ saved: true });
                 this.closeEdit();
+            }else {
+                throw new Error(response.body);
             }
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
         });
 
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.documentsR),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
+        if (this.state.documentsR.length > 0){
+            let fileList = new Array();
+            let offerId = this.state.showData.id;
+            let documents = this.state.documentsR.filter(doc => doc["iddocument"] === undefined)
+            documents.forEach(function(doc) {
+                let docObj = {
+                    idoffer: offerId,
+                    typeRS: "R",
+                    filename: doc["filename"],
+                    length: doc["length"]
+                };
+                fileList.push(docObj);
+            });
 
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.documentsS),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
+            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+                method: 'POST',
+                body: JSON.stringify(fileList),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    this.setState({ saved: true });
+                    //this.closeEdit();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
+        }
 
+        if (this.state.documentsS.length > 0){
+            let fileList = new Array();
+            let offerId = this.state.showData.id;
+            let documents = this.state.documentsS.filter(doc => doc["iddocument"] === undefined)
+            documents.forEach(function(doc) {
+                let docObj = {
+                    idoffer: offerId,
+                    typeRS: "S",
+                    filename: doc["filename"],
+                    length: doc["length"]
+                };
+                fileList.push(docObj);
+            });
+
+            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+                method: 'POST',
+                body: JSON.stringify(fileList),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    this.setState({ saved: true });
+                    //this.closeEdit();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
+        }
     };
 
 
@@ -160,34 +202,35 @@ class OffersDetail extends Component {
     }
 
     deleteDocument = (item) => {
-//    deleteDocument(item){
-        this.setState({
-            documents: _.reject(this.state.documents, function(el) { return el.iddocument === item.iddocument; })}
-        );
-        /*fetch('http://localhost/nz_rest_api_slim/offers/delete', {
+        let fileDel = new Object( {idoffer: this.state.showData.id, iddocument: item["iddocument"]} );
+
+        if (item["typeRS"] === "R"){
+            this.setState({documentsR: _.reject(this.state.documentsR, function(el) { return el.iddocument === item.iddocument; })});
+        }
+        if (item["typeRS"] === "S"){
+            this.setState({documentsS: _.reject(this.state.documentsS, function(el) { return el.iddocument === item.iddocument; })});
+        }
+
+        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/delete', {
             method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(item),
+            body: JSON.stringify(fileDel),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => {
-            if (res.status === 0){
-            };
-            this.setState({
-                tableData: _.reject(this.state.tableData, function(el) { return el.id == item.id; })}
-            );
-            console.log(res.toString());
-        }).catch(err => {
-            console.log(err.toString())
-        });*/
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
     addDocument = (documents, typeRS) => {
-        //let items = [];
-
-        //let file = '';
-
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
@@ -216,7 +259,7 @@ class OffersDetail extends Component {
 
     render() {
         const panes = [
-            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
+            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
             { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
             { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
 //            { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
@@ -234,7 +277,7 @@ class OffersDetail extends Component {
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
+                    <Button type='createOrder' onClick={this.createOrder} active={this.state.showData.idorder === 0}>Vytvořit zakázku</Button>
                     <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                     <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                 </Modal.Actions>

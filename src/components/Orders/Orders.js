@@ -6,6 +6,7 @@ import {optionYesNo, optionDeliveryType} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
+import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
 
 class Orders extends Component {
 
@@ -28,11 +29,17 @@ class Orders extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            errorText: ''
+            errorText: '',
+            hasSalesRole: false,
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
+
+    componentWillMount(){
+        let hasSalesRole = checkSalesRole();
+        this.setState({ hasSalesRole: hasSalesRole });
+    }
 
     componentDidMount(){
         this.setState({ isLoading: true });
@@ -142,29 +149,13 @@ class Orders extends Component {
         })
     };
 
-    decodeOptionValue(value, optionArray) {
-        if (value === null) {
-            return ''
-        }else {
-            let optionItem = optionArray.find(item => item.value === value);
-            return optionItem.text;
-        }
-    }
-
-    getFormatDate = (date) => {
-        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };
-
-
     items(item, i){
         return(
             <Table.Row key={item.id}>
                 <Table.Cell>{item.id}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.customer}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.processdate)}</Table.Cell>
-                <Table.Cell>{this.decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
-                <Table.Cell>{item.price}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.processdate)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -174,6 +165,12 @@ class Orders extends Component {
         )
     }
 
+
+/*
+                <Table.Cell>{decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
+                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+
+ */
     // Capturing redux form values from redux form store (pay attention to the name we defined in the previous component)
     // <Table.Cell>{item.processtime}</Table.Cell>
     /*onSubmit = values => {(
@@ -206,12 +203,10 @@ class Orders extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
@@ -227,7 +222,7 @@ class Orders extends Component {
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='5' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='3' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -240,6 +235,7 @@ class Orders extends Component {
                 </Table>
                 <OrdersDetail showData={this.state.showData}
                                 showModal={this.state.showModal}
+                                hasSalesRole={this.state.hasSalesRole}
                                 newItem={this.state.newItem}
                                 onClose={this.closeEdit}
                                 onSubmit={this.onSubmit}
@@ -252,6 +248,10 @@ class Orders extends Component {
 export default Orders;
 
 /*
+
+                            <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
+
                             <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'winprice' && direction} onClick={this.handleSort('winprice')}>Vítězná cena</Table.HeaderCell>
 

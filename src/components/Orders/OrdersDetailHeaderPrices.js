@@ -6,7 +6,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
 
-class OrdersDetailHeader extends Component {
+class OrdersDetailHeaderPrices extends Component {
 
     constructor(props){
         super(props);
@@ -23,32 +23,16 @@ class OrdersDetailHeader extends Component {
         return (
             <div style={{paddingTop:'1em'}}>
                 <Form>
-                    <Form.Group>
-                        <Form.Field control={Input} readOnly label='Zakázka' placeholder='Zakázka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
-                        <Form.Field control={Input} label='Název' placeholder='Název akce' name='name' value={this.props.showData.name} width={10} onChange={this.props.handleChange }/>
-                    </Form.Group>
-                    <Form.Field control={Input} label='Investor' placeholder='Investor' name= 'customer' value={this.props.showData.customer} onChange={this.props.handleChange}/>
-                    <Form.Group>
-                        <Form.Field>
-                            <label>Termín dokončení</label>
-                            <DatePicker
-                                dateFormat="DD.MM.YYYY"
-                                selected={this.state.processdateNumber}
-                                onChange={this.props.handleChangeDate}
-                            />
-                        </Form.Field>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Field control={Input} readOnly label='Nabídka' name='idoffer' value={this.props.showData.idoffer} width={3}/>
-                        <Form.Field control={Input} readOnly label='Název' name='idofferdesc' value={this.props.showData.idofferdesc} width={10}/>
-                    </Form.Group>
+                    <Form.Field control={Input} label='Mzdy'   name='price_w' value={this.props.showData.price_w} width={4} onChange={this.props.handleChange}/>
+                    <Form.Field control={Input} label='Dohody' name='price_d' value={this.props.showData.price_d} width={4} onChange={this.props.handleChange }/>
+                    <Form.Field control={Input} label='Režie'  name='price_r' value={this.props.showData.price_r} width={4} onChange={this.props.handleChange}/>
                 </Form>
             </div>
         )
     }
 }
 
-export default OrdersDetailHeader;
+export default OrdersDetailHeaderPrices;
 
 /*
 

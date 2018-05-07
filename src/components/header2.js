@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {NavLink, Link} from "react-router-dom";
-import { Container, Dropdown, Menu} from 'semantic-ui-react'
+import { Container, Dropdown, Menu, Button} from 'semantic-ui-react'
+import {checkSalesRole, logout} from './validation';
 
 class Header2 extends Component {
     constructor(props) {
         super(props);
-        this.state = {selectedTabId: 0};
+        this.state = {selectedTabId: 0, activeItem: 'home'};
         // This binding is necessary to make `this` work in the callback
         this.setActiveTab = this.setActiveTab.bind(this);
     };
@@ -30,7 +31,11 @@ class Header2 extends Component {
         return classname;
     };
 
+    //state = { activeItem: 'home' }
+    //handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+
     render() {
+        //const { activeItem } = this.state
         return (
             <Menu fixed='top' inverted>
                 <Menu.Item>Evidence nabídek</Menu.Item>
@@ -44,18 +49,23 @@ class Header2 extends Component {
                             <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>
                             <Dropdown.Item as={NavLink} to="/documents">Dokumenty</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item as={NavLink} to="/customers">Subjekty</Dropdown.Item>
+                            <Dropdown.Item as={NavLink} to="/customers">Zákazníci</Dropdown.Item>
+                            <Dropdown.Item as={NavLink} to="/subcontractors">Subdodavatelé</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
+                    <Menu.Menu position='right'>
+                        <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
+                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+                    </Menu.Menu>
                 </Container>
             </Menu>
         );
     }
 }
 
-
 export default Header2;
 
+//                          <Menu.Item name='logout' active={activeItem === 'logout'} onClick={this.handleItemClick} />
 
 /*
 

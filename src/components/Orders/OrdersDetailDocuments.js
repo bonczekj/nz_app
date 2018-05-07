@@ -14,7 +14,7 @@ class OrdersDetailDocuments extends Component {
             newItem: false,
             showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
             saved: false,
-            shortVersion: false,
+            shortVersion: true,
             typeRS: ''
         }
     };

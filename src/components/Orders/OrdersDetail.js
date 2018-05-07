@@ -4,8 +4,10 @@ import { Button, Modal, Tab } from 'semantic-ui-react'
 import  MyMessage from '../MyMessage';
 import _ from 'lodash';
 import OrdersDetailHeader from "./OrdersDetailHeader";
+import OrdersDetailHeaderPrices from "./OrdersDetailHeaderPrices";
 import OrdersDetailDocuments from "./OrdersDetailDocuments";
 import OrdersDetailTasks from "./OrdersDetailTasks";
+import OrdersDetailSub from "./OrdersDetailSub";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
@@ -20,13 +22,14 @@ class OrdersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0 },
             processdateNumber: 0,
             newItem: false,
             saved: false,
             documentsR: [],
             documentsS: [],
             tasks: [],
+            subs: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -88,12 +91,35 @@ class OrdersDetail extends Component {
                 this.setState({ errorText: error.toString() });
             });
 
+            fetch(PHP_url+'/nz_rest_api_slim/orderssubs', {
+                method: 'POST',
+                body: JSON.stringify(nextProps.showData),
+                headers: {
+                    'Accept': 'application/json',
+                }
+            })
+                .then((response)  => {
+                    return response.json();
+                }).then(json => {
+                this.setState({subs: json});
+                this.setState({ errorText: '' });
+            }).catch(error => {
+                this.setState({ errorText: error.toString() });
+            });
         }
     }
 
 
     handleChange = (e) => {
         const newState = {...this.state.showData, [e.target.name]: e.target.value};
+        this.setState({ showData: newState });
+    };
+
+    handleChangeNum = (e) => {
+        console.log(e.target.value);
+        let newValue = e.target.value.replace(/\s+/g, '');
+        console.log(newValue);
+        const newState = {...this.state.showData, [e.target.name]: newValue};
         this.setState({ showData: newState });
     };
 
@@ -117,7 +143,7 @@ class OrdersDetail extends Component {
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/orders/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/orders';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/update';
         }
 
         fetch(fetchUrl, {
@@ -188,6 +214,23 @@ class OrdersDetail extends Component {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
         });
+
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
+            method: 'POST',
+            body: JSON.stringify(this.state.subs),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
 
@@ -204,6 +247,12 @@ class OrdersDetail extends Component {
     deleteTask = (item) => {
         this.setState({
             tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
+        );
+    };
+
+    deleteSub = (item) => {
+        this.setState({
+            subs: _.reject(this.state.subs, function(el) { return el.idsub === item.idsub; })}
         );
     };
 
@@ -236,6 +285,13 @@ class OrdersDetail extends Component {
         });
     };
 
+    addSub = (sub) => {
+        const items = this.state.subs;
+        items.push(sub);
+        this.setState({
+            subs: items
+        });
+    };
 
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
@@ -247,13 +303,23 @@ class OrdersDetail extends Component {
         this.addTask(item)
     };
 
+    onSubmitSub = (e, item) => {
+        //e.preventDefault(); // Stop form submit
+        this.addSub(item)
+    };
+
     render() {
-        const panes = [
-            { menuItem: 'Parametry', render: () => <OrdersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
-            { menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> },
-        ];
+        let panes = [];
+        panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
+        if (this.props.hasSalesRole){
+            panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
+        }
+        panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        if (this.props.hasSalesRole){
+            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
+        }
+        panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
 
         return (
             <div>

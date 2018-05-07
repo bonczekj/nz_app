@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import { BrowserRouter } from 'react-router-dom';
-import { PHP_url, set_PHP_url  } from './PHP_Connector';
+import { set_PHP_url  } from './PHP_Connector';
 
 set_PHP_url();
 

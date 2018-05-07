@@ -6,6 +6,9 @@ import {optionYesNo, optionDeliveryType} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
+import {getFormatDate, decodeOptionValue} from '../validation';
+import {Redirect} from 'react-router-dom';
+
 
 class Offers extends Component {
 
@@ -17,6 +20,7 @@ class Offers extends Component {
     constructor(){
         super();
         this.state = {
+            redirect: false,
             showModal: false,
             newItem: false,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
@@ -33,6 +37,15 @@ class Offers extends Component {
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
+
+    componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({redirect: true})
+        }else{
+            this.setState({redirect: false})
+        }
+
+    }
 
     componentDidMount(){
         this.setState({ isLoading: true });
@@ -142,18 +155,9 @@ class Offers extends Component {
         })
     };
 
-    decodeOptionValue(value, optionArray) {
-        if (value === null) {
-            return ''
-        }else {
-            let optionItem = optionArray.find(item => item.value === value);
-            return optionItem.text;
-        }
-    }
-
-    getFormatDate = (date) => {
+    /*getFormatDate = (date) => {
         return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };
+    };*/
 
 
     items(item, i){
@@ -162,10 +166,10 @@ class Offers extends Component {
                 <Table.Cell>{item.id}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.customer}</Table.Cell>
-                <Table.Cell>{this.getFormatDate(item.processdate)}</Table.Cell>
-                <Table.Cell>{this.decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
-                <Table.Cell>{this.decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
-                <Table.Cell>{item.price}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.processdate)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
+                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{item.winprice}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
@@ -183,6 +187,11 @@ class Offers extends Component {
     )};*/
 
     render(){
+
+        if (this.state.redirect !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
@@ -203,7 +212,7 @@ class Offers extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>

@@ -7,14 +7,15 @@ class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
 
     texts = {
-        detail: 'Detail subjektu',
+        detail: 'Detail zákazníka',
+        detailSub: 'Detail subdodavatele',
     };
 
     constructor(props){
         super(props);
         this.state = {
             file:null,
-            showData: {ico: '', name: '', profession: '', address: ''},
+            showData: {ico: '', name: '', profession: '', address: '', sub: ''},
             newItem: false,
             saved: false,
             errorText: ''
@@ -39,10 +40,15 @@ class CustomerDetail extends Component {
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
         let fetchUrl = '';
+
+        //Označení subdodávky
         if (this.state.newItem === true){
+            if (this.props.is_sub === true){
+                this.state.showData.sub = 1;
+            }
             fetchUrl = PHP_url+'/nz_rest_api_slim/customers/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/customers';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/customers/update';
         }
 
         fetch(fetchUrl, {
@@ -114,7 +120,7 @@ class CustomerDetail extends Component {
                    onClose={this.closeEdit.bind(this)}
                    closeOnEscape={true}
                    closeOnRootNodeClick={false}>
-                <Modal.Header>{this.texts.detail}</Modal.Header>
+                <Modal.Header>{(this.props.is_sub === false) ? this.texts.detail : this.texts.detailSub}</Modal.Header>
                 <Modal.Content>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Form>

@@ -8,6 +8,7 @@ import Documents from '../components/documents/Documents';
 import Orders from '../components/Orders/Orders';
 import Customers from '../components/customers/Customers';
 import Tasks from '../components/tasks/Tasks';
+import Login from '../components/login/Login';
 
 class Main extends Component {
     render() {
@@ -19,7 +20,9 @@ class Main extends Component {
                 <Route exact path="/users" component={Users}/>
                 <Route exact path="/documents" component={Documents}/>
                 <Route exact path="/customers" component={Customers}/>
+                <Route exact path="/subcontractors" component={Customers} />
                 <Route exact path="/tasks" component={Tasks}/>
+                <Route exact path="/login" component={Login}/>
             </Container>
         );
     }

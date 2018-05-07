@@ -8,17 +8,19 @@ import {PHP_url} from './../../PHP_Connector';
 class Customers extends Component {
 
     texts = {
-        newItem: 'Nový subjekt',
-        header: 'Subjekty'
+        newItem: 'Nový zákazník',
+        header: 'Zákazníci',
+        newItemSub: 'Nový subdodavatel',
+        headerSub: 'Subdodavatelé',
     };
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {ico: '', name: '', profession: '', address: ''},
-            tableData: [],
+            showData: {ico: '', name: '', profession: '', address: '', sub: ''},
+            tableData: new Array(),
             isLoading: false,
             error: null,
             activePage: 1,
@@ -26,17 +28,27 @@ class Customers extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            errorText: ''
+            errorText: '',
+            is_sub: false,
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
 
+    componentWillMount(){
+        let is_sub = (this.props.match.path === "/subcontractors") ? true : false;
+        this.setState({
+            is_sub: is_sub,
+        });
+    }
+
+
     componentDidMount(){
-        this.setState({ isLoading: true });
-        console.log(PHP_url);
-        fetch(PHP_url+'/nz_rest_api_slim/customers', {
-                //mode: 'no-cors',
+        this.setState({
+            isLoading: true,
+        });
+        let urlSuffix = (this.state.is_sub === false) ? 'customers' : 'subcontractors';
+        fetch(PHP_url+'/nz_rest_api_slim/'+urlSuffix, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -165,18 +177,19 @@ class Customers extends Component {
 
     render(){
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
+        //const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
             { key: 20, text: '20', value: 20 },
         ];
 
+        console.log(this.state.tableData);
         return (
             <div>
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
-                    <Header as='h1'>{this.texts.header}</Header>
+                    <Header as='h1'>{(this.state.is_sub === false) ? this.texts.header : this.texts.headerSub}</Header>
                 </Segment>
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
@@ -201,7 +214,7 @@ class Customers extends Component {
                         <Table.Row >
                             <Table.HeaderCell >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
-                                    <Icon name='file' /> {this.texts.newItem}
+                                    <Icon name='file' /> {(this.state.is_sub === false) ? this.texts.newItem : this.texts.newItemSub}
                                 </Button>
                             </Table.HeaderCell>
                             <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
@@ -217,6 +230,7 @@ class Customers extends Component {
                 </Table>
                 <CustomerDetail showData={this.state.showData}
                                 showModal={this.state.showModal}
+                                is_sub={this.state.is_sub}
                                 newItem={this.state.newItem}
                                 onClose={this.closeEdit}
                                 onSubmit={this.onSubmit}

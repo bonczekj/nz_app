@@ -1,21 +1,22 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form, Dropdown } from 'semantic-ui-react'
+import {Button, Modal, Form, Dropdown, Select, Input} from 'semantic-ui-react'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
+import {optionYesNo} from "../constants";
 
-class TaskDetail extends Component {
+class OrdersDetailSubDetail extends Component {
 
     texts = {
-        detail: 'Detail termínu',
+        detail: 'Detail subdodávky',
     };
 
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0},
+            showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
             taskdateNumber: '',
             finishedNumber: '',
             newItem: false,
@@ -84,10 +85,8 @@ class TaskDetail extends Component {
                     <Modal.Header>{this.texts.detail}</Modal.Header>
                     <Modal.Content>
                         <Form>
-                            <Form.Field required>
-                                <label>Popis</label>
-                                <input placeholder='Popis' name='taskdesc' value={this.state.showData.taskdescr} onChange={ this.handleChange }/>
-                            </Form.Field>
+                            <Form.Field control={Input} required label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
+                            <Form.Field control={Input} label="Subdodavatel" name='name' value={this.state.showData.name} onChange={ this.handleChange }/>
                             <Form.Field>
                                 <label>Termín</label>
                                 <DatePicker
@@ -96,10 +95,8 @@ class TaskDetail extends Component {
                                     onChange={this.handleChangeDate}
                                 />
                             </Form.Field>
-                            <Form.Field>
-                                <label>Cena</label>
-                                <input placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
-                            </Form.Field>
+                            <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
+                            <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                             <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                         </Form>
@@ -125,6 +122,6 @@ class TaskDetail extends Component {
                              <input placeholder='Typ' name='type' value={this.state.showData.type} onChange={ this.handleChange }/>
 
 * */
-export default TaskDetail;
+export default OrdersDetailSubDetail;
 
 

@@ -115,7 +115,7 @@ class UserDetail extends Component {
                         </Form.Field>
                         <Form.Field>
                             <label>Heslo</label>
-                            <input name = 'password' value={this.state.showData.password} onChange={ this.handleChange }/>
+                            <input name = 'password' type='password' value={this.state.showData.password} onChange={ this.handleChange }/>
                         </Form.Field>
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>

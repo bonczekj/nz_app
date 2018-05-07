@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import { Button,Icon, Table} from 'semantic-ui-react'
-import TaskDetail from '../Orders/TaskDetail';
+import OrdersDetailSubDetail from '../Orders/OrdersDetailSubDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
-import {getFormatDate} from '../validation';
+import {decodeOptionValue, getFormatDate} from '../validation';
+import {optionYesNo} from "../constants";
 
-class OrdersDetailTasks extends Component {
+class OrdersDetailSub extends Component {
 
     constructor(props){
         super(props);
@@ -13,13 +14,13 @@ class OrdersDetailTasks extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0},
+            showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
             saved: false,
         }
     };
 
     texts = {
-        newItem: 'Nový termín',
+        newItem: 'Nová subdodávka',
     };
 
 /*    componentWillReceiveProps(nextProps){
@@ -31,8 +32,8 @@ class OrdersDetailTasks extends Component {
     }*/
 
 
-    deleteTask = (item) => {
-        this.props.deleteTask(item)
+    deleteSub = (item) => {
+        this.props.deleteSub(item)
     }
 
     closeEdit = (item, saved) => {
@@ -55,48 +56,28 @@ class OrdersDetailTasks extends Component {
         });
     }
 
-    onSubmitTask = (e, item) => {
+    onSubmitSub = (e, item) => {
         //e.preventDefault(); // Stop form submit
-        this.props.onSubmitTask(e, item);
+        this.props.onSubmitSub(e, item);
         this.setState({showModal: false});
     }
 
     tabItems(item, i){
-        let today = new Date();
-        let todayW = new Date();
-        todayW.setDate(todayW.getDate() + 7);
-        let taskDate = new Date(item.taskdate);
-        let flg_warning = false;
-        let flg_negative = false;
-
-        console.log(taskDate - today);
-        if (taskDate  < today){
-            flg_negative = true;
-        }else if (taskDate < todayW){
-            flg_warning = true;
-        };
         return(
-            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
+            <Table.Row key={item.idsub}>
+                <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                <Table.Cell>{item.taskdesc}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteTask.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteSub.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
     }
-/*
-
-                <Table.Cell>
-                    <Icon link name='trash' onClick={this.props.deleteTask.bind(this, item)}/>
-                </Table.Cell>
-
- */
-
 
     render() {
         return (
@@ -104,21 +85,22 @@ class OrdersDetailTasks extends Component {
                 <Table celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
+                            <Table.HeaderCell>Subdodavatel</Table.HeaderCell>
                             <Table.HeaderCell>Termín</Table.HeaderCell>
-                            <Table.HeaderCell>Popis</Table.HeaderCell>
                             <Table.HeaderCell>Cena</Table.HeaderCell>
                             <Table.HeaderCell>Dokončeno</Table.HeaderCell>
+                            <Table.HeaderCell>Fakturace</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        {this.props.tasks.map(this.tabItems)}
+                        {this.props.subs.map(this.tabItems)}
                     </Table.Body>
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='5' >
+                            <Table.HeaderCell colSpan='6' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
@@ -126,18 +108,18 @@ class OrdersDetailTasks extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <TaskDetail
+                <OrdersDetailSubDetail
                     showData={this.state.showData}
                     showModal={this.state.showModal}
                     newItem={this.state.newItem}
-                    onSubmit={this.onSubmitTask}
+                    onSubmit={this.onSubmitSub}
                     onClose={this.closeEdit}/>
             </div>
         )
     }
 }
 
-export default OrdersDetailTasks;
+export default OrdersDetailSub;
 
 /*
                         {this.state.documents.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}

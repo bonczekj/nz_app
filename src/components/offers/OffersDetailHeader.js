@@ -24,7 +24,7 @@ class OffersDetailHeader extends Component {
             <div style={{paddingTop:'1em'}}>
                 <Form>
                     <Form.Group>
-                        <Form.Field control={Input} label='Nabídka' placeholder='Nabídka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
+                        <Form.Field control={Input} readOnly label='Nabídka' placeholder='Nabídka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Název' placeholder='Název akce' name='name' value={this.props.showData.name} width={10} onChange={this.props.handleChange }/>
                     </Form.Group>
                     <Form.Field control={Input} label='Investor' placeholder='Investor' name= 'customer' value={this.props.showData.customer} onChange={this.props.handleChange}/>
@@ -37,12 +37,16 @@ class OffersDetailHeader extends Component {
                                 onChange={this.props.handleChangeDate}
                             />
                         </Form.Field>
-                        <Form.Field control={Select} options={optionDeliveryType} label='Způsob podání' placeholder='Způsob podání' name = 'deliverytype' value={this.props.showData.deliverytype} onChange={this.props.handleChangeDD}/>
-                        <Form.Field control={Select} options={optionYesNo} label='Pochůzka' placeholder='Pochůzka' name='errand' value={this.props.showData.errand} onChange={this.props.handleChangeDD }/>
+                        <Form.Field control={Select} options={optionDeliveryType} label='Způsob podání' placeholder='Způsob podání' name = 'deliverytype' value={this.props.showData.deliverytype} onChange={this.props.handleChangeDD} />
+                        <Form.Field control={Select} options={optionYesNo} label='Pochůzka' placeholder='Pochůzka' name='errand' value={this.props.showData.errand} onChange={this.props.handleChangeDD } />
                     </Form.Group>
                     <Form.Group>
-                        <Form.Field control={Input} label='Cena' placeholder='Cena' name='price' value={this.props.showData.price} onChange={this.props.handleChange}/>
-                        <Form.Field control={Input} label='Výtězná cena' placeholder='Vítězní cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange}/>
+                        <Form.Field control={Input} label='Cena' placeholder='Cena' name='price' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price)} onChange={this.props.handleChangeNum} />
+                        <Form.Field control={Input} label='Výtězná cena' placeholder='Vítězní cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>
+                        <Form.Field control={Input} readOnly label='Název' name='idorderdesc' value={this.props.showData.idorderdesc} width={10}/>
                     </Form.Group>
                 </Form>
             </div>

@@ -27,3 +27,22 @@ export function set_PHP_url() {
     }
     console.log("PHP_url="+PHP_url);
 };
+
+export function PostData(type, userData) {
+    return new Promise((resolve, reject) =>{
+        fetch(PHP_url+type, {
+            method: 'POST',
+            body: JSON.stringify(userData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+            .then((response) => response.json())
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
