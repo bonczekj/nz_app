@@ -2,10 +2,17 @@ import React, {Component} from 'react';
 import {Form, Button} from 'semantic-ui-react'
 import {PostData} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
+import {myFetch} from "../../PHP_Connector";
+import  MyMessage from '../MyMessage';
+import  AuthService from '../AuthService';
 
 class Login extends Component {
-    constructor(){
-        super();
+
+
+
+    constructor(props){
+        super(props);
+        this.auth = new AuthService();
         this.state = {
             username: '',
             password: '',
@@ -25,25 +32,41 @@ class Login extends Component {
 
     login = (e) => {
         e.preventDefault(); // Stop form submit
-        console.log(this.state.showData.username +' '+ this.state.showData.password);
+        let loggedIn = this.auth.login(this.state.showData.username, this.state.showData.password);
+        this.setState({redirect: loggedIn});
+
+        /*console.log(this.state.showData.username +' '+ this.state.showData.password);
         if(this.state.showData.username && this.state.showData.password){
-            PostData('/nz_rest_api_slim/login', this.state.showData).then((result) => {
-                let responseJson = result;
-                console.log(responseJson);
-                if(responseJson.userData){
-                    sessionStorage.setItem('userData',JSON.stringify(responseJson));
-                    this.setState({redirect: true});
-                }
-            });
-        }
+            myFetch( 'POST', '/nz_rest_api_slim/login', this.state.showData).then(
+                result => this.fetchOK(result),
+                error => this.fetchERR(error)
+            )
+        }*/
     };
 
+    /*fetchOK(result){
+        let responseJson = result;
+        console.log(responseJson);
+        if(responseJson.userData){
+            sessionStorage.setItem('userData',JSON.stringify(responseJson));
+            this.setState({redirect: true});
+        }
+        console.log('FETCH response');
+        //console.log(response.json());
+    };
+    fetchERR(error){
+        this.setState({errorText: error.toString()});
+        console.log("FETCH error")
+    }*/
+
     render (){
-        if (this.state.redirect || sessionStorage.getItem('userData')){
+        //if (this.state.redirect || sessionStorage.getItem('userData')){
+        if (this.auth.isLoggedIn()){
             return (<Redirect to={'/offers'}/>)
         }
         return (
             <Form >
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Form.Field width={4}>
                     <label>Login/email</label>
                     <input type='text' name='username' value={this.state.showData.username} onChange={this.handleChange}/>

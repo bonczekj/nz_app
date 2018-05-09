@@ -3,7 +3,7 @@ import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'sema
 import _ from 'lodash';
 import UserDetail from './UserDetail';
 import  MyMessage from '../MyMessage';
-import {PHP_url} from './../../PHP_Connector';
+import {PHP_url, myFetchAuth} from './../../PHP_Connector';
 
 class Users extends Component {
 
@@ -34,9 +34,8 @@ class Users extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
- //       fetch('http://localhost/nz_rest_api_slim/users/listlist', {
         this.setState({ errorText: "" });
-        fetch(PHP_url+'/nz_rest_api_slim/users', {
+        /*fetch(PHP_url+'/nz_rest_api_slim/users', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -58,8 +57,32 @@ class Users extends Component {
                 this.setState({ error, isLoading: false });
                 this.setState({ errorText: error.toString() });
                 console.log("error")
-            });
+            });*/
+
+        this.setState({ isLoading: true });
+        myFetchAuth( 'GET', '/nz_rest_api_slim/users').then(
+            result => this.fetchOK(result),
+            error => this.fetchERR(error)
+        )
     };
+
+    fetchOK(result){
+        this.setState({
+            tableData : result,
+            isLoading: false,
+            errorText: '',
+            totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage),
+        });
+        console.log('FETCH response');
+    };
+    fetchERR(error){
+        this.setState({
+            errorText: error.toString(),
+            isLoading: false
+        });
+        console.log("FETCH error")
+    }
+
 
     handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 

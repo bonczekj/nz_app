@@ -44,7 +44,6 @@ class Offers extends Component {
         }else{
             this.setState({redirect: false})
         }
-
     }
 
     componentDidMount(){

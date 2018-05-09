@@ -55,10 +55,9 @@ export const checkSalesRole = () => {
     console.log(userData);
     let userDataObj = JSON.parse(userData);
     let userDataDetail = userDataObj["userData"];
-    if (userDataDetail["salesData"]){
-        return true;
+    if (!userDataDetail["salesData"]){
+        return false;
     }
-    return false;
-    let role =  (userDataDetail["salesData"] === 1) ? true : false ;
+    let role =  (userDataDetail["salesData"] === "1") ? true : false ;
     return role;
 }
