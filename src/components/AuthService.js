@@ -3,29 +3,28 @@ import {myFetch} from './../PHP_Connector';
 
 class AuthService extends Component {
 
-    login = (username, password) => {
-        console.log(username +' '+ password);
+    login = (username, password, myFunc) => {
         if(username && password){
             let credetials = {'username': username, 'password': password};
             myFetch( 'POST', '/nz_rest_api_slim/login', credetials).then(
-                result => this.fetchOK(result),
-                error => this.fetchERR(error)
-            )
+                result => { this.fetchOK(result);
+                            myFunc();
+                            return true;
+                             },
+                error => { this.fetchERR(error); return true }
+        )
         }
     };
 
     fetchOK(result){
         let responseJson = result;
-        console.log(responseJson);
         if(responseJson.userData){
             sessionStorage.setItem('userData',JSON.stringify(responseJson));
             this.setState({redirect: true});
         }
-        console.log('FETCH response');
     };
     fetchERR(error){
         this.setState({errorText: error.toString()});
-        console.log("FETCH error")
     }
 
     isLoggedIn(){

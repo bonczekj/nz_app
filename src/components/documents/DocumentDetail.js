@@ -5,6 +5,7 @@ import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
+import {checkSalesRole} from "../validation";
 
 class DocumentDetail extends Component {
 
@@ -100,6 +101,12 @@ class DocumentDetail extends Component {
     }
 
     onSubmit = (e) => {
+
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+
         this.props.onSubmit(e, this.state.showData);
         /*
         e.preventDefault(); // Stop form submit

@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {arrToObject} from './../validation';
+import {checkSalesRole} from "../validation";
 
 class OffersDetail extends Component {
 
@@ -20,7 +21,7 @@ class OffersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idorder: '', idorderdesc: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idorder: '', nameorder: ''},
             processdateNumber: 0,
             newItem: false,
             saved: false,
@@ -100,6 +101,10 @@ class OffersDetail extends Component {
 
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         let fetchUrl = '';
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/offers/create';
@@ -202,6 +207,10 @@ class OffersDetail extends Component {
     }
 
     deleteDocument = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         let fileDel = new Object( {idoffer: this.state.showData.id, iddocument: item["iddocument"]} );
 
         if (item["typeRS"] === "R"){
@@ -231,6 +240,10 @@ class OffersDetail extends Component {
     };
 
     addDocument = (documents, typeRS) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
@@ -253,6 +266,10 @@ class OffersDetail extends Component {
 
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.addDocument(item, typeRS)
 
     };
@@ -274,6 +291,7 @@ class OffersDetail extends Component {
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
                 <Modal.Content>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>

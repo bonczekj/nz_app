@@ -46,7 +46,7 @@ class OffersDetailHeader extends Component {
                     </Form.Group>
                     <Form.Group>
                         <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>
-                        <Form.Field control={Input} readOnly label='Název' name='idorderdesc' value={this.props.showData.idorderdesc} width={10}/>
+                        <Form.Field control={Input} readOnly label='Název' name='nameorder' value={this.props.showData.nameorder} width={10}/>
                     </Form.Group>
                 </Form>
             </div>

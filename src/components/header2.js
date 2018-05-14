@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {NavLink, Link} from "react-router-dom";
 import { Container, Dropdown, Menu, Button} from 'semantic-ui-react'
-import {checkSalesRole, logout} from './validation';
+import {checkSalesRole, getUserName, logout} from './validation';
 
 class Header2 extends Component {
     constructor(props) {
@@ -36,13 +36,15 @@ class Header2 extends Component {
 
     render() {
         //const { activeItem } = this.state
+        let headerText = 'Evidence nabídek:    ' + getUserName();
         return (
             <Menu fixed='top' inverted>
-                <Menu.Item>Evidence nabídek</Menu.Item>
+                <Menu.Item>{headerText}</Menu.Item>
                 <Container>
                     Evidence nabídek
                     <Menu.Item as={NavLink} to="/offers">Nabídky</Menu.Item>
                     <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
+                    <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
                     <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
                     <Dropdown item simple text='Čísleníky'>
                         <Dropdown.Menu>

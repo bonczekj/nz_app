@@ -52,7 +52,6 @@ export const checkSalesRole = () => {
     if(!userData){
         return false;
     }
-    console.log(userData);
     let userDataObj = JSON.parse(userData);
     let userDataDetail = userDataObj["userData"];
     if (!userDataDetail["salesData"]){
@@ -60,4 +59,14 @@ export const checkSalesRole = () => {
     }
     let role =  (userDataDetail["salesData"] === "1") ? true : false ;
     return role;
+}
+
+export const getUserName = () => {
+    let userData = sessionStorage.getItem('userData');
+    if(!userData){
+        return 'uživatel nepřihlášen';
+    }
+    let userDataObj = JSON.parse(userData);
+    let userDataDetail = userDataObj["userData"];
+    return userDataDetail["firstname"] + " " + userDataDetail["lastname"];
 }

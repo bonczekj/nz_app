@@ -12,7 +12,8 @@ class Orders extends Component {
 
     texts = {
         newItem: 'Nová zakázka',
-        header: 'Zakázka'
+        header: 'Zakázky',
+        headerArch: 'Archív zakázek'
     };
 
     constructor(){
@@ -20,7 +21,7 @@ class Orders extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archiv: 0},
             tableData: [],
             isLoading: false,
             error: null,
@@ -38,13 +39,18 @@ class Orders extends Component {
 
     componentWillMount(){
         let hasSalesRole = checkSalesRole();
-        this.setState({ hasSalesRole: hasSalesRole });
+        let is_archive = (this.props.match.path === "/ordersarchive") ? true : false;
+        this.setState({
+            hasSalesRole: hasSalesRole,
+            is_archive: is_archive,
+        });
     }
 
     componentDidMount(){
         this.setState({ isLoading: true });
         console.log(PHP_url);
-        fetch(PHP_url+'/nz_rest_api_slim/orders', {
+        let url = this.state.is_archive ? '/nz_rest_api_slim/ordersarchive' : '/nz_rest_api_slim/orders';
+        fetch(PHP_url+url, {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -198,7 +204,7 @@ class Orders extends Component {
             <div>
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
-                    <Header as='h1'>{this.texts.header}</Header>
+                    <Header as='h1'>{this.state.is_archive ? this.texts.headerArch : this.texts.header}</Header>
                 </Segment>
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>

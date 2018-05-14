@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form, Dropdown } from 'semantic-ui-react'
+import {Button, Modal, Form, Dropdown, Select} from 'semantic-ui-react'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
+import {optionYesNo} from "../constants";
 
 class TaskDetail extends Component {
 
@@ -100,6 +101,7 @@ class TaskDetail extends Component {
                                 <label>Cena</label>
                                 <input placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
                             </Form.Field>
+                            <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                             <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                         </Form>

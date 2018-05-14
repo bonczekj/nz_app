@@ -17,7 +17,7 @@ class Login extends Component {
             username: '',
             password: '',
             showData: {username: '', password: ''},
-            redirect: false,
+            loggedIn: false,
             isLoading: false,
             error: null,
             errorText: ''
@@ -32,8 +32,7 @@ class Login extends Component {
 
     login = (e) => {
         e.preventDefault(); // Stop form submit
-        let loggedIn = this.auth.login(this.state.showData.username, this.state.showData.password);
-        this.setState({redirect: loggedIn});
+        let loggedIn = this.auth.login(this.state.showData.username, this.state.showData.password, this.loginResult);
 
         /*console.log(this.state.showData.username +' '+ this.state.showData.password);
         if(this.state.showData.username && this.state.showData.password){
@@ -43,6 +42,10 @@ class Login extends Component {
             )
         }*/
     };
+
+    loginResult = () => {
+        this.setState({loggedIn: this.auth.isLoggedIn()});
+    }
 
     /*fetchOK(result){
         let responseJson = result;
@@ -61,7 +64,7 @@ class Login extends Component {
 
     render (){
         //if (this.state.redirect || sessionStorage.getItem('userData')){
-        if (this.auth.isLoggedIn()){
+        if (this.state.loggedIn || this.auth.isLoggedIn() ){
             return (<Redirect to={'/offers'}/>)
         }
         return (

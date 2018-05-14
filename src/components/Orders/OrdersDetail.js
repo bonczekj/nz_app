@@ -11,6 +11,7 @@ import OrdersDetailSub from "./OrdersDetailSub";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
+import {checkSalesRole} from "../validation";
 
 class OrdersDetail extends Component {
 
@@ -22,9 +23,10 @@ class OrdersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0 },
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0, archiv: 0, archiveloc: '' },
             processdateNumber: 0,
             newItem: false,
+            errorText: '',
             saved: false,
             documentsR: [],
             documentsS: [],
@@ -61,7 +63,7 @@ class OrdersDetail extends Component {
                     return response.json();
                 }).then(json => {
                     //this.setState({documents : json});
-                this.setState({ errorText: '' });
+                //this.setState({ errorText: '' });
                 const allDocuments = json;
                 this.setState({
                     documentsR: _.reject(allDocuments, function(el) { return el.typeRS !== 'R'; })}
@@ -86,7 +88,7 @@ class OrdersDetail extends Component {
                     return response.json();
                 }).then(json => {
                 this.setState({tasks: json});
-                this.setState({ errorText: '' });
+                //this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
             });
@@ -102,7 +104,7 @@ class OrdersDetail extends Component {
                     return response.json();
                 }).then(json => {
                 this.setState({subs: json});
-                this.setState({ errorText: '' });
+                //this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
             });
@@ -137,8 +139,18 @@ class OrdersDetail extends Component {
         this.setState({ showData: newState });
     };
 
+    handleChangeCheckbox = (e, checkBox) => {
+        let checked = checkBox.checked ? '1' : '0';
+        const newState = {...this.state.showData, [checkBox.name]: checked};
+        this.setState({ showData: newState });
+    };
+
     onSubmit = (e) => {
-        e.preventDefault(); // Stop form submit
+        e.preventDefault();
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         let fetchUrl = '';
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/orders/create';
@@ -239,18 +251,30 @@ class OrdersDetail extends Component {
     }
 
     deleteDocument = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.setState({
             documents: _.reject(this.state.documents, function(el) { return el.iddocument === item.iddocument; })}
         );
     };
 
     deleteTask = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.setState({
             tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
         );
     };
 
     deleteSub = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.setState({
             subs: _.reject(this.state.subs, function(el) { return el.idsub === item.idsub; })}
         );
@@ -295,22 +319,37 @@ class OrdersDetail extends Component {
 
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.addDocument(item, typeRS)
     };
 
     onSubmitTask = (e, item) => {
         //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.addTask(item)
     };
 
     onSubmitSub = (e, item) => {
         //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         this.addSub(item)
     };
 
     render() {
         let panes = [];
-        panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
+        panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader
+                                                              showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum}
+                                                              handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}
+                                                              handleChangeCheckbox={this.handleChangeCheckbox}/> });
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
         }
@@ -330,11 +369,12 @@ class OrdersDetail extends Component {
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
                 <Modal.Content>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>
                     <Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
-                    <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
+                    <Button type='submit' onClick={this.onSubmit.bind(this) }>Uložit</Button>
                     <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                 </Modal.Actions>
             </Modal>

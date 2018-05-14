@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form } from 'semantic-ui-react'
+import { Button, Modal, Form, Checkbox } from 'semantic-ui-react'
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
+import {checkSalesRole} from "../validation";
 
 class UserDetail extends Component {
 
@@ -13,7 +14,7 @@ class UserDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
+            showData: {username: '', email: '', password: '', firstname: '', lastname: '', salesData: 0},
             newItem: false,
             saved: false,
             errorText: ''
@@ -37,12 +38,24 @@ class UserDetail extends Component {
         this.setState({ showData: newState });
     };
 
+    handleChangeCheckbox = (e, checkBox) => {
+        let checked = checkBox.checked ? '1' : '0';
+        const newState = {...this.state.showData, [checkBox.name]: checked};
+        this.setState({ showData: newState });
+    };
+
     onFileChange(e) {
         this.setState({file: e.target.files[0]})
     }
 
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
+
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+
         let fetchUrl = '';
         this.setState({ isLoading: true });
         if (this.state.newItem === true){
@@ -114,8 +127,10 @@ class UserDetail extends Component {
                             <input placeholder='Příjmení' name = 'lastname' value={this.state.showData.lastname} onChange={ this.handleChange }/>
                         </Form.Field>
                         <Form.Field>
-                            <label>Heslo</label>
-                            <input name = 'password' type='password' value={this.state.showData.password} onChange={ this.handleChange }/>
+                            <Checkbox label='Editace dat'
+                                      name={'salesData'}
+                                      checked={this.state.showData.salesData === '1' ? true : false}
+                                      onChange={ this.handleChangeCheckbox }/>
                         </Form.Field>
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
@@ -129,4 +144,11 @@ class UserDetail extends Component {
 
 export default UserDetail;
 
+/*
+                        <Form.Field>
+                            <label>Heslo</label>
+                            <input name = 'password' type='password' value={this.state.showData.password} onChange={ this.handleChange }/>
+                        </Form.Field>
 
+
+ */

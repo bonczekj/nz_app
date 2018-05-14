@@ -17,6 +17,7 @@ class Main extends Component {
                 <Route exact path="/" component={Offers}/>
                 <Route exact path="/offers" component={Offers}/>
                 <Route exact path="/orders" component={Orders}/>
+                <Route exact path="/ordersarchive" component={Orders}/>
                 <Route exact path="/users" component={Users}/>
                 <Route exact path="/documents" component={Documents}/>
                 <Route exact path="/customers" component={Customers}/>

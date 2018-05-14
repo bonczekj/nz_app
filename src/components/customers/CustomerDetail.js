@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Button, Modal, Form} from 'semantic-ui-react';
 import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
+import {checkSalesRole} from "../validation";
 
 class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
@@ -39,6 +40,12 @@ class CustomerDetail extends Component {
 
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
+
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+
         let fetchUrl = '';
 
         //Označení subdodávky

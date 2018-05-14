@@ -3,7 +3,8 @@ import { Button,Icon, Table} from 'semantic-ui-react'
 import TaskDetail from '../Orders/TaskDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
-import {getFormatDate} from '../validation';
+import {decodeOptionValue, getFormatDate} from '../validation';
+import {optionYesNo} from "../constants";
 
 class OrdersDetailTasks extends Component {
 
@@ -13,7 +14,7 @@ class OrdersDetailTasks extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0},
+            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, invoice: false},
             saved: false,
         }
     };
@@ -81,6 +82,7 @@ class OrdersDetailTasks extends Component {
                 <Table.Cell>{item.taskdesc}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -108,6 +110,7 @@ class OrdersDetailTasks extends Component {
                             <Table.HeaderCell>Popis</Table.HeaderCell>
                             <Table.HeaderCell>Cena</Table.HeaderCell>
                             <Table.HeaderCell>Dokončeno</Table.HeaderCell>
+                            <Table.HeaderCell>Fakturace</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
@@ -118,7 +121,7 @@ class OrdersDetailTasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='5' >
+                            <Table.HeaderCell colSpan='6' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>

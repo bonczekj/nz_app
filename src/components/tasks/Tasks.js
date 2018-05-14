@@ -5,7 +5,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, getFormatDate} from '../validation';
+import {checkSalesRole, decodeOptionValue, getFormatDate} from '../validation';
+import {optionYesNo} from "../constants";
 
 class Tasks extends Component {
 
@@ -19,7 +20,7 @@ class Tasks extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: ''},
+            showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: '', invoice: false},
             tableData: [],
             isLoading: false,
             error: null,
@@ -212,6 +213,7 @@ class Tasks extends Component {
                 <Table.Cell>{item.taskdesc}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
             </Table.Row>
         )
     }
@@ -266,6 +268,8 @@ class Tasks extends Component {
                                 Cena</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'finished' && direction} onClick={this.handleSort('finished')}>
                                 Dokončeno</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'invoice' && direction} onClick={this.handleSort('invoice')}>
+                                Fakturace</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 

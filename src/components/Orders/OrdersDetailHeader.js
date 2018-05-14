@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Input, Form, Select } from 'semantic-ui-react'
+import { Input, Form, Select, Checkbox } from 'semantic-ui-react'
 import {optionYesNo, optionDeliveryType} from "../constants";
 import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
@@ -42,6 +42,13 @@ class OrdersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Nabídka' name='idoffer' value={this.props.showData.idoffer} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='idofferdesc' value={this.props.showData.idofferdesc} width={10}/>
                     </Form.Group>
+                    <Form.Field>
+                        <Checkbox label='Archív'
+                                  name={'archiv'}
+                                  checked={this.props.showData.archiv === '1' ? true : false}
+                                  onChange={ this.props.handleChangeCheckbox }/>
+                    </Form.Field>
+                    <Form.Field control={Input} label='Umístění' placeholder='Umístění v archívu' name='archiveloc' value={this.props.showData.archiveloc} onChange={this.props.handleChange}/>
                 </Form>
             </div>
         )
