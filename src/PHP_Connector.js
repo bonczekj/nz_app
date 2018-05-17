@@ -98,11 +98,11 @@ export function myFetch(type, url, userData) {
             return Promise.reject(new Error('Invalid content type: ' + contentType));
         }
 
-        if (response.status == 401) {
+        if (response.status === 401) {
             return Promise.reject(new Error('Uživatel není přihlášen'));
         }
 
-        if (response.status == 404) {
+        if (response.status === 404) {
             return Promise.reject(new Error('Page not found: ' + url));
         }
 
@@ -165,11 +165,11 @@ export function myFetchAuth(urlType, url, userData) {
             return Promise.reject(new Error('Invalid content type: ' + contentType));
         }
 
-        if (response.status == 401) {
+        if (response.status === 401) {
             return Promise.reject(new Error('Uživatel není přihlášen'));
         }
 
-        if (response.status == 404) {
+        if (response.status === 404) {
             return Promise.reject(new Error('Page not found: ' + url));
         }
 

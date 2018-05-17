@@ -19,7 +19,7 @@ class Customers extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {ico: '', name: '', profession: '', address: '', sub: ''},
+            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
             tableData: new Array(),
             isLoading: false,
             error: null,
@@ -83,7 +83,8 @@ class Customers extends Component {
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
             }else{
-                items = this.state.tableData[this.state.tableData.findIndex(el => el.ico === item.ico)] = item;
+                //items = this.state.tableData[this.state.tableData.findIndex(el => el.ico === item.ico)] = item;
+                items = this.state.tableData[this.state.tableData.findIndex(el => el.ico === item.ico)];
             }
             this.setState({
                 showData: items
@@ -176,7 +177,7 @@ class Customers extends Component {
     )};
 
     render(){
-        const { rowsPerPage, activePage, showModal, column, direction } = this.state;
+        const { rowsPerPage, activePage, column, direction } = this.state;
         //const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
             { key: 5, text: '5', value: 5 },

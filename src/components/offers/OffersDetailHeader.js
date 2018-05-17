@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Input, Form, Select } from 'semantic-ui-react'
+import { Input, Form, Select, Button } from 'semantic-ui-react'
 import {optionYesNo, optionDeliveryType} from "../constants";
 import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
@@ -48,6 +48,7 @@ class OffersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='nameorder' value={this.props.showData.nameorder} width={10}/>
                     </Form.Group>
+                    <Button type='createOrder' onClick={this.props.createOrder}>Vytvořit zakázku</Button>
                 </Form>
             </div>
         )
@@ -57,6 +58,12 @@ class OffersDetailHeader extends Component {
 export default OffersDetailHeader;
 
 /*
+
+                    <Form.Action>
+                        <Button type='createOrder' onClick={this.props.createOrder}>Vytvořit zakázku</Button>
+                    </Form.Action>
+
+
                         <Form.Field control={Input} label='Termín podání' placeholder='Termín podání' name='processdate' value={this.props.showData.processdate} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Hodina' placeholder='Hodina' name='processtime' value={this.props.showData.processtime} onChange={this.props.handleChange}/>
 

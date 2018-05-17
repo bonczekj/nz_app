@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Button, Modal, Form, Dropdown, Select} from 'semantic-ui-react'
+import {Button, Modal, Form, Select} from 'semantic-ui-react'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import {PHP_url} from './../../PHP_Connector';
+//import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
 import {optionYesNo} from "../constants";
@@ -84,6 +84,7 @@ class TaskDetail extends Component {
                        closeOnRootNodeClick={false}>
                     <Modal.Header>{this.texts.detail}</Modal.Header>
                     <Modal.Content>
+                        <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                         <Form>
                             <Form.Field required>
                                 <label>Popis</label>

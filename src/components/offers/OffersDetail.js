@@ -53,20 +53,17 @@ class OffersDetail extends Component {
                 headers: {
                     'Accept': 'application/json',
                 }
-            })
-                .then((response)  => {
+            }).then((response)  => {
                     return response.json();
                 }).then(json => {
-                    //this.setState({documents : json});
-                this.setState({ errorText: '' });
-                const allDocuments = json;
-                this.setState({
-                    documentsR: _.reject(allDocuments, function(el) { return el.typeRS !== 'R'; })}
-                );
-                this.setState({
-                    documentsS: _.reject(allDocuments, function(el) { return el.typeRS !== 'S'; })}
-                );
-
+                    this.setState({ errorText: '' });
+                    const allDocuments = json;
+                    this.setState({
+                        documentsR: _.reject(allDocuments, function(el) { return el.typeRS !== 'R'; })}
+                    );
+                    this.setState({
+                        documentsS: _.reject(allDocuments, function(el) { return el.typeRS !== 'S'; })}
+                    );
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
             });
@@ -239,6 +236,44 @@ class OffersDetail extends Component {
         });
     };
 
+    createOrder = () => {
+        if (this.state.showData.idorder) {
+            this.setState({ errorText: 'Zakázka již existuje' });
+            return;
+        }
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        fetch(PHP_url+'/nz_rest_api_slim/offers/createorder', {
+            method: 'POST',
+            body: JSON.stringify(this.state.showData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                return response.json();
+            }else {
+                throw new Error(response.body);
+            }
+        }).then(json => {
+            console.log(json['id'] + " "+json['name']);
+            this.setState({ errorText: '' });
+            let newState = {...this.state.showData, ['idorder']: json['id']};
+            newState = {...newState, ['nameorder']: json['name']};
+            this.setState({ showData: newState });
+            //const newState1 = {...this.state.showData, ['nameorder']: json['name']};
+            //this.setState({ showData: newState1 });
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
+
+
     addDocument = (documents, typeRS) => {
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
@@ -276,10 +311,15 @@ class OffersDetail extends Component {
 
     render() {
         const panes = [
-            { menuItem: 'Parametry', render: () => <OffersDetailHeader showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> },
+            { menuItem: 'Parametry', render: () => <OffersDetailHeader
+                            showData={this.state.showData}
+                            handleChange={this.handleChange}
+                            handleChangeNum={this.handleChangeNum}
+                            handleChangeDD={this.handleChangeDD}
+                            handleChangeDate={this.handleChangeDate}
+                            createOrder={this.createOrder} /> },
             { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
             { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-//            { menuItem: 'Termíny', pane: 'Tab 3333 Content' },
         ];
 
         return (

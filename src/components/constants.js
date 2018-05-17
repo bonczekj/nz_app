@@ -8,3 +8,8 @@ export const optionDeliveryType = [
     { key: 'e', text: 'Emailem', value: 'email' },
     { key: 'o', text: 'Osobně', value: 'person' },
 ]
+
+export const optionDealType = [
+    { key: 'd', text: 'Dohoda', value: 'Dohoda' },
+    { key: 's', text: 'Smlouva', value: 'Smlouva' },
+]

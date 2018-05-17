@@ -5,7 +5,6 @@ import OffersDetail from './OffersDetail';
 import {optionYesNo, optionDeliveryType} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import moment from "moment/moment";
 import {getFormatDate, decodeOptionValue} from '../validation';
 import {Redirect} from 'react-router-dom';
 
@@ -191,7 +190,7 @@ class Offers extends Component {
             return(<Redirect to={"/login"}/>);
         }
 
-        const { rowsPerPage, activePage, showModal, column, direction } = this.state;
+        const { rowsPerPage, activePage, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
             { key: 5, text: '5', value: 5 },

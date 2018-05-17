@@ -21,7 +21,7 @@ class Orders extends Component {
         this.state = {
             showModal: false,
             newItem: false,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archiv: 0},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -49,8 +49,9 @@ class Orders extends Component {
     componentDidMount(){
         this.setState({ isLoading: true });
         console.log(PHP_url);
-        let url = this.state.is_archive ? '/nz_rest_api_slim/ordersarchive' : '/nz_rest_api_slim/orders';
-        fetch(PHP_url+url, {
+        //let url = this.state.is_archive ? '/nz_rest_api_slim/ordersarchive' : '/nz_rest_api_slim/orders';
+        let urlSuffix = (this.state.is_archive) ? 'ordersarchive' : 'orders';
+        fetch(PHP_url+/nz_rest_api_slim/+urlSuffix, {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {

@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
+import { Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 //import DocumentDetail from './DocumentDetail';
-import moment from 'moment';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, decodeOptionValue, getFormatDate} from '../validation';

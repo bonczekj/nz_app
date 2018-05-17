@@ -44,8 +44,8 @@ class OrdersDetailHeader extends Component {
                     </Form.Group>
                     <Form.Field>
                         <Checkbox label='Archív'
-                                  name={'archiv'}
-                                  checked={this.props.showData.archiv === '1' ? true : false}
+                                  name={'archive'}
+                                  checked={this.props.showData.archive === '1' ? true : false}
                                   onChange={ this.props.handleChangeCheckbox }/>
                     </Form.Field>
                     <Form.Field control={Input} label='Umístění' placeholder='Umístění v archívu' name='archiveloc' value={this.props.showData.archiveloc} onChange={this.props.handleChange}/>

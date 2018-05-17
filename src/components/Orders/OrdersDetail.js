@@ -8,7 +8,6 @@ import OrdersDetailHeaderPrices from "./OrdersDetailHeaderPrices";
 import OrdersDetailDocuments from "./OrdersDetailDocuments";
 import OrdersDetailTasks from "./OrdersDetailTasks";
 import OrdersDetailSub from "./OrdersDetailSub";
-import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole} from "../validation";
@@ -23,7 +22,7 @@ class OrdersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0, archiv: 0, archiveloc: '' },
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0, archive: '', archiveloc: '' },
             processdateNumber: 0,
             newItem: false,
             errorText: '',

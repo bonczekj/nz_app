@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import { Button, Modal, Form} from 'semantic-ui-react';
+import { Button, Modal, Form, Select} from 'semantic-ui-react';
 import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole} from "../validation";
+import {optionDealType} from "../constants";
 
 class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
@@ -16,7 +17,7 @@ class CustomerDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {ico: '', name: '', profession: '', address: '', sub: ''},
+            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
             newItem: false,
             saved: false,
             errorText: ''
@@ -26,6 +27,7 @@ class CustomerDetail extends Component {
     };
 
     componentWillReceiveProps(nextProps){
+        console.log(nextProps.showData);
         this.setState({
                 showData: nextProps.showData,
                 newItem: nextProps.newItem,
@@ -35,6 +37,11 @@ class CustomerDetail extends Component {
 
     handleChange = (e) => {
         const newState = {...this.state.showData, [e.target.name]: e.target.value};
+        this.setState({ showData: newState });
+    };
+
+    handleChangeDD = (e, { name, value }) => {
+        const newState = {...this.state.showData, [name]: value};
         this.setState({ showData: newState });
     };
 
@@ -149,6 +156,7 @@ class CustomerDetail extends Component {
                             <label>Profese</label>
                             <input placeholder='Profese' name = 'profession' value={this.state.showData.profession} onChange={ this.handleChange }/>
                         </Form.Field>
+                        <Form.Field control={Select} options={optionDealType} label='Typ dohody' placeholder='Typ dohody' name = 'dealtype' value={this.state.showData.deliverytype} onChange={this.handleChangeDD}/>
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                     </Form>
