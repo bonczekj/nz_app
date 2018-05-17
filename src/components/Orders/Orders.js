@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Input, Form } from 'semantic-ui-react'
 import _ from 'lodash';
 import OrdersDetail from './OrdersDetail';
 import {optionYesNo, optionDeliveryType} from "../constants";
@@ -7,6 +7,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
 import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
+import  SearchBox from '../common/SearchBox';
 
 class Orders extends Component {
 
@@ -32,6 +33,7 @@ class Orders extends Component {
             direction: 'ascending',
             errorText: '',
             hasSalesRole: false,
+            search: '',
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -47,37 +49,55 @@ class Orders extends Component {
     }
 
     componentDidMount(){
+        this.readData();
+    };
+
+    readData(){
+
         this.setState({ isLoading: true });
         console.log(PHP_url);
         //let url = this.state.is_archive ? '/nz_rest_api_slim/ordersarchive' : '/nz_rest_api_slim/orders';
         let urlSuffix = (this.state.is_archive) ? 'ordersarchive' : 'orders';
-        fetch(PHP_url+/nz_rest_api_slim/+urlSuffix, {
-                //mode: 'no-cors',
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                }
+
+        //fetch(PHP_url+/nz_rest_api_slim/+urlSuffix, {
+
+        var url = new URL(PHP_url+'/nz_rest_api_slim/'+urlSuffix)
+        var params = {search: this.state.search} // or:
+        //var params = [['lat', '35.696233'], ['long', '139.570431']]
+
+        url.search = new URLSearchParams(params)
+
+        fetch(url, {
+            //mode: 'no-cors',
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
         })
             .then((response)  => {
                 if (response.status === 200){
                     return response.json();
                 }
             }).then(json => {
-                    this.setState({tableData : json});
-                    this.setState({ isLoading: false });
-                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-                    this.setState({ errorText: '' });
-            }).catch(error => {
-                this.setState({ error, isLoading: false });
-                this.setState({ errorText: error.toString() });
-                console.log("error")
-            });
-    };
+            this.setState({tableData : json});
+            this.setState({ isLoading: false });
+            this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+            this.setState({ errorText: '' });
+        }).catch(error => {
+            this.setState({ error, isLoading: false });
+            this.setState({ errorText: error.toString() });
+            console.log("error")
+        });
+    }
 
     handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
 
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
+    };
+
+    handleChange = (e) => {
+        this.setState({ [e.target.name]: e.target.value });
     };
 
     closeEdit(item, saved){
@@ -189,6 +209,10 @@ class Orders extends Component {
 
     */
 
+    handleSearch = () => {
+        this.readData();
+    };
+
     render(){
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
@@ -207,6 +231,7 @@ class Orders extends Component {
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.state.is_archive ? this.texts.headerArch : this.texts.header}</Header>
                 </Segment>
+                <SearchBox search={this.state.search} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
@@ -241,11 +266,11 @@ class Orders extends Component {
                     </Table.Footer>
                 </Table>
                 <OrdersDetail showData={this.state.showData}
-                                showModal={this.state.showModal}
-                                hasSalesRole={this.state.hasSalesRole}
-                                newItem={this.state.newItem}
-                                onClose={this.closeEdit}
-                                onSubmit={this.onSubmit}
+                              showModal={this.state.showModal}
+                              hasSalesRole={this.state.hasSalesRole}
+                              newItem={this.state.newItem}
+                              onClose={this.closeEdit}
+                              onSubmit={this.onSubmit}
                 />
             </div>
         )

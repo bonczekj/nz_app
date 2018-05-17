@@ -372,9 +372,8 @@ class OrdersDetail extends Component {
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
                     <Button type='submit' onClick={this.onSubmit.bind(this) }>Uložit</Button>
-                    <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                    <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
                 </Modal.Actions>
             </Modal>
             </div>
@@ -383,6 +382,7 @@ class OrdersDetail extends Component {
 }
 
 //                        <Field name="ico" component={semanticFormField} as={Form.Input} type="text" label="IČO" placeholder="IČO" validate={required} />
+//<Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
 
 /*
 CustomerDetail.propTypes = {

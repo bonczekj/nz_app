@@ -69,15 +69,18 @@ class OrdersDetailTasks extends Component {
         let taskDate = new Date(item.taskdate);
         let flg_warning = false;
         let flg_negative = false;
+        let rowStyle = '';
 
-        console.log(taskDate - today);
         if (taskDate  < today){
             flg_negative = true;
+            rowStyle = 'bg-danger text-white';
         }else if (taskDate < todayW){
             flg_warning = true;
+            rowStyle = 'bg-warning';
         };
+        //<Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
         return(
-            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
+            <Table.Row key={item.idtask} className={rowStyle}>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
                 <Table.Cell>{item.taskdesc}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>

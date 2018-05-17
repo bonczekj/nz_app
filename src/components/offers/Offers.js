@@ -7,6 +7,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {getFormatDate, decodeOptionValue} from '../validation';
 import {Redirect} from 'react-router-dom';
+import  SearchBox from '../common/SearchBox';
 
 
 class Offers extends Component {
@@ -31,7 +32,8 @@ class Offers extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            errorText: ''
+            errorText: '',
+            search: ''
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -46,30 +48,39 @@ class Offers extends Component {
     }
 
     componentDidMount(){
+        this.readData();
+    };
+
+    readData(){
         this.setState({ isLoading: true });
         console.log(PHP_url);
-        fetch(PHP_url+'/nz_rest_api_slim/offers', {
-                //mode: 'no-cors',
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                }
+        //fetch(PHP_url+'/nz_rest_api_slim/offers', {
+
+        var url = new URL(PHP_url+'/nz_rest_api_slim/offers');
+        var params = {search: this.state.search};
+        //var params = [['lat', '35.696233'], ['long', '139.570431']]
+        url.search = new URLSearchParams(params);
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
         })
             .then((response)  => {
                 if (response.status === 200){
                     return response.json();
                 }
             }).then(json => {
-                    this.setState({tableData : json});
-                    this.setState({ isLoading: false });
-                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-                    this.setState({ errorText: '' });
-            }).catch(error => {
-                this.setState({ error, isLoading: false });
-                this.setState({ errorText: error.toString() });
-                console.log("error")
-            });
-    };
+            this.setState({tableData : json});
+            this.setState({ isLoading: false });
+            this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+            this.setState({ errorText: '' });
+        }).catch(error => {
+            this.setState({ error, isLoading: false });
+            this.setState({ errorText: error.toString() });
+            console.log("error")
+        });
+    }
 
     handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
 
@@ -184,6 +195,14 @@ class Offers extends Component {
             values.id
     )};*/
 
+    handleChange = (e) => {
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
+    handleSearch = () => {
+        this.readData();
+    };
+
     render(){
 
         if (this.state.redirect !== true ){
@@ -207,6 +226,7 @@ class Offers extends Component {
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>
+                <SearchBox search={this.state.search} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>

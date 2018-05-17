@@ -48,7 +48,7 @@ class OffersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='nameorder' value={this.props.showData.nameorder} width={10}/>
                     </Form.Group>
-                    <Button type='createOrder' onClick={this.props.createOrder}>Vytvořit zakázku</Button>
+                    <Button type='createOrder' positive onClick={this.props.createOrder}>Vytvořit zakázku</Button>
                 </Form>
             </div>
         )

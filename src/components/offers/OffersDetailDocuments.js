@@ -31,6 +31,13 @@ class OffersDetailDocuments extends Component {
         );
     }
 
+    componentWillMount(){
+        this.setState({
+                typeRS: this.props.typeRS,
+                shortVersion: this.props.shortVersion,
+            },
+        );
+    }
 
     deleteDocument = (item) => {
         this.props.deleteDocument(item)

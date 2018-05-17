@@ -129,112 +129,12 @@ class OffersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        if (this.state.documentsR.length > 0){
-            let fileList = new Array();
-            let offerId = this.state.showData.id;
-            let documents = this.state.documentsR.filter(doc => doc["iddocument"] === undefined)
-            documents.forEach(function(doc) {
-                let docObj = {
-                    idoffer: offerId,
-                    typeRS: "R",
-                    filename: doc["filename"],
-                    length: doc["length"]
-                };
-                fileList.push(docObj);
-            });
-
-            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
-                method: 'POST',
-                body: JSON.stringify(fileList),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                this.setState({ errorText: ''});
-                if (response.status === 200){
-                    this.setState({ saved: true });
-                    //this.closeEdit();
-                }else {
-                    throw new Error(response.body);
-                }
-            }).catch(error => {
-                console.log(error.toString())
-                this.setState({ errorText: error.toString() });
-            });
-        }
-
-        if (this.state.documentsS.length > 0){
-            let fileList = new Array();
-            let offerId = this.state.showData.id;
-            let documents = this.state.documentsS.filter(doc => doc["iddocument"] === undefined)
-            documents.forEach(function(doc) {
-                let docObj = {
-                    idoffer: offerId,
-                    typeRS: "S",
-                    filename: doc["filename"],
-                    length: doc["length"]
-                };
-                fileList.push(docObj);
-            });
-
-            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
-                method: 'POST',
-                body: JSON.stringify(fileList),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                this.setState({ errorText: ''});
-                if (response.status === 200){
-                    this.setState({ saved: true });
-                    //this.closeEdit();
-                }else {
-                    throw new Error(response.body);
-                }
-            }).catch(error => {
-                console.log(error.toString())
-                this.setState({ errorText: error.toString() });
-            });
-        }
     };
 
 
     closeEdit(){
         this.props.onClose(this.state.showData, this.state.saved);
     }
-
-    deleteDocument = (item) => {
-        if (!checkSalesRole()) {
-            this.setState({ errorText: 'Nemáte právo na změnu dat' });
-            return;
-        }
-        let fileDel = new Object( {idoffer: this.state.showData.id, iddocument: item["iddocument"]} );
-
-        if (item["typeRS"] === "R"){
-            this.setState({documentsR: _.reject(this.state.documentsR, function(el) { return el.iddocument === item.iddocument; })});
-        }
-        if (item["typeRS"] === "S"){
-            this.setState({documentsS: _.reject(this.state.documentsS, function(el) { return el.iddocument === item.iddocument; })});
-        }
-
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/delete', {
-            method: 'POST',
-            body: JSON.stringify(fileDel),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-            }else {
-                throw new Error(response.body);
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
-    };
 
     createOrder = () => {
         if (this.state.showData.idorder) {
@@ -273,30 +173,158 @@ class OffersDetail extends Component {
         });
     };
 
+    deleteDocument = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let fileDel = new Object( {idoffer: this.state.showData.id, iddocument: item["iddocument"]} );
+
+        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/delete', {
+            method: 'POST',
+            body: JSON.stringify(fileDel),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                if (item["typeRS"] === "R"){
+                    this.setState({documentsR: _.reject(this.state.documentsR, function(el) { return el.iddocument === item.iddocument; })});
+                }
+                if (item["typeRS"] === "S"){
+                    this.setState({documentsS: _.reject(this.state.documentsS, function(el) { return el.iddocument === item.iddocument; })});
+                }
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
 
     addDocument = (documents, typeRS) => {
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
+
+        /*if (this.state.documentsR.length > 0){
+            let fileList = new Array();
+            let offerId = this.state.showData.id;
+            let documents = this.state.documentsR.filter(doc => doc["iddocument"] === undefined)
+            documents.forEach(function(doc) {
+                let docObj = {
+                    idoffer: offerId,
+                    typeRS: "R",
+                    filename: doc["filename"],
+                    length: doc["length"]
+                };
+                fileList.push(docObj);
+            });
+
+            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+                method: 'POST',
+                body: JSON.stringify(fileList),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    this.setState({ saved: true });
+                    //this.closeEdit();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
+        }*/
+
+        /*if (this.state.documentsS.length > 0){
+            let fileList = new Array();
+            let offerId = this.state.showData.id;
+            let documents = this.state.documentsS.filter(doc => doc["iddocument"] === undefined)
+            documents.forEach(function(doc) {
+                let docObj = {
+                    idoffer: offerId,
+                    typeRS: "S",
+                    filename: doc["filename"],
+                    length: doc["length"]
+                };
+                fileList.push(docObj);
+            });
+
+            fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+                method: 'POST',
+                body: JSON.stringify(fileList),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    this.setState({ saved: true });
+                    //this.closeEdit();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
+        }*/
+
+
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
+        let fileList = new Array();
+        let offerId = this.state.showData.id;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
             let item = [];
             item.filename = file.name;
             items.push(item);
-        }
 
-        if (typeRS === "R") {
-            this.setState({
-                documentsR: items
-            });
-        }else {
-            this.setState({
-                documentsS: items
-            });
+            let docObj = {
+                idoffer: offerId,
+                typeRS: typeRS,
+                filename: file.name,
+                //length: file.l
+            };
+            fileList.push(docObj);
 
         }
+
+        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+            method: 'POST',
+            body: JSON.stringify(fileList),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                if (typeRS === "R") {
+                    this.setState({
+                        documentsR: items
+                    });
+                }else {
+                    this.setState({
+                        documentsS: items
+                    });
+                }
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
     onSubmitDocument = (e, item, typeRS) => {
@@ -335,9 +363,8 @@ class OffersDetail extends Component {
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button type='createOrder' onClick={this.createOrder} active={this.state.showData.idorder === 0}>Vytvořit zakázku</Button>
                     <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
-                    <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                    <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
                 </Modal.Actions>
             </Modal>
             </div>
@@ -345,6 +372,7 @@ class OffersDetail extends Component {
     }
 }
 
+//                    <Button type='createOrder' onClick={this.createOrder} active={this.state.showData.idorder === 0}>Vytvořit zakázku</Button>
 //                        <Field name="ico" component={semanticFormField} as={Form.Input} type="text" label="IČO" placeholder="IČO" validate={required} />
 
 /*

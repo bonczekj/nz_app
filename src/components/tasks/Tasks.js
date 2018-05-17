@@ -10,7 +10,7 @@ import {optionYesNo} from "../constants";
 class Tasks extends Component {
 
     texts = {
-        newItem: 'Nový dokument',
+        newItem: 'Nový termín',
         header: 'Termíny'
     };
 
@@ -130,41 +130,6 @@ class Tasks extends Component {
         });
     }
 
-    /*onSubmitDocument = (e, item) => {
-        e.preventDefault(); // Stop form submit
-
-        let fetchUrl = '';
-        if (this.state.newItem === true){
-            fetchUrl = PHP_url+'/nz_rest_api_slim/documents/create';
-        }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/documents';
-        }
-
-        fetch(fetchUrl, {
-            method: 'POST',
-            body: JSON.stringify(item),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then((response) => {
-            if (response.status === 200){
-                this.setState({ saved: true });
-                let body = response.json();
-                return body;
-            }
-        }).then(json => {
-            console.log('then data' + json);
-            //this.setState({tableData : json});
-            //this.setState({ isLoading: false });
-            //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-            this.closeEdit();
-        }).catch(err => {
-            console.log(err.toString());
-            this.closeEdit(item);
-        });
-    };*/
-
     /*getFormatDate = (date) => {
         return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
     };*/
@@ -197,15 +162,18 @@ class Tasks extends Component {
         let taskDate = new Date(item.taskdate);
         let flg_warning = false;
         let flg_negative = false;
+        let rowStyle = '';
 
-        console.log(taskDate - today);
         if (taskDate  < today){
             flg_negative = true;
+            rowStyle = 'bg-danger text-white';
         }else if (taskDate < todayW){
             flg_warning = true;
+            rowStyle = 'bg-warning';
         };
         return(
-            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
+
+            <Table.Row key={item.idtask} className={rowStyle}>
                 <Table.Cell>{item.idorder}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
@@ -217,6 +185,7 @@ class Tasks extends Component {
         )
     }
 /*
+            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} inverted={true} className="bg-danger">
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
