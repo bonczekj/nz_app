@@ -8,6 +8,7 @@ import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
 import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
 import  SearchBox from '../common/SearchBox';
+import OrdersExcel from "./OrdersExcel";
 
 class Orders extends Component {
 
@@ -253,6 +254,7 @@ class Orders extends Component {
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
+                                <OrdersExcel tableData={this.state.tableData} />
                             </Table.HeaderCell>
                             <Table.HeaderCell colSpan='3' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>

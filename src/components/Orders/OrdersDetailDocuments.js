@@ -31,6 +31,14 @@ class OrdersDetailDocuments extends Component {
         );
     }
 
+    componentWillMount(){
+        this.setState({
+                typeRS: this.props.typeRS,
+                shortVersion: this.props.shortVersion,
+            },
+        );
+    }
+
 
     deleteDocument = (item) => {
         this.props.deleteDocument(item)
@@ -110,8 +118,6 @@ class OrdersDetailDocuments extends Component {
         }else{
             return(
                 <Table.Row key={item.iddocument}>
-                    <Table.Cell>{item.type}</Table.Cell>
-                    <Table.Cell>{item.description}</Table.Cell>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
@@ -128,7 +134,6 @@ class OrdersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell>Popis</Table.HeaderCell>
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>
                                 <Table.HeaderCell />
                             </Table.Row>
@@ -140,7 +145,7 @@ class OrdersDetailDocuments extends Component {
 
                         <Table.Footer fullWidth >
                             <Table.Row >
-                                <Table.HeaderCell colSpan='3' >
+                                <Table.HeaderCell colSpan='2' >
                                     <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                         <Icon name='file' /> {this.texts.newItem}
                                     </Button>

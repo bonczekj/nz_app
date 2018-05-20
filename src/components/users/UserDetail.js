@@ -99,7 +99,54 @@ class UserDetail extends Component {
     }
 
     render() {
+        if (this.props.showModal != true) {
+            return (<div></div>);
+        }
         return (
+            <div>
+            <Form>
+                <p>{this.texts.detail}</p>
+                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                    <Form.Field required>
+                        <label>Login</label>
+                        <input placeholder='Login' name='username' value={this.state.showData.username} onChange={ this.handleChange }/>
+                    </Form.Field>
+                    <Form.Field required>
+                        <label>Email</label>
+                        <input placeholder='Email' name='email' value={this.state.showData.email} onChange={ this.handleChange }/>
+                    </Form.Field>
+                    <Form.Field>
+                        <label>Jméno</label>
+                        <input placeholder='Jméno' name = 'firstname' value={this.state.showData.firstname} onChange={ this.handleChange }/>
+                    </Form.Field>
+                    <Form.Field>
+                        <label>Příjmení</label>
+                        <input placeholder='Příjmení' name = 'lastname' value={this.state.showData.lastname} onChange={ this.handleChange }/>
+                    </Form.Field>
+                    <Form.Field>
+                        <Checkbox label='Editace dat'
+                                  name={'salesData'}
+                                  checked={this.state.showData.salesData === '1' ? true : false}
+                                  onChange={ this.handleChangeCheckbox }/>
+                    </Form.Field>
+                    <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
+                    <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+            </Form>
+            </div>
+        )
+    }
+}
+
+export default UserDetail;
+
+/*
+                        <Form.Field>
+                            <label>Heslo</label>
+                            <input name = 'password' type='password' value={this.state.showData.password} onChange={ this.handleChange }/>
+                        </Form.Field>
+
+
+
             <div>
             <Modal size={'small'}
                    open={this.props.showModal}
@@ -138,17 +185,6 @@ class UserDetail extends Component {
                 </Modal.Content>
             </Modal>
             </div>
-        )
-    }
-}
-
-export default UserDetail;
-
-/*
-                        <Form.Field>
-                            <label>Heslo</label>
-                            <input name = 'password' type='password' value={this.state.showData.password} onChange={ this.handleChange }/>
-                        </Form.Field>
 
 
  */

@@ -194,52 +194,57 @@ class Users extends Component {
             { key: 20, text: '20', value: 20 },
         ];
 
-        return (
-            <div>
-                <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
-                <Segment textAlign='center'>
-                    <Header as='h1'>{this.texts.header}</Header>
-                </Segment>
-                <Table sortable celled fixed={true} compact={true} selectable>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell sorted={column === 'username' && direction} onClick={this.handleSort('username')}>
-                                ID</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'email' && direction} onClick={this.handleSort('email')}>
-                                Typ</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'firstname' && direction} onClick={this.handleSort('firstname')}>
-                                Popis</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'lastname' && direction} onClick={this.handleSort('lastname')}>
-                                Platnost</Table.HeaderCell>
-                            <Table.HeaderCell />
-                        </Table.Row>
-                    </Table.Header>
-
-                    <Table.Body>
-                        {this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
-                    </Table.Body>
-
-                    <Table.Footer fullWidth >
-                        <Table.Row >
-                            <Table.HeaderCell >
-                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
-                                    <Icon name='file' /> {this.texts.newItem}
-                                </Button>
-                            </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
-                                <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
-                                <Pagination
-                                    floated='right'
-                                    activePage={this.state.activePage}
-                                    onPageChange={this.handlePaginationChange}
-                                    totalPages={this.state.totalPages} />
-                            </Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Footer>
-                </Table>
+        if (this.state.showModal === true){
+            return (
                 <UserDetail showData={this.state.showData} showModal={this.state.showModal} newItem={this.state.newItem} onClose={this.closeEdit}/>
-            </div>
-        )
+            )
+        }else {
+            return (
+                <div>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                    <Segment textAlign='center'>
+                        <Header as='h1'>{this.texts.header}</Header>
+                    </Segment>
+                    <Table sortable celled fixed={true} compact={true} selectable>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell sorted={column === 'username' && direction} onClick={this.handleSort('username')}>
+                                    ID</Table.HeaderCell>
+                                <Table.HeaderCell sorted={column === 'email' && direction} onClick={this.handleSort('email')}>
+                                    Typ</Table.HeaderCell>
+                                <Table.HeaderCell sorted={column === 'firstname' && direction} onClick={this.handleSort('firstname')}>
+                                    Popis</Table.HeaderCell>
+                                <Table.HeaderCell sorted={column === 'lastname' && direction} onClick={this.handleSort('lastname')}>
+                                    Platnost</Table.HeaderCell>
+                                <Table.HeaderCell />
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
+                        </Table.Body>
+
+                        <Table.Footer fullWidth >
+                            <Table.Row >
+                                <Table.HeaderCell >
+                                    <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
+                                        <Icon name='file' /> {this.texts.newItem}
+                                    </Button>
+                                </Table.HeaderCell>
+                                <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
+                                    <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
+                                    <Pagination
+                                        floated='right'
+                                        activePage={this.state.activePage}
+                                        onPageChange={this.handlePaginationChange}
+                                        totalPages={this.state.totalPages} />
+                                </Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Footer>
+                    </Table>
+                </div>
+            )
+        }
     }
 }
 

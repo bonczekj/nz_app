@@ -22,13 +22,17 @@ class OrdersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idoffer: '', idofferdesc: '', price_w: 0, price_d: 0, price_r: 0, archive: '', archiveloc: '' },
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '',
+                       idoffer: '', idofferdesc: '',
+                       price_w: 0, price_d: 0, price_r: 0, price_s: 0, price_s_pl: 0, price_c: 0, price_c_pl: 0,
+                       archive: '', archiveloc: '' },
             processdateNumber: 0,
             newItem: false,
             errorText: '',
             saved: false,
-            documentsR: [],
-            documentsS: [],
+            documentsP: [],
+            documentsF: [],
+            documentsO: [],
             tasks: [],
             subs: [],
         };
@@ -65,10 +69,13 @@ class OrdersDetail extends Component {
                 //this.setState({ errorText: '' });
                 const allDocuments = json;
                 this.setState({
-                    documentsR: _.reject(allDocuments, function(el) { return el.typeRS !== 'R'; })}
+                    documentsP: _.reject(allDocuments, function(el) { return el.typeRS !== 'P'; })}
                 );
                 this.setState({
-                    documentsS: _.reject(allDocuments, function(el) { return el.typeRS !== 'S'; })}
+                    documentsF: _.reject(allDocuments, function(el) { return el.typeRS !== 'F'; })}
+                );
+                this.setState({
+                    documentsO: _.reject(allDocuments, function(el) { return el.typeRS !== 'O'; })}
                 );
 
             }).catch(error => {
@@ -175,7 +182,7 @@ class OrdersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
+        /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
             method: 'POST',
             body: JSON.stringify(this.state.documentsR),
             headers: {
@@ -207,7 +214,7 @@ class OrdersDetail extends Component {
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
-        });
+        });*/
 
         fetch(PHP_url+'/nz_rest_api_slim/orderstasks/create', {
             method: 'POST',
@@ -280,24 +287,68 @@ class OrdersDetail extends Component {
     };
 
     addDocument = (documents, typeRS) => {
-        const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let items = [];
+        switch(typeRS){
+            case "P":
+                items = this.state.documentsP;
+                break;
+            case "F":
+                items = this.state.documentsF;
+                break;
+            case "O":
+                items = this.state.documentsO;
+                break;
+        }
+        let fileList = new Array();
+        let orderId = this.state.showData.id;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
             let item = [];
             item.filename = file.name;
             items.push(item);
+
+            let docObj = {
+                idorder: orderId,
+                typeRS: typeRS,
+                filename: file.name,
+                //length: file.l
+            };
+            fileList.push(docObj);
         }
 
-        if (typeRS === "R") {
-            this.setState({
-                documentsR: items
-            });
-        }else {
-            this.setState({
-                documentsS: items
-            });
+        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
+            method: 'POST',
+            body: JSON.stringify(fileList),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
 
-        }
+                switch(typeRS){
+                    case "P":
+                        this.setState({documentsP: items});
+                        break;
+                    case "F":
+                        this.setState({documentsF: items});
+                        break;
+                    case "O":
+                        this.setState({documentsO: items});
+                        break;
+                }
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
     addTask = (task) => {
@@ -352,9 +403,11 @@ class OrdersDetail extends Component {
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
         }
-        panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        //panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsP} typeRS={'P'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsF} typeRS={'F'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
-            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
             panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
         }
         panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
@@ -367,7 +420,7 @@ class OrdersDetail extends Component {
                    closeOnEscape={true}
                    closeOnRootNodeClick={false}>
                 <Modal.Header>{this.texts.detail}</Modal.Header>
-                <Modal.Content>
+                <Modal.Content scrolling>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
