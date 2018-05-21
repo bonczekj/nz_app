@@ -35,6 +35,8 @@ class Orders extends Component {
             errorText: '',
             hasSalesRole: false,
             search: '',
+            subContractors: [],
+            Customers: [],
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -50,7 +52,64 @@ class Orders extends Component {
     }
 
     componentDidMount(){
+        this.readCustomers()
         this.readData();
+    };
+
+    readCustomers() {
+        let CustOptions = [];
+        fetch(PHP_url+'/nz_rest_api_slim/subcontractors', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            if (response.status === 200){
+                return response.json();
+            }
+        }).then(json => {
+            let index;
+            for (index = 0; index < json.length; ++index) {
+                let CustOption = {
+                    key: json[index].ico,
+                    text: json[index].name,
+                    value: json[index].ico,
+                };
+                CustOptions.push(CustOption);
+            }
+            console.log(CustOptions);
+            this.setState({
+                subContractors: CustOptions
+            })
+        }).catch(error => {
+        });
+
+        fetch(PHP_url+'/nz_rest_api_slim/customers', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            if (response.status === 200){
+                return response.json();
+            }
+        }).then(json => {
+            CustOptions = [];
+            let index;
+            for (index = 0; index < json.length; ++index) {
+                let CustOption = {
+                    key: json[index].ico,
+                    text: json[index].name,
+                    value: json[index].ico,
+                };
+                CustOptions.push(CustOption);
+            }
+            console.log(CustOptions);
+            this.setState({
+                Customers: CustOptions
+            })
+        }).catch(error => {
+        });
     };
 
     readData(){
@@ -105,6 +164,12 @@ class Orders extends Component {
         this.setState({showModal: false});
         if (saved === true){
             let items = [];
+
+            let myCusts = this.state.Customers;
+            let myCust = myCusts.filter(c => c.key == item["ico"]);
+            let myCust0 = myCust[0];
+            item.customer = myCust0["text"];
+
             if (this.state.newItem === true){
                 items = this.state.tableData.push(item);
             }else{
@@ -236,7 +301,7 @@ class Orders extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
@@ -271,6 +336,8 @@ class Orders extends Component {
                               showModal={this.state.showModal}
                               hasSalesRole={this.state.hasSalesRole}
                               newItem={this.state.newItem}
+                              Customers={this.state.Customers}
+                              subContractors={this.props.subContractors}
                               onClose={this.closeEdit}
                               onSubmit={this.onSubmit}
                 />

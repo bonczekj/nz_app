@@ -112,6 +112,7 @@ class OrdersDetailSub extends Component {
                     showData={this.state.showData}
                     showModal={this.state.showModal}
                     newItem={this.state.newItem}
+                    subContractors={this.props.subContractors}
                     onSubmit={this.onSubmitSub}
                     onClose={this.closeEdit}/>
             </div>

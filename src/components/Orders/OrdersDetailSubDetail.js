@@ -6,6 +6,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
 import {optionYesNo} from "../constants";
+import {getSubContractors, subContractorsOption} from "../common/SubContractors";
 
 class OrdersDetailSubDetail extends Component {
 
@@ -72,9 +73,13 @@ class OrdersDetailSubDetail extends Component {
 
     closeEdit(){
         this.props.onClose(this.state.showData);
-    }
+    };
+
 
     render() {
+        //let SubContractors = [ { key: '1', text: 'první', value: 'první'}, { key: '2', text: 'druhá', value: 'druhá' }  ];
+        //var SubContractors = subContractorsOption();
+        console.log(this.props.subContractors);
         return (
             <div>
                 <Modal size={'small'}
@@ -85,8 +90,8 @@ class OrdersDetailSubDetail extends Component {
                     <Modal.Header>{this.texts.detail}</Modal.Header>
                     <Modal.Content>
                         <Form>
-                            <Form.Field control={Input} required label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
-                            <Form.Field control={Input} label="Subdodavatel" name='name' value={this.state.showData.name} onChange={ this.handleChange }/>
+                            <Form.Field control={Select} required search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />
+                            <Form.Field control={Input} readOnly label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
                             <Form.Field>
                                 <label>Termín</label>
                                 <DatePicker

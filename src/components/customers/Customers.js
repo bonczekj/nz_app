@@ -70,6 +70,7 @@ class Customers extends Component {
             });
     };
 
+
     handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
     handleChangeRowsPerPage = (e, { value }) => {

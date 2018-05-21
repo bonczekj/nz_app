@@ -117,7 +117,6 @@ class OrdersDetail extends Component {
         }
     }
 
-
     handleChange = (e) => {
         const newState = {...this.state.showData, [e.target.name]: e.target.value};
         this.setState({ showData: newState });
@@ -163,6 +162,10 @@ class OrdersDetail extends Component {
         }else{
             fetchUrl = PHP_url+'/nz_rest_api_slim/orders/update';
         }
+
+        /*let subCont = subConts.filter(c => c.key == sub["ico"]);
+        let subCont0 = subCont[0];
+        sub.name = subCont0["text"];*/
 
         fetch(fetchUrl, {
             method: 'POST',
@@ -233,7 +236,7 @@ class OrdersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
+        /*fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
             method: 'POST',
             body: JSON.stringify(this.state.subs),
             headers: {
@@ -248,7 +251,7 @@ class OrdersDetail extends Component {
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
-        });
+        });*/
     };
 
 
@@ -360,11 +363,39 @@ class OrdersDetail extends Component {
     };
 
     addSub = (sub) => {
-        const items = this.state.subs;
-        items.push(sub);
-        this.setState({
-            subs: items
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        sub['idorder'] = this.state.showData.id;
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
+            method: 'POST',
+            body: JSON.stringify(sub),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                //this.closeEdit();
+                const items = this.state.subs;
+
+                let subConts = this.state.subContractors;
+                let subCont = subConts.filter(c => c.key == sub["ico"]);
+                let subCont0 = subCont[0];
+                sub.name = subCont0["text"];
+
+                items.push(sub);
+                this.setState({
+                    subs: items
+                });
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
         });
+
     };
 
     onSubmitDocument = (e, item, typeRS) => {
@@ -397,7 +428,9 @@ class OrdersDetail extends Component {
     render() {
         let panes = [];
         panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader
-                                                              showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum}
+                                                              showData={this.state.showData}
+                                                              Customers={this.props.Customers}
+                                                              handleChange={this.handleChange} handleChangeNum={this.handleChangeNum}
                                                               handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}
                                                               handleChangeCheckbox={this.handleChangeCheckbox}/> });
         if (this.props.hasSalesRole){
@@ -410,7 +443,7 @@ class OrdersDetail extends Component {
             panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
             panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
         }
-        panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
+        panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} subContractors={this.props.subContractors} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
 
         return (
             <div>

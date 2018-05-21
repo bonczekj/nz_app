@@ -27,7 +27,7 @@ class OrdersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Zakázka' placeholder='Zakázka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Název' placeholder='Název akce' name='name' value={this.props.showData.name} width={10} onChange={this.props.handleChange }/>
                     </Form.Group>
-                    <Form.Field control={Input} label='Investor' placeholder='Investor' name= 'customer' value={this.props.showData.customer} onChange={this.props.handleChange}/>
+                    <Form.Field control={Select} required search options={this.props.Customers} label='Investor' name='ico' value={this.props.showData.ico} onChange={this.props.handleChangeDD } />
                     <Form.Group>
                         <Form.Field>
                             <label>Termín dokončení</label>

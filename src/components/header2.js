@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {NavLink, Link} from "react-router-dom";
 import { Container, Dropdown, Menu, Button} from 'semantic-ui-react'
 import {checkSalesRole, getUserName, logout} from './validation';
+import AuthService from "./AuthService";
 
-class Header2 extends Component {
+export default class Header2 extends Component {
     constructor(props) {
         super(props);
         this.state = {selectedTabId: 0, activeItem: 'home'};
@@ -56,8 +57,7 @@ class Header2 extends Component {
                         </Dropdown.Menu>
                     </Dropdown>
                     <Menu.Menu position='right'>
-                        <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
-                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+                        <Header2_Login/>
                     </Menu.Menu>
                 </Container>
             </Menu>
@@ -65,7 +65,33 @@ class Header2 extends Component {
     }
 }
 
-export default Header2;
+/*
+                        <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
+                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+
+ */
+
+class Header2_Login extends Component {
+
+    constructor(props) {
+        super(props);
+    };
+
+    render() {
+        let auth = new AuthService();
+        if (!auth.isLoggedIn()){
+            return(
+                <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
+            );
+        }else{
+            return(
+                <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+            );
+        }
+    }
+}
+
+
 
 //                          <Menu.Item name='logout' active={activeItem === 'logout'} onClick={this.handleItemClick} />
 
