@@ -121,11 +121,19 @@ class Orders extends Component {
 
         //fetch(PHP_url+/nz_rest_api_slim/+urlSuffix, {
 
-        var url = new URL(PHP_url+'/nz_rest_api_slim/'+urlSuffix)
+        /*var url = new URL(PHP_url+'/nz_rest_api_slim/'+urlSuffix)
         var params = {search: this.state.search} // or:
         //var params = [['lat', '35.696233'], ['long', '139.570431']]
-
         url.search = new URLSearchParams(params)
+        */
+
+        var url = PHP_url+'/nz_rest_api_slim/'+urlSuffix;
+        if (this.state.search){
+            let params = {search: this.state.search};
+            let urlParams = new URLSearchParams(Object.entries(params));
+            url = url+'?'+urlParams;
+        }
+
 
         fetch(url, {
             //mode: 'no-cors',

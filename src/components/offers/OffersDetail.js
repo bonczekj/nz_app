@@ -210,6 +210,8 @@ class OffersDetail extends Component {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
+
+
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         let fileList = new Array();
         let offerId = this.state.showData.id;
@@ -219,11 +221,14 @@ class OffersDetail extends Component {
             item.filename = file.name;
             items.push(item);
 
+            const formData = new FormData();
+            formData.append('files', file);
             let docObj = {
                 idoffer: offerId,
                 typeRS: typeRS,
                 filename: file.name,
-                //length: file.l
+                //length: file.
+                formData: formData,
             };
             fileList.push(docObj);
 
@@ -282,7 +287,7 @@ class OffersDetail extends Component {
 
         return (
             <div>
-            <Modal size={'large'}
+            <Modal className="scrolling" size={'large'}
                    open={this.props.showModal}
                    onClose={this.closeEdit.bind(this)}
                    closeOnEscape={true}

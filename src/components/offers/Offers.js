@@ -8,7 +8,7 @@ import {PHP_url} from './../../PHP_Connector';
 import {getFormatDate, decodeOptionValue} from '../validation';
 import {Redirect} from 'react-router-dom';
 import  SearchBox from '../common/SearchBox';
-
+import 'url-search-params-polyfill';
 
 class Offers extends Component {
 
@@ -56,10 +56,17 @@ class Offers extends Component {
         console.log(PHP_url);
         //fetch(PHP_url+'/nz_rest_api_slim/offers', {
 
-        var url = new URL(PHP_url+'/nz_rest_api_slim/offers');
-        var params = {search: this.state.search};
-        //var params = [['lat', '35.696233'], ['long', '139.570431']]
-        url.search = new URLSearchParams(params);
+        var url = PHP_url+'/nz_rest_api_slim/offers';
+        if (this.state.search){
+            let params = {search: this.state.search};
+            let urlParams = new URLSearchParams(Object.entries(params));
+            url = url+'?'+urlParams;
+        }
+
+        //var url = new URL(PHP_url+'/nz_rest_api_slim/offers');
+        //var params = {search: this.state.search};
+        ////var params = [['lat', '35.696233'], ['long', '139.570431']]
+        //url.search = new URLSearchParams(params);
         fetch(url, {
             method: 'GET',
             headers: {

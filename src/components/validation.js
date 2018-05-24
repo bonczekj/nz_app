@@ -70,3 +70,13 @@ export const getUserName = () => {
     let userDataDetail = userDataObj["userData"];
     return userDataDetail["firstname"] + " " + userDataDetail["lastname"];
 }
+
+export const getArrayPos = (arr, key, value) => {
+    for (var i=0; i<arr.length; i++) {
+        var d = arr[i];
+        if (d[key] === value){
+            return i;
+        }
+    }
+    return -1;
+}

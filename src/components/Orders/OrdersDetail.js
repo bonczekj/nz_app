@@ -10,7 +10,7 @@ import OrdersDetailTasks from "./OrdersDetailTasks";
 import OrdersDetailSub from "./OrdersDetailSub";
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole} from "../validation";
+import {checkSalesRole, getArrayPos} from "../validation";
 
 class OrdersDetail extends Component {
 
@@ -219,7 +219,7 @@ class OrdersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });*/
 
-        fetch(PHP_url+'/nz_rest_api_slim/orderstasks/create', {
+        /*fetch(PHP_url+'/nz_rest_api_slim/orderstasks/create', {
             method: 'POST',
             body: JSON.stringify(this.state.tasks),
             headers: {
@@ -234,7 +234,7 @@ class OrdersDetail extends Component {
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
-        });
+        });*/
 
         /*fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
             method: 'POST',
@@ -355,11 +355,52 @@ class OrdersDetail extends Component {
     };
 
     addTask = (task) => {
-        const items = this.state.tasks;
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let fetchUrl;
+        let newTask = (task['idtask']) ? false : true;
+        if (task['idorder']){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderstasks/update';
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderstasks/create';
+            task['idorder'] = this.state.showData.id;
+        }
+
+        fetch(fetchUrl, {
+            method: 'POST',
+            body: JSON.stringify(task),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+
+                const items = this.state.tasks;
+                if (newTask) {
+                    items.push(task);
+                }else{
+                    let pos = getArrayPos(items, 'idtask', task['idtask']);
+                    items.splice(pos, 1, task);
+                }
+                this.setState({
+                    tasks: items
+                });
+                this.setState({ saved: true });
+                //this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+
+        /*const items = this.state.tasks;
         items.push(task);
         this.setState({
             tasks: items
-        });
+        });*/
     };
 
     addSub = (sub) => {
@@ -442,8 +483,8 @@ class OrdersDetail extends Component {
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
             panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
+            panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} subContractors={this.props.subContractors} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
         }
-        panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} subContractors={this.props.subContractors} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
 
         return (
             <div>
