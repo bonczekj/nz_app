@@ -97,7 +97,7 @@ class OrdersDetailDocuments extends Component {
             if (response.status === 200) {
                 return response.blob()
             }else {
-                throw new Error(response.text());
+                throw new Error(response.body());
             }
         }).then(blob => {
             saveAs(blob, item['filename'])
