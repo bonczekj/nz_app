@@ -211,55 +211,71 @@ class OffersDetail extends Component {
             return;
         }
 
-
         const items = (typeRS === "R") ? this.state.documentsR : this.state.documentsS;
         let fileList = new Array();
         let offerId = this.state.showData.id;
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
             let item = [];
-            item.filename = file.name;
-            items.push(item);
 
             const formData = new FormData();
-            formData.append('files', file);
-            let docObj = {
-                idoffer: offerId,
-                typeRS: typeRS,
-                filename: file.name,
-                //length: file.
-                formData: formData,
-            };
-            fileList.push(docObj);
+            formData.append('document', file);
+
+            fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
+                method: 'POST',
+                body: formData,
+                /*headers: {
+                    'Content-Type': 'multipart/form-data'
+                }*/
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    return response.json();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).then(json => {
+                let docObj = {
+                    idoffer: offerId,
+                    documentId: json.docID,
+                    typeRS: typeRS,
+                };
+                fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
+                    method: 'POST',
+                    body: JSON.stringify(docObj),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    this.setState({ errorText: ''});
+                    if (response.status === 200){
+                        this.setState({ saved: true });
+                        item.filename = file.name;
+                        items.push(item);
+                        if (typeRS === "R") {
+                            this.setState({
+                                documentsR: items
+                            });
+                        }else {
+                            this.setState({
+                                documentsS: items
+                            });
+                        }
+                    }else {
+                        throw new Error(response.body);
+                    }
+                }).catch(error => {
+                    console.log(error.toString())
+                    this.setState({ errorText: error.toString() });
+                });
+
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
 
         }
 
-        fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(fileList),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                if (typeRS === "R") {
-                    this.setState({
-                        documentsR: items
-                    });
-                }else {
-                    this.setState({
-                        documentsS: items
-                    });
-                }
-            }else {
-                throw new Error(response.body);
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
     };
 
     onSubmitDocument = (e, item, typeRS) => {

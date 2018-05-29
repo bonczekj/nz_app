@@ -311,19 +311,67 @@ class OrdersDetail extends Component {
         for (var i = 0; i < documents.files.length; i++) {
             const file = documents.files[i];
             let item = [];
-            item.filename = file.name;
-            items.push(item);
 
-            let docObj = {
-                idorder: orderId,
-                typeRS: typeRS,
-                filename: file.name,
-                //length: file.l
-            };
-            fileList.push(docObj);
+            const formData = new FormData();
+            formData.append('document', file);
+
+            fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
+                method: 'POST',
+                body: formData,
+                /*headers: {
+                    'Content-Type': 'multipart/form-data'
+                }*/
+            }).then(response => {
+                this.setState({ errorText: ''});
+                if (response.status === 200){
+                    return response.json();
+                }else {
+                    throw new Error(response.body);
+                }
+            }).then(json => {
+                let docObj = {
+                    idorder: orderId,
+                    documentId: json.docID,
+                    typeRS: typeRS,
+                };
+                fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
+                    method: 'POST',
+                    body: JSON.stringify(docObj),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    this.setState({ errorText: ''});
+                    if (response.status === 200){
+                        this.setState({ saved: true });
+                        item.filename = file.name;
+                        items.push(item);
+                        switch(typeRS){
+                            case "P":
+                                this.setState({documentsP: items});
+                                break;
+                            case "F":
+                                this.setState({documentsF: items});
+                                break;
+                            case "O":
+                                this.setState({documentsO: items});
+                                break;
+                        }
+                    }else {
+                        throw new Error(response.body);
+                    }
+                }).catch(error => {
+                    console.log(error.toString())
+                    this.setState({ errorText: error.toString() });
+                });
+
+            }).catch(error => {
+                console.log(error.toString())
+                this.setState({ errorText: error.toString() });
+            });
         }
 
-        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
+        /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
             method: 'POST',
             body: JSON.stringify(fileList),
             headers: {
@@ -351,7 +399,7 @@ class OrdersDetail extends Component {
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
-        });
+        });*/
     };
 
     addTask = (task) => {

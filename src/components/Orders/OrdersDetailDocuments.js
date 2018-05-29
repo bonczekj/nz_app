@@ -3,6 +3,7 @@ import { Button,Icon, Table} from 'semantic-ui-react'
 import DocumentDetail from '../documents/DocumentDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
+import { saveAs } from 'file-saver'
 
 class OrdersDetailDocuments extends Component {
 
@@ -10,6 +11,8 @@ class OrdersDetailDocuments extends Component {
         super(props);
         this.tabItems = this.tabItems.bind(this);
         this.state = {
+            isLoading: false,
+            error: null,
             showModal: false,
             newItem: false,
             showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
@@ -81,6 +84,29 @@ class OrdersDetailDocuments extends Component {
         this.setState({showModal: false});
     }
 
+    downloadDocument = (item) => {
+        this.setState({ errorText: '' });
+        fetch(PHP_url+'/nz_rest_api_slim/filedownload', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then(response => {
+            if (response.status === 200) {
+                return response.blob()
+            }else {
+                throw new Error(response.text());
+            }
+        }).then(blob => {
+            saveAs(blob, item['filename'])
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+
+    }
+
     /*closeEditDocument(item){
         this.setState({showModal: false});
         if (this.state.saved === true){
@@ -111,6 +137,7 @@ class OrdersDetailDocuments extends Component {
                 <Table.Row key={item.iddocument}>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
                         <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -120,6 +147,7 @@ class OrdersDetailDocuments extends Component {
                 <Table.Row key={item.iddocument}>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
                         <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -131,6 +159,7 @@ class OrdersDetailDocuments extends Component {
         if (this.state.shortVersion === true) {
             return (
                 <div style={{paddingTop:'1em'}}>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
@@ -165,6 +194,7 @@ class OrdersDetailDocuments extends Component {
         }else {
             return (
                 <div style={{paddingTop:'1em'}}>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>

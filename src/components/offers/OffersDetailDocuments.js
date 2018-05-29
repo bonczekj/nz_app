@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import { Button,Icon, Table} from 'semantic-ui-react'
+import { Button,Icon, Table, Checkbox} from 'semantic-ui-react'
 import DocumentDetail from '../documents/DocumentDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
+import { saveAs } from 'file-saver'
 
 class OffersDetailDocuments extends Component {
 
@@ -80,6 +81,20 @@ class OffersDetailDocuments extends Component {
         this.setState({showModal: false});
     }
 
+    downloadDocument = (item) => {
+        fetch(PHP_url+'/nz_rest_api_slim/filedownload', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then(response => response.blob()).then(blob => saveAs(blob, item['filename'])).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+
+    }
+
     /*closeEditDocument(item){
         this.setState({showModal: false});
         if (this.state.saved === true){
@@ -110,6 +125,7 @@ class OffersDetailDocuments extends Component {
                 <Table.Row key={item.iddocument}>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
                         <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -121,6 +137,7 @@ class OffersDetailDocuments extends Component {
                     <Table.Cell>{item.description}</Table.Cell>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
                         <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -171,6 +188,7 @@ class OffersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
+                                <Table.HeaderCell></Table.HeaderCell>
                                 <Table.HeaderCell>Typ</Table.HeaderCell>
                                 <Table.HeaderCell>Popis</Table.HeaderCell>
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>
