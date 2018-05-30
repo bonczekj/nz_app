@@ -4,6 +4,7 @@ import _ from 'lodash';
 import CustomerDetail from './CustomerDetail';
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
+import {Redirect} from 'react-router-dom';
 
 class Customers extends Component {
 
@@ -17,6 +18,7 @@ class Customers extends Component {
     constructor(props){
         super(props);
         this.state = {
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
@@ -36,6 +38,11 @@ class Customers extends Component {
     };
 
     componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({logged: true})
+        }else{
+            this.setState({loggedf: false})
+        }
         let is_sub = (this.props.match.path === "/subcontractors") ? true : false;
         this.setState({
             is_sub: is_sub,
@@ -178,6 +185,10 @@ class Customers extends Component {
     )};
 
     render(){
+        if (this.state.logged !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, column, direction } = this.state;
         //const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [

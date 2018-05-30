@@ -4,6 +4,7 @@ import _ from 'lodash';
 import UserDetail from './UserDetail';
 import  MyMessage from '../MyMessage';
 import {PHP_url, myFetchAuth} from './../../PHP_Connector';
+import {Redirect} from 'react-router-dom';
 
 class Users extends Component {
 
@@ -15,6 +16,7 @@ class Users extends Component {
     constructor(){
         super();
         this.state = {
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
@@ -31,6 +33,14 @@ class Users extends Component {
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
+
+    componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({logged: true})
+        }else{
+            this.setState({loggedf: false})
+        }
+    }
 
     componentDidMount(){
         this.setState({ isLoading: true });
@@ -186,6 +196,10 @@ class Users extends Component {
     }
 
     render(){
+        if (this.state.logged !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [

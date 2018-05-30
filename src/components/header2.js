@@ -35,15 +35,40 @@ export default class Header2 extends Component {
     //state = { activeItem: 'home' }
     //handleItemClick = (e, { name }) => this.setState({ activeItem: name })
 
+
     render() {
         //const { activeItem } = this.state
         let headerText = 'Evidence nabídek:    ' + getUserName();
         return (
             <Menu fixed='top' inverted>
                 <Menu.Item>{headerText}</Menu.Item>
+                <Header2_NavMenu/>
+            </Menu>
+        );
+    }
+}
+
+/*
+                        <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
+                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+
+ */
+
+class Header2_NavMenu extends Component{
+
+    constructor(props) {
+        super(props);
+    };
+
+    render(){
+        let auth = new AuthService();
+        if (!auth.isLoggedIn()){
+            return('');
+        }else {
+            return(
                 <Container>
                     Evidence nabídek
-                    <Menu.Item as={NavLink} to="/offers">Nabídky</Menu.Item>
+                    <Menu.Item as={NavLink} to="/offers">Nabídky </Menu.Item>
                     <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
                     <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
                     <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
@@ -57,19 +82,13 @@ export default class Header2 extends Component {
                         </Dropdown.Menu>
                     </Dropdown>
                     <Menu.Menu position='right'>
-                        <Header2_Login/>
+                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
                     </Menu.Menu>
                 </Container>
-            </Menu>
-        );
+            );
+        }
     }
 }
-
-/*
-                        <Menu.Item as={NavLink} to="/login">Přihlásit</Menu.Item>
-                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
-
- */
 
 class Header2_Login extends Component {
 

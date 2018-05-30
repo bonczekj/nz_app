@@ -9,12 +9,14 @@ import Orders from '../components/Orders/Orders';
 import Customers from '../components/customers/Customers';
 import Tasks from '../components/tasks/Tasks';
 import Login from '../components/login/Login';
+import Start from '../components/start/Start';
 
 class Main extends Component {
     render() {
         return (
             <Container style={{paddingTop:'5em'}}>
-                <Route exact path="/" component={Offers}/>
+                <Route exact path="/" component={Start}/>
+                <Route exact path="/start" component={Start}/>
                 <Route exact path="/offers" component={Offers}/>
                 <Route exact path="/orders" component={Orders}/>
                 <Route exact path="/ordersarchive" component={Orders}/>

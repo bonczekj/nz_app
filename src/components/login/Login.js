@@ -65,13 +65,13 @@ class Login extends Component {
     render (){
         //if (this.state.redirect || sessionStorage.getItem('userData')){
         if (this.state.loggedIn || this.auth.isLoggedIn() ){
-            return (<Redirect to={'/offers'}/>)
+            return (<Redirect to={'/start'}/>)
         }
         return (
             <Form >
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Form.Field width={4}>
-                    <label>Login/email</label>
+                    <label>E-mail</label>
                     <input type='text' name='username' value={this.state.showData.username} onChange={this.handleChange}/>
                 </Form.Field>
                 <Form.Field width={4}>

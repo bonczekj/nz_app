@@ -82,6 +82,7 @@ class OffersDetailDocuments extends Component {
     }
 
     downloadDocument = (item) => {
+        this.setState({ errorText: '' });
         fetch(PHP_url+'/nz_rest_api_slim/filedownload', {
             //mode: 'no-cors',
             method: 'POST',
@@ -89,10 +90,17 @@ class OffersDetailDocuments extends Component {
             headers: {
                 'Accept': 'application/json',
             }
-        }).then(response => response.blob()).then(blob => saveAs(blob, item['filename'])).catch(error => {
+        }).then(response => {
+            if (response.status === 200) {
+                return response.blob()
+            }else {
+                throw new Error(response.body());
+            }
+        }).then(blob => {
+            saveAs(blob, item['filename'])
+        }).catch(error => {
             this.setState({ errorText: error.toString() });
         });
-
     }
 
     /*closeEditDocument(item){
@@ -150,6 +158,7 @@ class OffersDetailDocuments extends Component {
         if (this.state.shortVersion === true) {
             return (
                 <div style={{paddingTop:'1em'}}>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>

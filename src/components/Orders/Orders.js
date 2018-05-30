@@ -9,6 +9,7 @@ import moment from "moment/moment";
 import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
 import  SearchBox from '../common/SearchBox';
 import OrdersExcel from "./OrdersExcel";
+import {Redirect} from 'react-router-dom';
 
 class Orders extends Component {
 
@@ -21,6 +22,7 @@ class Orders extends Component {
     constructor(){
         super();
         this.state = {
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: ''},
@@ -43,6 +45,11 @@ class Orders extends Component {
     };
 
     componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({logged: true})
+        }else{
+            this.setState({loggedf: false})
+        }
         let hasSalesRole = checkSalesRole();
         let is_archive = (this.props.match.path === "/ordersarchive") ? true : false;
         this.setState({
@@ -129,9 +136,10 @@ class Orders extends Component {
 
         var url = PHP_url+'/nz_rest_api_slim/'+urlSuffix;
         if (this.state.search){
-            let params = {search: this.state.search};
-            let urlParams = new URLSearchParams(Object.entries(params));
-            url = url+'?'+urlParams;
+            //let params = {search: this.state.search};
+            //let urlParams = new URLSearchParams(Object.entries(params));
+            //url = url+'?'+urlParams;
+            url = url+'?search='+this.state.search;
         }
 
 
@@ -288,6 +296,10 @@ class Orders extends Component {
     };
 
     render(){
+        if (this.state.logged !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
@@ -345,7 +357,7 @@ class Orders extends Component {
                               hasSalesRole={this.state.hasSalesRole}
                               newItem={this.state.newItem}
                               Customers={this.state.Customers}
-                              subContractors={this.props.subContractors}
+                              subContractors={this.state.subContractors}
                               onClose={this.closeEdit}
                               onSubmit={this.onSubmit}
                 />

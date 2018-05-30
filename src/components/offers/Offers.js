@@ -20,7 +20,7 @@ class Offers extends Component {
     constructor(){
         super();
         this.state = {
-            redirect: false,
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
@@ -41,9 +41,9 @@ class Offers extends Component {
 
     componentWillMount(){
         if(sessionStorage.getItem('userData')){
-            this.setState({redirect: true})
+            this.setState({logged: true})
         }else{
-            this.setState({redirect: false})
+            this.setState({loggedf: false})
         }
     }
 
@@ -58,9 +58,10 @@ class Offers extends Component {
 
         var url = PHP_url+'/nz_rest_api_slim/offers';
         if (this.state.search){
-            let params = {search: this.state.search};
-            let urlParams = new URLSearchParams(Object.entries(params));
-            url = url+'?'+urlParams;
+            //let params = {search: this.state.search};
+            //let urlParams = new URLSearchParams(Object.entries(params));
+            //url = url+'?'+urlParams;
+            url = url+'?search='+this.state.search;
         }
 
         //var url = new URL(PHP_url+'/nz_rest_api_slim/offers');
@@ -212,7 +213,7 @@ class Offers extends Component {
 
     render(){
 
-        if (this.state.redirect !== true ){
+        if (this.state.logged !== true ){
             return(<Redirect to={"/login"}/>);
         }
 

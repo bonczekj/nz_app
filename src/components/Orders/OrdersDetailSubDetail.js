@@ -4,9 +4,18 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
-import 'react-datepicker/dist/react-datepicker.css';
 import {optionYesNo} from "../constants";
 import {getSubContractors, subContractorsOption} from "../common/SubContractors";
+//import 'react-datepicker/dist/react-datepicker.css';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import DayPicker from 'react-day-picker';
+import 'react-day-picker/lib/style.css';
+import MomentLocaleUtils, {
+    formatDate,
+    parseDate,
+} from 'react-day-picker/moment';
+// Make sure moment.js has the required locale data
+import 'moment/locale/cs';
 
 class OrdersDetailSubDetail extends Component {
 
@@ -36,10 +45,10 @@ class OrdersDetailSubDetail extends Component {
             },
         );
         if (nextProps.showData.taskdate !== null){
-            this.setState({ taskdateNumber: moment(nextProps.showData.taskdate) });
+            //this.setState({ taskdateNumber: moment(nextProps.showData.taskdate) });
         }
         if (nextProps.showData.finished !== null){
-            this.setState({ finishedNumber: moment(nextProps.showData.finished) });
+            //this.setState({ finishedNumber: moment(nextProps.showData.finished) });
         }
     }
 
@@ -54,6 +63,13 @@ class OrdersDetailSubDetail extends Component {
         this.setState({ showData: newState });
         this.setState({ taskdateNumber: date });
     }
+
+    handleDayChange(selectedDay, modifiers) {
+        const newState = {...this.state.showData, ['taskdate']: selectedDay};
+        this.setState({ showData: newState });
+        this.setState({ taskdateNumber: selectedDay });
+    }
+
 
     handleChangeDateF = (date) => {
         const selDate = moment(date).format('YYYY-MM-DD');
@@ -79,7 +95,7 @@ class OrdersDetailSubDetail extends Component {
     render() {
         //let SubContractors = [ { key: '1', text: 'první', value: 'první'}, { key: '2', text: 'druhá', value: 'druhá' }  ];
         //var SubContractors = subContractorsOption();
-        console.log(this.props.subContractors);
+        console.log(this.state.showData.finished);
         return (
             <div>
                 <Modal size={'small'}
@@ -94,11 +110,15 @@ class OrdersDetailSubDetail extends Component {
                             <Form.Field control={Input} readOnly label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
                             <Form.Field>
                                 <label>Termín</label>
-                                <DatePicker
-                                    dateFormat="DD.MM.YYYY"
-                                    selected={this.state.taskdateNumber}
-                                    onChange={this.handleChangeDate}
-                                />
+                                <DayPickerInput
+                                    formatDate={formatDate}
+                                    parseDate={parseDate}
+                                    onDayChange={this.handleChangeDate}
+                                    value={moment(this.state.showData.taskdate).format('DD.MM.YYYY')}
+                                    dayPickerProps={{
+                                        locale: 'cs',
+                                        localeUtils: MomentLocaleUtils,
+                                    }}/>
                             </Form.Field>
                             <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
                             <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
@@ -113,6 +133,14 @@ class OrdersDetailSubDetail extends Component {
 }
 
 /*
+
+placeholder={`${formatDate(new Date(this.state.showData.finished), 'LL', 'cs')}`}
+
+<DatePicker
+                                    dateFormat="DD.MM.YYYY"
+                                    selected={this.state.taskdateNumber}
+                                    onChange={this.handleChangeDate}
+                                />
 
                             <Form.Field>
                                 <label>Dokončeno</label>

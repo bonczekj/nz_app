@@ -456,8 +456,17 @@ class OrdersDetail extends Component {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-        sub['idorder'] = this.state.showData.id;
-        fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
+        let fetchUrl;
+
+        let newSub = (sub['idsub']) ? false : true;
+        if (sub['idorder']){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubs/update';
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubs/create';
+            sub['idsub'] = this.state.showData.id;
+        }
+
+        fetch(fetchUrl, {
             method: 'POST',
             body: JSON.stringify(sub),
             headers: {
@@ -470,12 +479,18 @@ class OrdersDetail extends Component {
                 //this.closeEdit();
                 const items = this.state.subs;
 
-                let subConts = this.state.subContractors;
+                let subConts = this.props.subContractors;
                 let subCont = subConts.filter(c => c.key == sub["ico"]);
                 let subCont0 = subCont[0];
                 sub.name = subCont0["text"];
 
-                items.push(sub);
+
+                if (newSub) {
+                    items.push(sub);
+                }else{
+                    let pos = getArrayPos(items, 'idsub', sub['idsub']);
+                    items.splice(pos, 1, sub);
+                }
                 this.setState({
                     subs: items
                 });

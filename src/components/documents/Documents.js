@@ -6,6 +6,7 @@ import moment from 'moment';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {getFormatDate} from '../validation';
+import {Redirect} from 'react-router-dom';
 
 class Documents extends Component {
 
@@ -17,6 +18,7 @@ class Documents extends Component {
     constructor(){
         super();
         this.state = {
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {type: '', description: '', expiration: '', filename: ''},
@@ -33,6 +35,14 @@ class Documents extends Component {
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
+
+    componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({logged: true})
+        }else{
+            this.setState({loggedf: false})
+        }
+    }
 
     componentDidMount(){
         this.setState({ isLoading: true });
@@ -203,6 +213,10 @@ class Documents extends Component {
                     </Button.Group>
  */
     render(){
+        if (this.state.logged !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [

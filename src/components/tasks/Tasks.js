@@ -6,6 +6,7 @@ import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
+import {Redirect} from 'react-router-dom';
 
 class Tasks extends Component {
 
@@ -17,6 +18,7 @@ class Tasks extends Component {
     constructor(){
         super();
         this.state = {
+            logged: false,
             showModal: false,
             newItem: false,
             showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: '', invoice: false},
@@ -36,6 +38,11 @@ class Tasks extends Component {
     };
 
     componentWillMount(){
+        if(sessionStorage.getItem('userData')){
+            this.setState({logged: true})
+        }else{
+            this.setState({loggedf: false})
+        }
         let role = checkSalesRole();
         this.setState({
             errorText: '',
@@ -199,6 +206,10 @@ class Tasks extends Component {
                     </Button.Group>
  */
     render(){
+        if (this.state.logged !== true ){
+            return(<Redirect to={"/login"}/>);
+        }
+
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
         //const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         const pageSize = [
