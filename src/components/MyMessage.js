@@ -17,7 +17,7 @@ class MyMessage extends Component {
             );
         }else if (this.props.infoText !== ""){
             return (
-                <Message attached='header'>
+                <Message attached='header' positive>
                     <Icon name='info circle' />
                     {this.props.infoText}
                 </Message>

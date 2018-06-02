@@ -9,6 +9,7 @@ import Orders from '../components/Orders/Orders';
 import Customers from '../components/customers/Customers';
 import Tasks from '../components/tasks/Tasks';
 import Login from '../components/login/Login';
+import ChangePassword from '../components/login/ChangePassword';
 import Start from '../components/start/Start';
 
 class Main extends Component {
@@ -26,6 +27,7 @@ class Main extends Component {
                 <Route exact path="/subcontractors" component={Customers} />
                 <Route exact path="/tasks" component={Tasks}/>
                 <Route exact path="/login" component={Login}/>
+                <Route exact path="/changepassword" component={ChangePassword}/>
             </Container>
         );
     }

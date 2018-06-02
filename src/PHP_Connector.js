@@ -75,8 +75,8 @@ export function myFetch(type, url, userData) {
             'Accept': 'application/json',
         }
     }).then(response => {
+        const contentType = response.headers.get('Content-Type') || '';
         if (response.ok) {
-            const contentType = response.headers.get('Content-Type') || '';
 
             if (contentType.includes('application/json')) {
                 return response.json().catch(error => {
@@ -106,7 +106,13 @@ export function myFetch(type, url, userData) {
             return Promise.reject(new Error('Page not found: ' + url));
         }
 
-        return Promise.reject(new Error('Chyba: ' + response.status + ' ' +response.body.toString()));
+        if (contentType.includes('text/plain')) {
+            return response.text().then(body => {
+                return Promise.reject(new Error('Chyba: ' + body.toString() +  ' '));
+            })
+        }
+        return Promise.reject(new Error('Chyba: ' + response.body.toLocaleString() +  ' '));
+        //return Promise.reject(new Error('Chyba: ' + response.body.toString() +  ' ' + response.status.toLocaleString()));
     }).catch(error => {
         return Promise.reject(error.message);
     });

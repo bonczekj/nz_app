@@ -32,7 +32,7 @@ class Login extends Component {
 
     login = (e) => {
         e.preventDefault(); // Stop form submit
-        let loggedIn = this.auth.login(this.state.showData.username, this.state.showData.password, this.loginResult);
+        let loggedIn = this.auth.login(this.state.showData.username, this.state.showData.password, this.loginOK, this.loginFailed);
 
         /*console.log(this.state.showData.username +' '+ this.state.showData.password);
         if(this.state.showData.username && this.state.showData.password){
@@ -43,8 +43,11 @@ class Login extends Component {
         }*/
     };
 
-    loginResult = () => {
+    loginOK = () => {
         this.setState({loggedIn: this.auth.isLoggedIn()});
+    }
+    loginFailed = (error) => {
+        this.setState({errorText: error});
     }
 
     /*fetchOK(result){
@@ -68,18 +71,20 @@ class Login extends Component {
             return (<Redirect to={'/start'}/>)
         }
         return (
+            <div align="center">
             <Form >
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
-                <Form.Field width={4}>
+                <Form.Field inline width={4}>
                     <label>E-mail</label>
                     <input type='text' name='username' value={this.state.showData.username} onChange={this.handleChange}/>
                 </Form.Field>
-                <Form.Field width={4}>
+                <Form.Field inline width={4}>
                     <label>Heslo</label>
                     <input type='password' name='password' value={this.state.showData.password} onChange={this.handleChange}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.login} >Přihlásit</Button>
             </Form>
+            </div>
         )
     }
 }

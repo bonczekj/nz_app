@@ -3,15 +3,19 @@ import {myFetch} from './../PHP_Connector';
 
 class AuthService extends Component {
 
-    login = (username, password, myFunc) => {
+    login = (username, password, myFuncOK, myFuncErr) => {
         if(username && password){
             let credetials = {'username': username, 'password': password};
             myFetch( 'POST', '/nz_rest_api_slim/login', credetials).then(
                 result => { this.fetchOK(result);
-                            myFunc();
+                            myFuncOK();
                             return true;
                              },
-                error => { this.fetchERR(error); return true }
+                error => {
+                    this.fetchERR(error);
+                    myFuncErr(error.toString());
+                    return true
+                }
         )
         }
     };

@@ -82,6 +82,7 @@ class Header2_NavMenu extends Component{
                         </Dropdown.Menu>
                     </Dropdown>
                     <Menu.Menu position='right'>
+                        <Menu.Item as={NavLink} to="/changepassword" to="/changepassword">Změna hesla</Menu.Item>
                         <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
                     </Menu.Menu>
                 </Container>
