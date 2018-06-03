@@ -65,6 +65,7 @@ class Orders extends Component {
 
     readCustomers() {
         let CustOptions = [];
+        let SubContOptions = [];
         fetch(PHP_url+'/nz_rest_api_slim/subcontractors', {
             method: 'GET',
             headers: {
@@ -77,16 +78,15 @@ class Orders extends Component {
         }).then(json => {
             let index;
             for (index = 0; index < json.length; ++index) {
-                let CustOption = {
+                let SubContOption = {
                     key: json[index].ico,
                     text: json[index].name,
                     value: json[index].ico,
                 };
-                CustOptions.push(CustOption);
+                SubContOptions.push(SubContOption);
             }
-            console.log(CustOptions);
             this.setState({
-                subContractors: CustOptions
+                subContractors: SubContOptions
             })
         }).catch(error => {
         });
@@ -101,7 +101,6 @@ class Orders extends Component {
                 return response.json();
             }
         }).then(json => {
-            CustOptions = [];
             let index;
             for (index = 0; index < json.length; ++index) {
                 let CustOption = {
@@ -301,7 +300,9 @@ class Orders extends Component {
         }
 
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
+        if (this.state.tableData != undefined){
+            const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
+        }
         const pageSize = [
             { key: 5, text: '5', value: 5 },
             { key: 10, text: '10', value: 10 },
@@ -330,7 +331,7 @@ class Orders extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
+                        { this.state.tableData != undefined && this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
                     </Table.Body>
 
                     <Table.Footer fullWidth >

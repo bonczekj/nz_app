@@ -35,6 +35,7 @@ class OrdersDetail extends Component {
             documentsO: [],
             tasks: [],
             subs: [],
+            subsDetail: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -114,6 +115,20 @@ class OrdersDetail extends Component {
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
             });
+
+            fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
+                method: 'POST',
+                body: JSON.stringify(nextProps.showData),
+                headers: {
+                    'Accept': 'application/json',
+                }
+            }).then((response)  => {
+                    return response.json();
+            }).then(json => {
+                this.setState({subsDetail: json});
+            }).catch(error => {
+                this.setState({ errorText: error.toString() });
+            });
         }
     }
 
@@ -185,73 +200,6 @@ class OrdersDetail extends Component {
             this.setState({ errorText: error.toString() });
         });
 
-        /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.documentsR),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
-
-        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.documentsS),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });*/
-
-        /*fetch(PHP_url+'/nz_rest_api_slim/orderstasks/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.tasks),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });*/
-
-        /*fetch(PHP_url+'/nz_rest_api_slim/orderssubs/create', {
-            method: 'POST',
-            body: JSON.stringify(this.state.subs),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });*/
     };
 
 
@@ -371,35 +319,6 @@ class OrdersDetail extends Component {
             });
         }
 
-        /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
-            method: 'POST',
-            body: JSON.stringify(fileList),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-
-                switch(typeRS){
-                    case "P":
-                        this.setState({documentsP: items});
-                        break;
-                    case "F":
-                        this.setState({documentsF: items});
-                        break;
-                    case "O":
-                        this.setState({documentsO: items});
-                        break;
-                }
-            }else {
-                throw new Error(response.body);
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });*/
     };
 
     addTask = (task) => {
@@ -502,6 +421,49 @@ class OrdersDetail extends Component {
 
     };
 
+    addSubDetail = (subDetail) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let fetchUrl;
+
+        let newSub = (subDetail['idsubdetail']) ? false : true;
+        if (newSub === true){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubsdetail/create';
+            subDetail['idorder'] = this.state.showData.id;
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubsdetail/update';
+        }
+
+        fetch(fetchUrl, {
+            method: 'POST',
+            body: JSON.stringify(subDetail),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                const items = this.state.subsDetail;
+
+                if (newSub) {
+                    items.push(subDetail);
+                }else{
+                    let pos = getArrayPos(items, 'idsubdetail', subDetail['idsubdetail']);
+                    items.splice(pos, 1, subDetail);
+                }
+                this.setState({
+                    subsDetail: items
+                });
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
+
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
         if (!checkSalesRole()) {
@@ -529,6 +491,15 @@ class OrdersDetail extends Component {
         this.addSub(item)
     };
 
+    onSubmitSubDetail = (e, item) => {
+        //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        this.addSubDetail(item)
+    };
+
     render() {
         let panes = [];
         panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader
@@ -546,7 +517,17 @@ class OrdersDetail extends Component {
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
             panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
-            panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub subs={this.state.subs} subContractors={this.props.subContractors} deleteSub={this.deleteDocument} addSub={this.addDocument} onSubmitSub={this.onSubmitSub} /> });
+            panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub
+                                                                    subs={this.state.subs}
+                                                                    subsDetail={this.state.subsDetail}
+                                                                    subContractors={this.props.subContractors}
+                                                                    deleteSub={this.deleteSub}
+                                                                    deleteSubDetail={this.deleteSubDetail}
+                                                                    addSub={this.addSub}
+                                                                    addSubDetail={this.addSubDetail}
+                                                                    onSubmitSub={this.onSubmitSub}
+                                                                    onSubmitSubDetail={this.onSubmitSubDetail}
+                                                                /> });
         }
 
         return (

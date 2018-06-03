@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
-import {Button, Modal, Form, Dropdown, Select, Input} from 'semantic-ui-react'
+import {Button, Modal, Form, Dropdown, Select, Input, Table, Icon} from 'semantic-ui-react'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {optionYesNo} from "../constants";
 import {getSubContractors, subContractorsOption} from "../common/SubContractors";
+import {decodeOptionValue, getFormatDate} from '../validation';
+
+
 //import 'react-datepicker/dist/react-datepicker.css';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import DayPicker from 'react-day-picker';
@@ -14,31 +17,39 @@ import MomentLocaleUtils, {
     formatDate,
     parseDate,
 } from 'react-day-picker/moment';
-// Make sure moment.js has the required locale data
 import 'moment/locale/cs';
+import OrdersDetailSubDetailEdit from "./OrdersDetailSubDetailEdit";
 
 class OrdersDetailSubDetail extends Component {
 
     texts = {
         detail: 'Detail subdodávky',
+        newItem: 'Nová'
     };
 
     constructor(props){
         super(props);
         this.state = {
             showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
+            showModal: false,
             taskdateNumber: '',
             finishedNumber: '',
+            subsDetail: [],
             newItem: false,
             saved: false,
         }
         this.closeEdit = this.closeEdit.bind(this);
+        this.closeEditM = this.closeEditM.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.tabItems = this.tabItems.bind(this);
     };
 
     componentWillReceiveProps(nextProps){
+        let subDetail = nextProps.subsDetail.filter(c => c.idsub == nextProps.showData.idsub);
+
         this.setState({
                 showData: nextProps.showData,
+                subsDetail: subDetail,
                 newItem: nextProps.newItem,
                 taskdateNumber: 0,
                 finishedNumber: 0,
@@ -84,17 +95,65 @@ class OrdersDetailSubDetail extends Component {
     }
 
      onSubmit = (e) => {
+         //const newState = {...this.state.showData, ['idsub']: value};
+         //this.setState({ showData: newState });
         this.props.onSubmit(e, this.state.showData);
     }
+
+    closeEditM(){
+        this.setState({showModal: false});
+    };
 
     closeEdit(){
         this.props.onClose(this.state.showData);
     };
 
+    editItemSD = (item) => {
+        this.setState({
+            showModal: true,
+            newItem: false,
+            showData: item
+        });
+    }
+
+    deleteItemSD = (item) => {
+        this.props.deleteSubDetail(item)
+    }
+
+    newItem = () => {
+        let showData = [];
+        showData['idsub'] = this.state.showData.idsub;
+        this.setState({
+            showModal: true,
+            newItem: true,
+            showData: showData,
+        });
+    };
+
+
+    onSubmitSubDetail = (e, item) => {
+        this.props.onSubmitSubDetail(e, item);
+        this.setState({showModal: false});
+    };
+
+    tabItems(item, i){
+        return(
+            <Table.Row key={item.idsubdetail}>
+                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
+                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItemSD.bind(this, item)}/>
+                    {'   '}
+                    <Icon link name='trash' onClick={this.deleteItemSD.bind(this, item)}/>
+                </Table.Cell>
+            </Table.Row>
+        )
+    }
+
 
     render() {
-        //let SubContractors = [ { key: '1', text: 'první', value: 'první'}, { key: '2', text: 'druhá', value: 'druhá' }  ];
-        //var SubContractors = subContractorsOption();
         console.log(this.state.showData.finished);
         return (
             <div>
@@ -107,7 +166,52 @@ class OrdersDetailSubDetail extends Component {
                     <Modal.Content>
                         <Form>
                             <Form.Field control={Select} required search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />
-                            <Form.Field control={Input} readOnly label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
+                            <Table celled fixed={true} compact={true} selectable>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Termín</Table.HeaderCell>
+                                        <Table.HeaderCell>Cena</Table.HeaderCell>
+                                        <Table.HeaderCell>Dokončeno</Table.HeaderCell>
+                                        <Table.HeaderCell>Fakturace</Table.HeaderCell>
+                                        <Table.HeaderCell />
+                                    </Table.Row>
+                                </Table.Header>
+
+                                <Table.Body>
+                                    {this.state.subsDetail.map(this.tabItems)}
+                                </Table.Body>
+
+                                <Table.Footer fullWidth >
+                                    <Table.Row >
+                                        <Table.HeaderCell colSpan='5' >
+                                            <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
+                                                <Icon name='file' /> {this.texts.newItem}
+                                            </Button>
+                                        </Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Footer>
+                            </Table>
+
+                            <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
+                            <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                        </Form>
+                    </Modal.Content>
+                </Modal>
+                <OrdersDetailSubDetailEdit
+                    showData={this.state.showData}
+                    showModal={this.state.showModal}
+                    newItem={this.state.newItem}
+                    onSubmitSubDetail={this.onSubmitSubDetail}
+                    onClose={this.closeEditM}/>
+            </div>
+        )
+    }
+}
+
+/*
+
+<Form.Field control={Input} readOnly label="IČ" placeholder='IČ Subdodavatele' name='ico' value={this.state.showData.ico} onChange={ this.handleChange } />
+
                             <Form.Field>
                                 <label>Termín</label>
                                 <DayPickerInput
@@ -122,17 +226,7 @@ class OrdersDetailSubDetail extends Component {
                             </Form.Field>
                             <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
                             <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
-                            <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
-                            <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
-                        </Form>
-                    </Modal.Content>
-                </Modal>
-            </div>
-        )
-    }
-}
 
-/*
 
 placeholder={`${formatDate(new Date(this.state.showData.finished), 'LL', 'cs')}`}
 
