@@ -9,6 +9,7 @@ import {getFormatDate, decodeOptionValue} from '../validation';
 import {Redirect} from 'react-router-dom';
 import  SearchBox from '../common/SearchBox';
 import 'url-search-params-polyfill';
+import {DelConfirm} from '../common/Confirmation';
 
 class Offers extends Component {
 
@@ -22,6 +23,7 @@ class Offers extends Component {
         this.state = {
             logged: false,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: ''},
             tableData: [],
@@ -33,7 +35,9 @@ class Offers extends Component {
             column: '',
             direction: 'ascending',
             errorText: '',
-            search: ''
+            search: '',
+            Customers:[],
+            item:[],
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -48,7 +52,37 @@ class Offers extends Component {
     }
 
     componentDidMount(){
+        this.readCustomers();
         this.readData();
+    };
+
+    readCustomers() {
+        let CustOptions = [];
+        fetch(PHP_url+'/nz_rest_api_slim/customers', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            if (response.status === 200){
+                return response.json();
+            }
+        }).then(json => {
+            let index;
+            for (index = 0; index < json.length; ++index) {
+                let CustOption = {
+                    key: json[index].ico,
+                    text: json[index].name,
+                    value: json[index].ico,
+                };
+                CustOptions.push(CustOption);
+            }
+            console.log(CustOptions);
+            this.setState({
+                Customers: CustOptions
+            })
+        }).catch(error => {
+        });
     };
 
     readData(){
@@ -129,7 +163,9 @@ class Offers extends Component {
         console.log('New item '+ this.state.showModal);
     }
 
-    deleteItem(item){
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/offers/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -147,6 +183,13 @@ class Offers extends Component {
         }).catch(error => {
             this.setState({ errorText: error.toString() });
             console.log(error.toString())
+        });
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
         });
     }
 
@@ -191,7 +234,7 @@ class Offers extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -274,9 +317,16 @@ class Offers extends Component {
                 </Table>
                 <OffersDetail showData={this.state.showData}
                                 showModal={this.state.showModal}
+                                Customers={this.state.Customers}
                                 newItem={this.state.newItem}
                                 onClose={this.closeEdit}
                                 onSubmit={this.onSubmit}
+                />
+                <DelConfirm visible={this.state.showConf}
+                            confText={'Chcete odstranit nabídku?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConf: false});}}
+                            onClose={() => {this.setState({showConf: false});}}
                 />
             </div>
         )

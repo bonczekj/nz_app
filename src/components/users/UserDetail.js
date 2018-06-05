@@ -3,6 +3,7 @@ import { Button, Modal, Form, Checkbox } from 'semantic-ui-react'
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {checkSalesRole} from "../validation";
+import {myFetchAuth} from "../../PHP_Connector";
 
 class UserDetail extends Component {
 
@@ -16,6 +17,12 @@ class UserDetail extends Component {
             file:null,
             showData: {username: '', email: '', password: '', firstname: '', lastname: '', salesData: 0},
             newItem: false,
+            saved: false,
+            errorText: ''
+        };
+        this.state = {
+            showData: props.showData,
+            newItem: props.newItem,
             saved: false,
             errorText: ''
         };
@@ -58,7 +65,7 @@ class UserDetail extends Component {
 
         let fetchUrl = '';
         this.setState({ isLoading: true });
-        if (this.state.newItem === true){
+        if (this.props.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/users/create';
         }else{
             fetchUrl = PHP_url+'/nz_rest_api_slim/users';
@@ -107,23 +114,23 @@ class UserDetail extends Component {
             <Form>
                 <p>{this.texts.detail}</p>
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
-                    <Form.Field required>
+                    <Form.Field required inline >
                         <label>Login</label>
                         <input placeholder='Login' name='username' value={this.state.showData.username} onChange={ this.handleChange }/>
                     </Form.Field>
-                    <Form.Field required>
+                    <Form.Field required inline>
                         <label>Email</label>
                         <input placeholder='Email' name='email' value={this.state.showData.email} onChange={ this.handleChange }/>
                     </Form.Field>
-                    <Form.Field>
+                    <Form.Field inline>
                         <label>Jméno</label>
                         <input placeholder='Jméno' name = 'firstname' value={this.state.showData.firstname} onChange={ this.handleChange }/>
                     </Form.Field>
-                    <Form.Field>
+                    <Form.Field inline>
                         <label>Příjmení</label>
                         <input placeholder='Příjmení' name = 'lastname' value={this.state.showData.lastname} onChange={ this.handleChange }/>
                     </Form.Field>
-                    <Form.Field>
+                    <Form.Field inline>
                         <Checkbox label='Editace dat'
                                   name={'salesData'}
                                   checked={this.state.showData.salesData === '1' ? true : false}

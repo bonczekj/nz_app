@@ -7,6 +7,7 @@ import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {getFormatDate} from '../validation';
 import {Redirect} from 'react-router-dom';
+import {DelConfirm} from '../common/Confirmation';
 
 class Documents extends Component {
 
@@ -20,6 +21,7 @@ class Documents extends Component {
         this.state = {
             logged: false,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {type: '', description: '', expiration: '', filename: ''},
             tableData: [],
@@ -31,6 +33,7 @@ class Documents extends Component {
             column: '',
             direction: 'ascending',
             saved: false,
+            item:[],
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -107,7 +110,9 @@ class Documents extends Component {
         });
     }
 
-    deleteItem(item){
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/documents/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -123,6 +128,13 @@ class Documents extends Component {
             }
         }).catch(err => {
             console.log(err.toString())
+        });
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
         });
     }
 
@@ -201,7 +213,7 @@ class Documents extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -278,6 +290,12 @@ class Documents extends Component {
                     newItem={this.state.newItem}
                     onClose={this.closeEdit}
                     onSubmit={this.onSubmitDocument}/>
+                <DelConfirm visible={this.state.showConf}
+                            confText={'Chcete odstranit dokument?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConf: false});}}
+                            onClose={() => {this.setState({showConf: false});}}
+                />
             </div>
         )
     }

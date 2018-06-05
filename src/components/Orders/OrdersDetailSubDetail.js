@@ -7,6 +7,7 @@ import  MyMessage from '../MyMessage';
 import {optionYesNo} from "../constants";
 import {getSubContractors, subContractorsOption} from "../common/SubContractors";
 import {decodeOptionValue, getFormatDate} from '../validation';
+import {DelConfirm} from '../common/Confirmation';
 
 
 //import 'react-datepicker/dist/react-datepicker.css';
@@ -20,7 +21,7 @@ import MomentLocaleUtils, {
 import 'moment/locale/cs';
 import OrdersDetailSubDetailEdit from "./OrdersDetailSubDetailEdit";
 
-class OrdersDetailSubDetail extends Component {
+export default class OrdersDetailSubDetail extends Component {
 
     texts = {
         detail: 'Detail subdodávky',
@@ -29,19 +30,21 @@ class OrdersDetailSubDetail extends Component {
 
     constructor(props){
         super(props);
+        this.tabItems = this.tabItems.bind(this);
         this.state = {
             showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
             showModal: false,
+            showConfSD: false,
             taskdateNumber: '',
             finishedNumber: '',
             subsDetail: [],
             newItem: false,
             saved: false,
+            item:[],
         }
         this.closeEdit = this.closeEdit.bind(this);
         this.closeEditM = this.closeEditM.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        this.tabItems = this.tabItems.bind(this);
     };
 
     componentWillReceiveProps(nextProps){
@@ -49,10 +52,13 @@ class OrdersDetailSubDetail extends Component {
 
         this.setState({
                 showData: nextProps.showData,
+                showConfSD: false,
                 subsDetail: subDetail,
                 newItem: nextProps.newItem,
                 taskdateNumber: 0,
                 finishedNumber: 0,
+                showConf: false,
+                item:[],
             },
         );
         if (nextProps.showData.taskdate !== null){
@@ -94,12 +100,6 @@ class OrdersDetailSubDetail extends Component {
         this.setState({ showData: newState });
     }
 
-     onSubmit = (e) => {
-         //const newState = {...this.state.showData, ['idsub']: value};
-         //this.setState({ showData: newState });
-        this.props.onSubmit(e, this.state.showData);
-    }
-
     closeEditM(){
         this.setState({showModal: false});
     };
@@ -116,8 +116,18 @@ class OrdersDetailSubDetail extends Component {
         });
     }
 
-    deleteItemSD = (item) => {
+
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConfSD: false, errorText: "" });
         this.props.deleteSubDetail(item)
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConfSD: true,
+            item: item
+        });
     }
 
     newItem = () => {
@@ -131,7 +141,17 @@ class OrdersDetailSubDetail extends Component {
     };
 
 
+    onSubmit = (e) => {
+        //const newState = {...this.state.showData, ['idsub']: value};
+        //this.setState({ showData: newState });
+        this.props.onSubmit(e, this.state.showData);
+    }
+
     onSubmitSubDetail = (e, item) => {
+        if (!item.idsub){
+            this.props.onSubmit(e, this.state.showData);
+        }
+
         this.props.onSubmitSubDetail(e, item);
         this.setState({showModal: false});
     };
@@ -146,7 +166,7 @@ class OrdersDetailSubDetail extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItemSD.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItemSD.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -154,7 +174,7 @@ class OrdersDetailSubDetail extends Component {
 
 
     render() {
-        console.log(this.state.showData.finished);
+        //console.log(this.state.showData.finished);
         return (
             <div>
                 <Modal size={'small'}
@@ -202,7 +222,14 @@ class OrdersDetailSubDetail extends Component {
                     showModal={this.state.showModal}
                     newItem={this.state.newItem}
                     onSubmitSubDetail={this.onSubmitSubDetail}
-                    onClose={this.closeEditM}/>
+                    onClose={this.closeEditM}
+                />
+                <DelConfirm visible={this.state.showConfSD}
+                            confText={'Chcete odstranit detail subdodávky?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConfSD: false});}}
+                            onClose={() => {this.setState({showConfSD: false});}}
+                />
             </div>
         )
     }
@@ -249,6 +276,5 @@ placeholder={`${formatDate(new Date(this.state.showData.finished), 'LL', 'cs')}`
                              <input placeholder='Typ' name='type' value={this.state.showData.type} onChange={ this.handleChange }/>
 
 * */
-export default OrdersDetailSubDetail;
 
 

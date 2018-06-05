@@ -8,7 +8,6 @@ import {optionYesNo} from "../constants";
 import {getSubContractors, subContractorsOption} from "../common/SubContractors";
 import {decodeOptionValue, getFormatDate} from '../validation';
 
-
 //import 'react-datepicker/dist/react-datepicker.css';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import DayPicker from 'react-day-picker';
@@ -95,23 +94,6 @@ class OrdersDetailSubDetailEdit extends Component {
         this.props.onClose(this.state.showData);
         //this.setState({showModal: false});
     };
-
-    tabItems(item, i){
-        return(
-            <Table.Row key={item.idsubdetail}>
-                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-                <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
-                    <Icon link name='trash' onClick={this.deleteSub.bind(this, item)}/>
-                </Table.Cell>
-            </Table.Row>
-        )
-    }
-
 
     render() {
         return (

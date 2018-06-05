@@ -5,6 +5,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
+import {DelConfirm} from '../common/Confirmation';
 
 class OrdersDetailSub extends Component {
 
@@ -13,10 +14,12 @@ class OrdersDetailSub extends Component {
         this.tabItems = this.tabItems.bind(this);
         this.state = {
             showModal: false,
+            showConfS: false,
             newItem: false,
             showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
             subsDetail: [],
             saved: false,
+            item:[],
         }
     };
 
@@ -26,15 +29,27 @@ class OrdersDetailSub extends Component {
 
 /*    componentWillReceiveProps(nextProps){
         this.setState({
-                typeRS: nextProps.typeRS,
-                shortVersion: nextProps.shortVersion,
-            },
-        );
+                showConf: false,
+            });
     }*/
 
 
-    deleteSub = (item) => {
+    deleteItem = (item) => {
         this.props.deleteSub(item)
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConfS: true,
+            item: item
+        });
+        this.setState({
+            showConfS: true,
+        });
+    }
+
+    closeConf = () => {
+        this.setState({showConf: false});
     }
 
     closeEdit = (item, saved) => {
@@ -68,6 +83,7 @@ class OrdersDetailSub extends Component {
     }
 
     tabItems(item, i){
+        console.log(item.idsub);
         return(
             <Table.Row key={item.idsub}>
                 <Table.Cell>{item.name}</Table.Cell>
@@ -75,7 +91,7 @@ class OrdersDetailSub extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteSub.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -118,7 +134,14 @@ class OrdersDetailSub extends Component {
                     subContractors={this.props.subContractors}
                     onSubmit={this.onSubmitSub}
                     onSubmitSubDetail={this.onSubmitSubDetail}
-                    onClose={this.closeEdit}/>
+                    onClose={this.closeEdit}
+                />
+                <DelConfirm visible={this.state.showConfS}
+                            confText={'Chcete odstranit celou subdodávku?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConfS: false});}}
+                            onClose={() => {this.setState({showConfS: false});}}
+                />
             </div>
         )
     }

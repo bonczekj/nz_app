@@ -10,6 +10,7 @@ import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
 import  SearchBox from '../common/SearchBox';
 import OrdersExcel from "./OrdersExcel";
 import {Redirect} from 'react-router-dom';
+import {DelConfirm} from '../common/Confirmation';
 
 class Orders extends Component {
 
@@ -24,6 +25,7 @@ class Orders extends Component {
         this.state = {
             logged: false,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: ''},
             tableData: [],
@@ -39,6 +41,7 @@ class Orders extends Component {
             search: '',
             subContractors: [],
             Customers: [],
+            item:[],
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
@@ -183,16 +186,18 @@ class Orders extends Component {
             let myCusts = this.state.Customers;
             let myCust = myCusts.filter(c => c.key == item["ico"]);
             let myCust0 = myCust[0];
-            item.customer = myCust0["text"];
+            if (myCust0){
+                item.customer = myCust0["text"];
 
-            if (this.state.newItem === true){
-                items = this.state.tableData.push(item);
-            }else{
-                items = this.state.tableData[this.state.tableData.findIndex(el => el.id === item.id)] = item;
+                if (this.state.newItem === true){
+                    items = this.state.tableData.push(item);
+                }else{
+                    items = this.state.tableData[this.state.tableData.findIndex(el => el.id === item.id)] = item;
+                }
+                this.setState({
+                    showData: items
+                });
             }
-            this.setState({
-                showData: items
-            });
         }
     }
 
@@ -214,7 +219,9 @@ class Orders extends Component {
         console.log('New item '+ this.state.showModal);
     }
 
-    deleteItem(item){
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/orders/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -232,6 +239,13 @@ class Orders extends Component {
         }).catch(error => {
             this.setState({ errorText: error.toString() });
             console.log(error.toString())
+        });
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
         });
     }
 
@@ -267,7 +281,7 @@ class Orders extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -319,14 +333,14 @@ class Orders extends Component {
                     <Header as='h1'>{this.state.is_archive ? this.texts.headerArch : this.texts.header}</Header>
                 </Segment>
                 <SearchBox search={this.state.search} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
-                <Table sortable celled fixed={true} compact={true} selectable>
+                <Table sortable padded celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
+                            <Table.HeaderCell width={1} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell width={2}sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
+                            <Table.HeaderCell width={2}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -361,6 +375,12 @@ class Orders extends Component {
                               subContractors={this.state.subContractors}
                               onClose={this.closeEdit}
                               onSubmit={this.onSubmit}
+                />
+                <DelConfirm visible={this.state.showConf}
+                            confText={'Chcete odstranit zakázku?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConf: false});}}
+                            onClose={() => {this.setState({showConf: false});}}
                 />
             </div>
         )

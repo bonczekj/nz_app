@@ -4,6 +4,7 @@ import DocumentDetail from '../documents/DocumentDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import { saveAs } from 'file-saver'
+import {DelConfirm} from '../common/Confirmation';
 
 class OrdersDetailDocuments extends Component {
 
@@ -14,11 +15,13 @@ class OrdersDetailDocuments extends Component {
             isLoading: false,
             error: null,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
             saved: false,
             shortVersion: true,
-            typeRS: ''
+            typeRS: '',
+            item:[],
         }
     };
 
@@ -43,9 +46,9 @@ class OrdersDetailDocuments extends Component {
     }
 
 
-    deleteDocument = (item) => {
+    /*deleteDocument = (item) => {
         this.props.deleteDocument(item)
-    }
+    }*/
 
     closeEdit = (item, saved) => {
         this.setState({showModal: false});
@@ -107,6 +110,19 @@ class OrdersDetailDocuments extends Component {
 
     }
 
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
+        this.props.deleteDocument(item);
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
+        });
+    }
+
     /*closeEditDocument(item){
         this.setState({showModal: false});
         if (this.state.saved === true){
@@ -138,7 +154,7 @@ class OrdersDetailDocuments extends Component {
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
-                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
             )
@@ -148,7 +164,7 @@ class OrdersDetailDocuments extends Component {
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
-                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
             )
@@ -189,6 +205,12 @@ class OrdersDetailDocuments extends Component {
                         newItem={this.state.newItem}
                         onSubmit={this.onSubmitDocument}
                         onClose={this.closeEdit}/>
+                    <DelConfirm visible={this.state.showConf}
+                                confText={'Chcete odstranit dokument?'}
+                                onYes={this.deleteItem}
+                                onNo={() => {this.setState({showConf: false});}}
+                                onClose={() => {this.setState({showConf: false});}}
+                    />
                 </div>
             )
         }else {
@@ -226,6 +248,12 @@ class OrdersDetailDocuments extends Component {
                         newItem={this.state.newItem}
                         onSubmit={this.onSubmitDocument}
                         onClose={this.closeEdit}/>
+                    <DelConfirm visible={this.state.showConf}
+                                confText={'Chcete odstranit dokument?'}
+                                onYes={this.deleteItem}
+                                onNo={() => {this.setState({showConf: false});}}
+                                onClose={() => {this.setState({showConf: false});}}
+                    />
                 </div>
             )
         }

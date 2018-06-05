@@ -137,12 +137,16 @@ class OffersDetail extends Component {
     }
 
     createOrder = () => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
         if (this.state.showData.idorder) {
             this.setState({ errorText: 'Zakázka již existuje' });
             return;
         }
-        if (!checkSalesRole()) {
-            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+        if (this.state.showData.id === undefined) {
+            this.setState({ errorText: 'Nabídku musíte nejdříve uložit' });
             return;
         }
         fetch(PHP_url+'/nz_rest_api_slim/offers/createorder', {
@@ -292,6 +296,7 @@ class OffersDetail extends Component {
         const panes = [
             { menuItem: 'Parametry', render: () => <OffersDetailHeader
                             showData={this.state.showData}
+                            Customers={this.props.Customers}
                             handleChange={this.handleChange}
                             handleChangeNum={this.handleChangeNum}
                             handleChangeDD={this.handleChangeDD}

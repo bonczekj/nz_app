@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Input, Form, Select, Checkbox } from 'semantic-ui-react'
+import { Input, Form, Select, Checkbox, Button } from 'semantic-ui-react'
 import {optionYesNo, optionDeliveryType} from "../constants";
 import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
@@ -49,6 +49,7 @@ class OrdersDetailHeader extends Component {
                                   onChange={ this.props.handleChangeCheckbox }/>
                     </Form.Field>
                     <Form.Field control={Input} label='Umístění' placeholder='Umístění v archívu' name='archiveloc' value={this.props.showData.archiveloc} onChange={this.props.handleChange}/>
+                    <Button type='submit' onClick={this.props.onSubmit}>Uložit</Button>
                 </Form>
             </div>
         )

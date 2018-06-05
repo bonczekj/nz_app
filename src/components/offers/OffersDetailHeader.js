@@ -27,7 +27,7 @@ class OffersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Nabídka' placeholder='Nabídka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Název' placeholder='Název akce' name='name' value={this.props.showData.name} width={10} onChange={this.props.handleChange }/>
                     </Form.Group>
-                    <Form.Field control={Input} label='Investor' placeholder='Investor' name= 'customer' value={this.props.showData.customer} onChange={this.props.handleChange}/>
+                    <Form.Field control={Select} required search options={this.props.Customers} label='Investor' name='ico' value={this.props.showData.ico} onChange={this.props.handleChangeDD } />
                     <Form.Group>
                         <Form.Field>
                             <label>Termín podání</label>
@@ -48,6 +48,7 @@ class OffersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='nameorder' value={this.props.showData.nameorder} width={10}/>
                     </Form.Group>
+                    <Button type='submit' positive onClick={this.props.onSubmit}>Uložit</Button>
                     <Button type='createOrder' positive onClick={this.props.createOrder}>Vytvořit zakázku</Button>
                 </Form>
             </div>

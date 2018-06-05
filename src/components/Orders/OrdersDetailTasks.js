@@ -5,6 +5,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
+import {DelConfirm} from '../common/Confirmation';
 
 class OrdersDetailTasks extends Component {
 
@@ -13,9 +14,11 @@ class OrdersDetailTasks extends Component {
         this.tabItems = this.tabItems.bind(this);
         this.state = {
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, invoice: false},
             saved: false,
+            item:[],
         }
     };
 
@@ -32,8 +35,17 @@ class OrdersDetailTasks extends Component {
     }*/
 
 
-    deleteTask = (item) => {
+    deleteItemT = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         this.props.deleteTask(item)
+    }
+
+    deleteItemConfT = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
+        });
     }
 
     closeEdit = (item, saved) => {
@@ -78,7 +90,6 @@ class OrdersDetailTasks extends Component {
             flg_warning = true;
             rowStyle = 'bg-warning';
         };
-        //<Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} >
         return(
             <Table.Row key={item.idtask} className={rowStyle}>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
@@ -89,7 +100,7 @@ class OrdersDetailTasks extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteTask.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConfT.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -137,7 +148,14 @@ class OrdersDetailTasks extends Component {
                     showModal={this.state.showModal}
                     newItem={this.state.newItem}
                     onSubmit={this.onSubmitTask}
-                    onClose={this.closeEdit}/>
+                    onClose={this.closeEdit}
+                />
+                <DelConfirm visible={this.state.showConf}
+                            confText={'Chcete odstranit termín?'}
+                            onYes={this.deleteItemT}
+                            onNo={() => {this.setState({showConf: false});}}
+                            onClose={() => {this.setState({showConf: false});}}
+                />
             </div>
         )
     }

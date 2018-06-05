@@ -5,6 +5,7 @@ import CustomerDetail from './CustomerDetail';
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
+import {DelConfirm} from '../common/Confirmation';
 
 class Customers extends Component {
 
@@ -20,6 +21,7 @@ class Customers extends Component {
         this.state = {
             logged: false,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
             tableData: new Array(),
@@ -32,9 +34,11 @@ class Customers extends Component {
             direction: 'ascending',
             errorText: '',
             is_sub: false,
+            item:[],
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
     };
 
     componentWillMount(){
@@ -118,7 +122,9 @@ class Customers extends Component {
         console.log('New item '+ this.state.showModal);
     }
 
-    deleteItem(item){
+    deleteItem(){
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/customers/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -136,6 +142,13 @@ class Customers extends Component {
         }).catch(err => {
             console.log(err.toString())
             this.setState({ errorText: err.toString() });
+        });
+    }
+
+    deleteItemConf(item){
+        this.setState({
+            showConf: true,
+            item: item
         });
     }
 
@@ -173,7 +186,7 @@ class Customers extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -247,6 +260,12 @@ class Customers extends Component {
                                 newItem={this.state.newItem}
                                 onClose={this.closeEdit}
                                 onSubmit={this.onSubmit}
+                />
+                <DelConfirm visible={this.state.showConf}
+                            confText={'Chcete odstranit subjekt?'}
+                            onYes={this.deleteItem}
+                            onNo={() => {this.setState({showConf: false});}}
+                            onClose={() => {this.setState({showConf: false});}}
                 />
             </div>
         )

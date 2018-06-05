@@ -5,6 +5,7 @@ import UserDetail from './UserDetail';
 import  MyMessage from '../MyMessage';
 import {PHP_url, myFetchAuth} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
+import {DelConfirm} from '../common/Confirmation';
 
 class Users extends Component {
 
@@ -18,6 +19,7 @@ class Users extends Component {
         this.state = {
             logged: false,
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
             tableData: [],
@@ -28,10 +30,13 @@ class Users extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            errorText: ''
+            errorText: '',
+            item:[],
+            counter: 0,
         };
         this.items = this.items.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
     };
 
     componentWillMount(){
@@ -43,33 +48,10 @@ class Users extends Component {
     }
 
     componentDidMount(){
-        this.setState({ isLoading: true });
-        this.setState({ errorText: "" });
-        /*fetch(PHP_url+'/nz_rest_api_slim/users', {
-                //mode: 'no-cors',
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                }
-        })
-            .then((response)  => {
-                if (response.status === 200){
-                    console.log('response');
-                    return response.json();
-                }else {
-                    throw new Error(response.body);
-                }
-            }).then(json => {
-                    this.setState({tableData : json});
-                    this.setState({ isLoading: false });
-                    this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-            }).catch(error => {
-                this.setState({ error, isLoading: false });
-                this.setState({ errorText: error.toString() });
-                console.log("error")
-            });*/
-
-        this.setState({ isLoading: true });
+        this.setState({
+            isLoading: true,
+            errorText: "",
+            isLoading: true });
         myFetchAuth( 'GET', '/nz_rest_api_slim/users').then(
             result => this.fetchOK(result),
             error => this.fetchERR(error)
@@ -83,14 +65,12 @@ class Users extends Component {
             errorText: '',
             totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage),
         });
-        console.log('FETCH response');
     };
     fetchERR(error){
         this.setState({
             errorText: error.toString(),
             isLoading: false
         });
-        console.log("FETCH error")
     }
 
 
@@ -119,9 +99,10 @@ class Users extends Component {
         this.setState({
             showModal: true,
             newItem: false,
-            showData: item
+            showData: item,
+            counter: this.state.counter++,
         });
-        console.log('Edit item '+ item.id + this.state.showModal);
+        console.log('Edit item '+ item.id + this.state.showModal+this.state.counter);
     }
 
     newItem(){
@@ -133,8 +114,17 @@ class Users extends Component {
         console.log('New item '+ this.state.showModal);
     }
 
-    deleteItem(item){
-        this.setState({ errorText: "" });
+
+    deleteItemConf(item){
+        this.setState({
+            showConf: true,
+            item: item
+        });
+    }
+
+    deleteItem(){
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
         fetch(PHP_url+'/nz_rest_api_slim/users/delete', {
             method: 'POST',
             //mode: 'no-cors',
@@ -189,7 +179,7 @@ class Users extends Component {
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
+                    <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
         )
@@ -208,9 +198,9 @@ class Users extends Component {
             { key: 20, text: '20', value: 20 },
         ];
 
-        if (this.state.showModal === true){
+        if (this.state.showModal){
             return (
-                <UserDetail showData={this.state.showData} showModal={this.state.showModal} newItem={this.state.newItem} onClose={this.closeEdit}/>
+                <UserDetail showData={this.state.showData} showModal={this.state.showModal} newItem={this.state.newItem} onClose={this.closeEdit} counter={this.state.counter}/>
             )
         }else {
             return (
@@ -223,13 +213,13 @@ class Users extends Component {
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell sorted={column === 'username' && direction} onClick={this.handleSort('username')}>
-                                    ID</Table.HeaderCell>
+                                    Zkratka</Table.HeaderCell>
                                 <Table.HeaderCell sorted={column === 'email' && direction} onClick={this.handleSort('email')}>
-                                    Typ</Table.HeaderCell>
+                                    E-mail</Table.HeaderCell>
                                 <Table.HeaderCell sorted={column === 'firstname' && direction} onClick={this.handleSort('firstname')}>
-                                    Popis</Table.HeaderCell>
+                                    Jméno</Table.HeaderCell>
                                 <Table.HeaderCell sorted={column === 'lastname' && direction} onClick={this.handleSort('lastname')}>
-                                    Platnost</Table.HeaderCell>
+                                    Příjmení</Table.HeaderCell>
                                 <Table.HeaderCell />
                             </Table.Row>
                         </Table.Header>
@@ -256,10 +246,17 @@ class Users extends Component {
                             </Table.Row>
                         </Table.Footer>
                     </Table>
+                    <DelConfirm visible={this.state.showConf}
+                                confText={'Chcete odstranit uživatele?'}
+                                onYes={this.deleteItem}
+                                onNo={() => {this.setState({showConf: false});}}
+                                onClose={() => {this.setState({showConf: false});}}
+                    />
                 </div>
             )
         }
     }
 }
-
+//onNo={}
+//()=> {this.setState({ showConf: false})}
 export default Users;

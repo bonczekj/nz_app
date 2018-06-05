@@ -165,44 +165,6 @@ class OrdersDetail extends Component {
         this.setState({ showData: newState });
     };
 
-    onSubmit = (e) => {
-        e.preventDefault();
-        if (!checkSalesRole()) {
-            this.setState({ errorText: 'Nemáte právo na změnu dat' });
-            return;
-        }
-        let fetchUrl = '';
-        if (this.state.newItem === true){
-            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/create';
-        }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/update';
-        }
-
-        /*let subCont = subConts.filter(c => c.key == sub["ico"]);
-        let subCont0 = subCont[0];
-        sub.name = subCont0["text"];*/
-
-        fetch(fetchUrl, {
-            method: 'POST',
-            //mode: 'no-cors',
-            body: JSON.stringify(this.state.showData),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            this.setState({ errorText: ''});
-            if (response.status === 200){
-                this.setState({ saved: true });
-                this.closeEdit();
-            }
-        }).catch(error => {
-            console.log(error.toString())
-            this.setState({ errorText: error.toString() });
-        });
-
-    };
-
-
     closeEdit(){
         this.props.onClose(this.state.showData, this.state.saved);
     }
@@ -212,9 +174,66 @@ class OrdersDetail extends Component {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-        this.setState({
-            documents: _.reject(this.state.documents, function(el) { return el.iddocument === item.iddocument; })}
-        );
+        let fileDel = new Object( {idorder: this.state.showData.id, iddocument: item["iddocument"]} );
+
+        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/delete', {
+            method: 'POST',
+            body: JSON.stringify(fileDel),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                if (item["typeRS"] === "P"){
+                    this.setState({documentsP: _.reject(this.state.documentsP, function(el) { return el.iddocument === item.iddocument; })});
+                }
+                if (item["typeRS"] === "F"){
+                    this.setState({documentsF: _.reject(this.state.documentsF, function(el) { return el.iddocument === item.iddocument; })});
+                }
+                if (item["typeRS"] === "O"){
+                    this.setState({documentsO: _.reject(this.state.documentsO, function(el) { return el.iddocument === item.iddocument; })});
+                }
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
+
+
+    deleteSub = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubss/delete', {
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.setState({
+                    subs: _.reject(this.state.subs, function(el) { return el.idsub === item.idsub; })}
+                );
+                this.setState({
+                    subsDetail: _.reject(this.state.subsDetail, function(el) { return el.idsub === item.idsub; })}
+                );
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
     deleteTask = (item) => {
@@ -222,19 +241,54 @@ class OrdersDetail extends Component {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-        this.setState({
-            tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
-        );
+        fetch(PHP_url+'/nz_rest_api_slim/orderstasks/delete', {
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.setState({
+                    tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
+                );
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
-    deleteSub = (item) => {
+    deleteSubDetail = (item) => {
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-        this.setState({
-            subs: _.reject(this.state.subs, function(el) { return el.idsub === item.idsub; })}
-        );
+
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubss/delete', {
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.setState({
+                    subsDetail: _.reject(this.state.subsDetail, function(el) { return el.idsubdetail === item.idsubdetail; })}
+                );
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
     };
 
     addDocument = (documents, typeRS) => {
@@ -382,7 +436,7 @@ class OrdersDetail extends Component {
             fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubs/update';
         }else{
             fetchUrl = PHP_url+'/nz_rest_api_slim/orderssubs/create';
-            sub['idsub'] = this.state.showData.id;
+            sub['idorder'] = this.state.showData.id;
         }
 
         fetch(fetchUrl, {
@@ -464,6 +518,43 @@ class OrdersDetail extends Component {
         });
     };
 
+    onSubmit = (e) => {
+        e.preventDefault();
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let fetchUrl = '';
+        if (this.state.newItem === true){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/create';
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orders/update';
+        }
+
+        /*let subCont = subConts.filter(c => c.key == sub["ico"]);
+        let subCont0 = subCont[0];
+        sub.name = subCont0["text"];*/
+
+        fetch(fetchUrl, {
+            method: 'POST',
+            //mode: 'no-cors',
+            body: JSON.stringify(this.state.showData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.closeEdit();
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+
+    };
+
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
         if (!checkSalesRole()) {
@@ -505,9 +596,14 @@ class OrdersDetail extends Component {
         panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader
                                                               showData={this.state.showData}
                                                               Customers={this.props.Customers}
-                                                              handleChange={this.handleChange} handleChangeNum={this.handleChangeNum}
-                                                              handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}
-                                                              handleChangeCheckbox={this.handleChangeCheckbox}/> });
+                                                              handleChange={this.handleChange}
+                                                              handleChangeNum={this.handleChangeNum}
+                                                              handleChangeDD={this.handleChangeDD}
+                                                              handleChangeDate={this.handleChangeDate}
+                                                              handleChangeCheckbox={this.handleChangeCheckbox}
+                                                              onSubmit={this.onSubmit}
+                                                          /> }
+        );
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
         }
@@ -516,7 +612,12 @@ class OrdersDetail extends Component {
         panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsF} typeRS={'F'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
-            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks tasks={this.state.tasks} deleteTasks={this.deleteTask} addTask={this.addTask} onSubmitTask={this.onSubmitTask} /> });
+            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks
+                                                                tasks={this.state.tasks}
+                                                                deleteTask={this.deleteTask}
+                                                                addTask={this.addTask}
+                                                                onSubmitTask={this.onSubmitTask}
+                                                            /> });
             panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub
                                                                     subs={this.state.subs}
                                                                     subsDetail={this.state.subsDetail}
@@ -543,7 +644,6 @@ class OrdersDetail extends Component {
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button type='submit' onClick={this.onSubmit.bind(this) }>Uložit</Button>
                     <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
                 </Modal.Actions>
             </Modal>
@@ -551,7 +651,7 @@ class OrdersDetail extends Component {
         )
     }
 }
-
+//                     <Button type='submit' onClick={this.onSubmit.bind(this) }>Uložit</Button>
 //                        <Field name="ico" component={semanticFormField} as={Form.Input} type="text" label="IČO" placeholder="IČO" validate={required} />
 //<Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
 
