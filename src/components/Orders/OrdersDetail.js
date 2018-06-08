@@ -389,12 +389,12 @@ class OrdersDetail extends Component {
             task['idorder'] = this.state.showData.id;
         }
 
+        console.log(fetchUrl);
+        console.log(JSON.stringify(task));
         fetch(fetchUrl, {
+            headers: {'Content-Type': 'application/json'},
             method: 'POST',
             body: JSON.stringify(task),
-            headers: {
-                'Content-Type': 'application/json'
-            }
         }).then(response => {
             this.setState({ errorText: ''});
             if (response.status === 200){
