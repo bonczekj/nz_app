@@ -27,7 +27,7 @@ class Orders extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: '', idcenter: '', status: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -41,6 +41,7 @@ class Orders extends Component {
             search: '',
             subContractors: [],
             Customers: [],
+            Centers: [],
             item:[],
         };
         this.items = this.items.bind(this);
@@ -68,6 +69,7 @@ class Orders extends Component {
 
     readCustomers() {
         let CustOptions = [];
+        let CentOptions = [];
         let SubContOptions = [];
         fetch(PHP_url+'/nz_rest_api_slim/subcontractors', {
             method: 'GET',
@@ -116,6 +118,32 @@ class Orders extends Component {
             console.log(CustOptions);
             this.setState({
                 Customers: CustOptions
+            })
+        }).catch(error => {
+        });
+
+        fetch(PHP_url+'/nz_rest_api_slim/centers', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            if (response.status === 200){
+                return response.json();
+            }
+        }).then(json => {
+            let index;
+            for (index = 0; index < json.length; ++index) {
+                let CentOption = {
+                    key: json[index].idcenter,
+                    text: json[index].idcenter + " - " + json[index].person,
+                    value: json[index].idcenter,
+                };
+                CentOptions.push(CentOption);
+            }
+            console.log(CentOptions);
+            this.setState({
+                Centers: CentOptions
             })
         }).catch(error => {
         });
@@ -275,8 +303,10 @@ class Orders extends Component {
         return(
             <Table.Row key={item.id}>
                 <Table.Cell>{item.id}</Table.Cell>
+                <Table.Cell>{item.status}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.customer}</Table.Cell>
+                <Table.Cell>{item.idcenter}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.processdate)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
@@ -337,8 +367,10 @@ class Orders extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell width={1} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'status' && direction} onClick={this.handleSort('status')}>Status</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>Středisko</Table.HeaderCell>
                             <Table.HeaderCell width={2}sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
                             <Table.HeaderCell width={2}/>
                         </Table.Row>
@@ -350,13 +382,13 @@ class Orders extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='2' >
+                            <Table.HeaderCell colSpan='3' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                                 <OrdersExcel tableData={this.state.tableData} />
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='3' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -372,6 +404,7 @@ class Orders extends Component {
                               hasSalesRole={this.state.hasSalesRole}
                               newItem={this.state.newItem}
                               Customers={this.state.Customers}
+                              Centers={this.state.Centers}
                               subContractors={this.state.subContractors}
                               onClose={this.closeEdit}
                               onSubmit={this.onSubmit}

@@ -16,7 +16,7 @@ class OrdersDetailSub extends Component {
             showModal: false,
             showConfS: false,
             newItem: false,
-            showData: {idorder: '', idsub: '', idsubdetail: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
+            showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
             subsDetail: [],
             saved: false,
             item:[],
@@ -34,9 +34,8 @@ class OrdersDetailSub extends Component {
     }*/
 
 
-    deleteItem = () => {
-        this.setState({ showConfS: false, errorText: "" });
-        this.props.deleteSub(this.state.item)
+    deleteItem = (item) => {
+        this.props.deleteSub(item)
     }
 
     deleteItemConf = (item) => {
@@ -84,14 +83,11 @@ class OrdersDetailSub extends Component {
     }
 
     tabItems(item, i){
-        //console.log(item.idsubdetail);
+        console.log(item.idsub);
         return(
-            <Table.Row key={item.idsubdetail}>
+            <Table.Row key={item.idsub}>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                     {'   '}
@@ -111,21 +107,18 @@ class OrdersDetailSub extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Subdodavatel</Table.HeaderCell>
-                            <Table.HeaderCell>Cena</Table.HeaderCell>
-                            <Table.HeaderCell>Termín</Table.HeaderCell>
-                            <Table.HeaderCell>Fakturace</Table.HeaderCell>
-                            <Table.HeaderCell>Dokončeno</Table.HeaderCell>
+                            <Table.HeaderCell>Cena celkem</Table.HeaderCell>
                             <Table.HeaderCell />
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        {this.props.subsDetail.map(this.tabItems)}
+                        {this.props.subs.map(this.tabItems)}
                     </Table.Body>
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='6' >
+                            <Table.HeaderCell colSpan='3' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>

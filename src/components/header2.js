@@ -75,6 +75,7 @@ class Header2_NavMenu extends Component{
                     <Dropdown item simple text='Čísleníky'>
                         <Dropdown.Menu>
                             <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>
+                            <Dropdown.Item as={NavLink} to="/centers">Střediska</Dropdown.Item>
                             <Dropdown.Item as={NavLink} to="/documents">Dokumenty</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item as={NavLink} to="/customers">Zákazníci</Dropdown.Item>

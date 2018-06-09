@@ -156,7 +156,7 @@ class CustomerDetail extends Component {
                             <label>Profese</label>
                             <input placeholder='Profese' name = 'profession' value={this.state.showData.profession} onChange={ this.handleChange }/>
                         </Form.Field>
-                        <Form.Field control={Select} options={optionDealType} label='Typ dohody' placeholder='Typ dohody' name = 'dealtype' value={this.state.showData.deliverytype} onChange={this.handleChangeDD}/>
+                        <Form.Field control={Select} options={optionDealType} label='Smluvní vztah' name = 'dealtype' value={this.state.showData.deliverytype} onChange={this.handleChangeDD}/>
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                     </Form>

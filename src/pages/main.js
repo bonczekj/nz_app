@@ -4,6 +4,7 @@ import { Container } from 'semantic-ui-react'
 
 import Offers from '../components/offers/Offers';
 import Users from '../components/users/Users';
+import Centers from '../components/centers/Centers';
 import Documents from '../components/documents/Documents';
 import Orders from '../components/Orders/Orders';
 import Customers from '../components/customers/Customers';
@@ -26,6 +27,7 @@ class Main extends Component {
                 <Route exact path="/customers" component={Customers}/>
                 <Route exact path="/subcontractors" component={Customers} />
                 <Route exact path="/tasks" component={Tasks}/>
+                <Route exact path="/centers" component={Centers}/>
                 <Route exact path="/login" component={Login}/>
                 <Route exact path="/changepassword" component={ChangePassword}/>
             </Container>

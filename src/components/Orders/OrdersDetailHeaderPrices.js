@@ -51,16 +51,16 @@ class OrdersDetailHeaderPrices extends Component {
                     <Form.Field control={Input} label='Mzdy'   name='price_w' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_w)} width={4} onChange={this.props.handleChangeNum}/>
                     <Form.Field control={Input} label='Režie'  name='price_r' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_r)} width={4} onChange={this.props.handleChangeNum}/>
                     <Form.Group>
-                        <Form.Field control={Input} label='Dohody - pl.' name='price_s_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_s_pl)}/>
-                        <Form.Field control={Input} label='Dohody - sk.' name='price_s' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_s)}/>
+                        <Form.Field control={Input} label='Dohody - plán' name='price_s_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_s_pl)}/>
+                        <Form.Field control={Input} label='Dohody' name='price_s' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_s)}/>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Field control={Input} label='Fakturace - pl.' name='price_c_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_c_pl)}/>
-                        <Form.Field control={Input} label='Fakturace - sk.' name='price_c' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_c)}/>
+                        <Form.Field control={Input} label='Fakturace - plán' name='price_c_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_c_pl)}/>
+                        <Form.Field control={Input} label='Fakturace' name='price_c' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price_c)}/>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Field control={Input} label='HV - pl.' name='hv_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(hv_pl)}/>
-                        <Form.Field control={Input} label='HV - sk.' name='hv' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(hv)}/>
+                        <Form.Field control={Input} label='HV - plán' name='hv_pl' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(hv_pl)}/>
+                        <Form.Field control={Input} label='HV' name='hv' readOnly width={4} value={new Intl.NumberFormat('cs-CS').format(hv)}/>
                     </Form.Group>
                 </Form>
             </div>

@@ -1,24 +1,36 @@
 import React, {Component} from 'react';
-import {Button, Modal, Form, Select} from 'semantic-ui-react'
+import {Button, Modal, Form, Dropdown, Select, Input, Table, Icon} from 'semantic-ui-react'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-//import {PHP_url} from './../../PHP_Connector';
+import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
-import 'react-datepicker/dist/react-datepicker.css';
 import {optionYesNo} from "../constants";
+import {getSubContractors, subContractorsOption} from "../common/SubContractors";
+import {decodeOptionValue, getFormatDate} from '../validation';
 
-class TaskDetail extends Component {
+//import 'react-datepicker/dist/react-datepicker.css';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import DayPicker from 'react-day-picker';
+import 'react-day-picker/lib/style.css';
+import MomentLocaleUtils, {
+    formatDate,
+    parseDate,
+} from 'react-day-picker/moment';
+import 'moment/locale/cs';
+
+class OrdersDetailSubDetailEdit extends Component {
 
     texts = {
-        detail: 'Detail termínu',
+        detail: 'Detail subdodávky',
     };
 
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0},
+            showData: {idorder: '', idsub: '', idsubdetail: '', taskdate: '', price: 0, finished: '', invoice: false},
             taskdateNumber: '',
             finishedNumber: '',
+            subsDetail: [],
             newItem: false,
             saved: false,
         }
@@ -27,6 +39,7 @@ class TaskDetail extends Component {
     };
 
     componentWillReceiveProps(nextProps){
+
         this.setState({
                 showData: nextProps.showData,
                 newItem: nextProps.newItem,
@@ -35,10 +48,10 @@ class TaskDetail extends Component {
             },
         );
         if (nextProps.showData.taskdate !== null){
-            this.setState({ taskdateNumber: moment(nextProps.showData.taskdate) });
+            //this.setState({ taskdateNumber: moment(nextProps.showData.taskdate) });
         }
         if (nextProps.showData.finished !== null){
-            this.setState({ finishedNumber: moment(nextProps.showData.finished) });
+            //this.setState({ finishedNumber: moment(nextProps.showData.finished) });
         }
     }
 
@@ -54,6 +67,13 @@ class TaskDetail extends Component {
         this.setState({ taskdateNumber: date });
     }
 
+    handleDayChange(selectedDay, modifiers) {
+        const newState = {...this.state.showData, ['taskdate']: selectedDay};
+        this.setState({ showData: newState });
+        this.setState({ taskdateNumber: selectedDay });
+    }
+
+
     handleChangeDateF = (date) => {
         const selDate = moment(date).format('YYYY-MM-DD');
         const newState = {...this.state.showData, ['finished']: selDate};
@@ -67,12 +87,13 @@ class TaskDetail extends Component {
     }
 
      onSubmit = (e) => {
-        this.props.onSubmit(e, this.state.showData);
+        this.props.onSubmitSubDetail(e, this.state.showData);
     }
 
     closeEdit(){
         this.props.onClose(this.state.showData);
-    }
+        //this.setState({showModal: false});
+    };
 
     render() {
         return (
@@ -84,24 +105,20 @@ class TaskDetail extends Component {
                        closeOnRootNodeClick={false}>
                     <Modal.Header>{this.texts.detail}</Modal.Header>
                     <Modal.Content>
-                        <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                         <Form>
-                            <Form.Field required>
-                                <label>Popis</label>
-                                <input placeholder='Popis' name='taskdesc' value={this.state.showData.taskdesc} onChange={ this.handleChange }/>
-                            </Form.Field>
                             <Form.Field>
                                 <label>Termín</label>
-                                <DatePicker
-                                    dateFormat="DD.MM.YYYY"
-                                    selected={this.state.taskdateNumber}
-                                    onChange={this.handleChangeDate}
-                                />
+                                <DayPickerInput
+                                    formatDate={formatDate}
+                                    parseDate={parseDate}
+                                    onDayChange={this.handleChangeDate}
+                                    value={moment(this.state.showData.taskdate).format('DD.MM.YYYY')}
+                                    dayPickerProps={{
+                                        locale: 'cs',
+                                        localeUtils: MomentLocaleUtils,
+                                    }}/>
                             </Form.Field>
-                            <Form.Field>
-                                <label>Cena</label>
-                                <input placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
-                            </Form.Field>
+                            <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
                             <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                             <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
@@ -115,19 +132,7 @@ class TaskDetail extends Component {
 
 /*
 
-                            <Form.Field>
-                                <label>Dokončeno</label>
-                                <DatePicker
-                                    dateFormat="DD.MM.YYYY"
-                                    selected={this.state.finishedNumber}
-                                    onChange={this.handleChangeDateF}
-                                />
-                            </Form.Field>
-
-
-                             <input placeholder='Typ' name='type' value={this.state.showData.type} onChange={ this.handleChange }/>
-
 * */
-export default TaskDetail;
+export default OrdersDetailSubDetailEdit;
 
 

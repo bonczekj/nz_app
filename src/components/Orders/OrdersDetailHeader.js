@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Input, Form, Select, Checkbox, Button } from 'semantic-ui-react'
-import {optionYesNo, optionDeliveryType} from "../constants";
+import {optionOrdStatus} from "../constants";
 import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
@@ -18,19 +18,22 @@ class OrdersDetailHeader extends Component {
             this.setState({ processdateNumber: moment(nextProps.showData.processdate) });
         }
     }
-
+// readOnly
     render() {
         return (
             <div style={{paddingTop:'1em'}}>
                 <Form>
                     <Form.Group>
-                        <Form.Field control={Input} readOnly label='Zakázka' placeholder='Zakázka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
+                        <Form.Field control={Input} label='Zakázka' placeholder='Zakázka' name='id' value={this.props.showData.id} width={3} onChange={this.props.handleChange}/>
                         <Form.Field control={Input} label='Název' placeholder='Název akce' name='name' value={this.props.showData.name} width={10} onChange={this.props.handleChange }/>
                     </Form.Group>
-                    <Form.Field control={Select} required search options={this.props.Customers} label='Investor' name='ico' value={this.props.showData.ico} onChange={this.props.handleChangeDD } />
+                    <Form.Group>
+                        <Form.Field control={Select} width={8} required search options={this.props.Customers} label='Investor' name='ico' value={this.props.showData.ico} onChange={this.props.handleChangeDD } />
+                        <Form.Field control={Select} search options={this.props.Centers} label='Střediko' name='idcenter' value={this.props.showData.idcenter} onChange={this.props.handleChangeDD } />
+                    </Form.Group>
                     <Form.Group>
                         <Form.Field>
-                            <label>Termín dokončení</label>
+                            <label>Termín dle SOD</label>
                             <DatePicker
                                 dateFormat="DD.MM.YYYY"
                                 selected={this.state.processdateNumber}
@@ -42,12 +45,7 @@ class OrdersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Nabídka' name='idoffer' value={this.props.showData.idoffer} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='idofferdesc' value={this.props.showData.idofferdesc} width={10}/>
                     </Form.Group>
-                    <Form.Field>
-                        <Checkbox label='Archív'
-                                  name={'archive'}
-                                  checked={this.props.showData.archive === '1' ? true : false}
-                                  onChange={ this.props.handleChangeCheckbox }/>
-                    </Form.Field>
+                    <Form.Field width={4} control={Select} options={optionOrdStatus} label='Status' name='status' value={this.props.showData.status} onChange={this.props.handleChangeDD}/>
                     <Form.Field control={Input} label='Umístění' placeholder='Umístění v archívu' name='archiveloc' value={this.props.showData.archiveloc} onChange={this.props.handleChange}/>
                     <Button type='submit' onClick={this.props.onSubmit}>Uložit</Button>
                 </Form>
@@ -59,6 +57,15 @@ class OrdersDetailHeader extends Component {
 export default OrdersDetailHeader;
 
 /*
+
+                    <Form.Field>
+
+                        <Checkbox label='Archív'
+                                  name={'archive'}
+                                  checked={this.props.showData.archive === '1' ? true : false}
+                                  onChange={ this.props.handleChangeCheckbox }/>
+                    </Form.Field>
+
 
                         <Form.Field control={Select} options={optionYesNo} label='Pochůzka' placeholder='Pochůzka' name='errand' value={this.props.showData.errand} onChange={this.props.handleChangeDD }/>
                     <Form.Group>

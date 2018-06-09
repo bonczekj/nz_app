@@ -23,9 +23,9 @@ class OrdersDetail extends Component {
         this.state = {
             file:null,
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '',
-                       idoffer: '', idofferdesc: '',
+                       idoffer: '', idofferdesc: '', status: '',
                        price_w: 0, price_d: 0, price_r: 0, price_s: 0, price_s_pl: 0, price_c: 0, price_c_pl: 0,
-                       archive: '', archiveloc: '' },
+                       archive: '', archiveloc: '', idcenter: ''},
             processdateNumber: 0,
             newItem: false,
             errorText: '',
@@ -34,7 +34,7 @@ class OrdersDetail extends Component {
             documentsF: [],
             documentsO: [],
             tasks: [],
-            subs: [],
+            //subs: [],
             subsDetail: [],
         };
         this.closeEdit = this.closeEdit.bind(this);
@@ -83,7 +83,8 @@ class OrdersDetail extends Component {
                 this.setState({ errorText: error.toString() });
             });
 
-            fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
+            this.readTasks(nextProps.showData);
+            /*fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
                 //mode: 'no-cors',
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
@@ -98,9 +99,9 @@ class OrdersDetail extends Component {
                 //this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
-            });
+            });*/
 
-            fetch(PHP_url+'/nz_rest_api_slim/orderssubs', {
+            /*fetch(PHP_url+'/nz_rest_api_slim/orderssubs', {
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
                 headers: {
@@ -114,9 +115,10 @@ class OrdersDetail extends Component {
                 //this.setState({ errorText: '' });
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
-            });
+            });*/
 
-            fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
+            this.readSubs(nextProps.showData);
+            /*fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
                 headers: {
@@ -128,8 +130,48 @@ class OrdersDetail extends Component {
                 this.setState({subsDetail: json});
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
-            });
+            });*/
         }
+    }
+
+
+
+    readTasks = (showData) => {
+        fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify(showData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+            .then((response)  => {
+                return response.json();
+            }).then(json => {
+            this.setState({tasks: json});
+            //this.setState({ errorText: '' });
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+    }
+
+        readSubs = (showData) => {
+        console.log("fetch orderssubsdetail ");
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
+            method: 'POST',
+            body: JSON.stringify(showData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            return response.json();
+        }).then(json => {
+            this.setState({subsDetail: json});
+            console.log(this.state.subsDetail);
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+
     }
 
     handleChange = (e) => {
@@ -157,6 +199,7 @@ class OrdersDetail extends Component {
     handleChangeDD = (e, { name, value }) => {
         const newState = {...this.state.showData, [name]: value};
         this.setState({ showData: newState });
+        console.log(name + value);
     };
 
     handleChangeCheckbox = (e, checkBox) => {
@@ -211,7 +254,9 @@ class OrdersDetail extends Component {
             return;
         }
 
-        fetch(PHP_url+'/nz_rest_api_slim/orderssubss/delete', {
+        console.log(PHP_url+'/nz_rest_api_slim/orderssubs/delete');
+        console.log(item);
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubs/delete', {
             method: 'POST',
             body: JSON.stringify(item),
             headers: {
@@ -221,12 +266,13 @@ class OrdersDetail extends Component {
             this.setState({ errorText: ''});
             if (response.status === 200){
                 this.setState({ saved: true });
-                this.setState({
+                /*this.setState({
                     subs: _.reject(this.state.subs, function(el) { return el.idsub === item.idsub; })}
                 );
                 this.setState({
                     subsDetail: _.reject(this.state.subsDetail, function(el) { return el.idsub === item.idsub; })}
-                );
+                );*/
+                this.readSubs(this.state.showData);
             }else {
                 throw new Error(response.body);
             }
@@ -251,9 +297,11 @@ class OrdersDetail extends Component {
             this.setState({ errorText: ''});
             if (response.status === 200){
                 this.setState({ saved: true });
+                this.readTasks(this.state.showData);
+                /*
                 this.setState({
                     tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
-                );
+                );*/
             }else {
                 throw new Error(response.body);
             }
@@ -399,7 +447,7 @@ class OrdersDetail extends Component {
             this.setState({ errorText: ''});
             if (response.status === 200){
 
-                const items = this.state.tasks;
+                /*const items = this.state.tasks;
                 if (newTask) {
                     items.push(task);
                 }else{
@@ -410,7 +458,8 @@ class OrdersDetail extends Component {
                     tasks: items
                 });
                 this.setState({ saved: true });
-                //this.closeEdit();
+                //this.closeEdit();*/
+                this.readTasks(this.state.showData);
             }
         }).catch(error => {
             console.log(error.toString())
@@ -439,6 +488,7 @@ class OrdersDetail extends Component {
             sub['idorder'] = this.state.showData.id;
         }
 
+        console.log(fetchUrl);
         fetch(fetchUrl, {
             method: 'POST',
             body: JSON.stringify(sub),
@@ -450,7 +500,7 @@ class OrdersDetail extends Component {
             if (response.status === 200){
                 this.setState({ saved: true });
                 //this.closeEdit();
-                const items = this.state.subs;
+                /*const items = this.state.subsDetail;
 
                 let subConts = this.props.subContractors;
                 let subCont = subConts.filter(c => c.key == sub["ico"]);
@@ -464,14 +514,32 @@ class OrdersDetail extends Component {
                     let pos = getArrayPos(items, 'idsub', sub['idsub']);
                     items.splice(pos, 1, sub);
                 }
-                this.setState({
-                    subs: items
-                });
+                //this.setState({subs: items});
+                this.setState({subsDetail: items});*/
+                this.readSubs(this.state.showData);
+
+
             }
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
         });
+
+        //this.readSubs(this.state.showData)
+        /*fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
+            method: 'POST',
+            body: JSON.stringify(this.state.showData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        }).then((response)  => {
+            return response.json();
+        }).then(json => {
+            this.setState({subsDetail: json});
+            console.log(this.state.subsDetail);
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });*/
 
     };
 
@@ -579,7 +647,8 @@ class OrdersDetail extends Component {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-        this.addSub(item)
+        this.addSub(item);
+
     };
 
     onSubmitSubDetail = (e, item) => {
@@ -593,9 +662,10 @@ class OrdersDetail extends Component {
 
     render() {
         let panes = [];
-        panes.push({ menuItem: 'Parametry', render: () => <OrdersDetailHeader
+        panes.push({ menuItem: 'Identifikační údaje', render: () => <OrdersDetailHeader
                                                               showData={this.state.showData}
                                                               Customers={this.props.Customers}
+                                                              Centers={this.props.Centers}
                                                               handleChange={this.handleChange}
                                                               handleChangeNum={this.handleChangeNum}
                                                               handleChangeDD={this.handleChangeDD}
@@ -608,16 +678,17 @@ class OrdersDetail extends Component {
             panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
         }
         //panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        if (this.props.hasSalesRole){
+            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks
+                    tasks={this.state.tasks}
+                    deleteTask={this.deleteTask}
+                    addTask={this.addTask}
+                    onSubmitTask={this.onSubmitTask}
+                /> });
+        }
         panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsP} typeRS={'P'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsF} typeRS={'F'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
-            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
-            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks
-                                                                tasks={this.state.tasks}
-                                                                deleteTask={this.deleteTask}
-                                                                addTask={this.addTask}
-                                                                onSubmitTask={this.onSubmitTask}
-                                                            /> });
             panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub
                                                                     subs={this.state.subs}
                                                                     subsDetail={this.state.subsDetail}
@@ -629,6 +700,7 @@ class OrdersDetail extends Component {
                                                                     onSubmitSub={this.onSubmitSub}
                                                                     onSubmitSubDetail={this.onSubmitSubDetail}
                                                                 /> });
+            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         }
 
         return (
@@ -638,7 +710,7 @@ class OrdersDetail extends Component {
                    onClose={this.closeEdit.bind(this)}
                    closeOnEscape={true}
                    closeOnRootNodeClick={false}>
-                <Modal.Header>{this.texts.detail}</Modal.Header>
+                <Modal.Header>{this.texts.detail} - {this.state.showData.name}</Modal.Header>
                 <Modal.Content scrolling>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                     <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
