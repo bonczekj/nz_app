@@ -6,6 +6,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
+import {checkSalesRole} from "../validation";
 
 class Customers extends Component {
 
@@ -23,7 +24,7 @@ class Customers extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
+            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: '', mobil: '', email: ''},
             tableData: new Array(),
             isLoading: false,
             error: null,
@@ -179,13 +180,14 @@ class Customers extends Component {
     items(item, i){
         return(
             <Table.Row key={item.ico}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.ico}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.profession}</Table.Cell>
                 <Table.Cell>{item.address}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -212,6 +214,7 @@ class Customers extends Component {
 
         console.log(this.state.tableData);
         return (
+
             <div>
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 <Segment textAlign='center'>
@@ -220,7 +223,8 @@ class Customers extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>
+                            <Table.HeaderCell width={1}/>
+                            <Table.HeaderCell width={2} sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>
                                 IČO</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>
                                 Název</Table.HeaderCell>
@@ -228,7 +232,7 @@ class Customers extends Component {
                                 Profese</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'address' && direction} onClick={this.handleSort('address')}>
                                 Adresa</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -238,7 +242,7 @@ class Customers extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell >
+                            <Table.HeaderCell colSpan='2' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {(this.state.is_sub === false) ? this.texts.newItem : this.texts.newItemSub}
                                 </Button>

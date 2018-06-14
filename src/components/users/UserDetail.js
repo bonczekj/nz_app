@@ -5,7 +5,7 @@ import  MyMessage from '../MyMessage';
 import {checkSalesRole} from "../validation";
 import {myFetchAuth} from "../../PHP_Connector";
 
-class UserDetail extends Component {
+export default class UserDetail extends Component {
 
     texts = {
         detail: 'Detail uživatele',
@@ -15,7 +15,7 @@ class UserDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {username: '', email: '', password: '', firstname: '', lastname: '', salesData: 0},
+            showData: {username: '', email: '', password: '', firstname: '', lastname: '', salesData: 0, techData: 0},
             newItem: false,
             saved: false,
             errorText: ''
@@ -68,7 +68,7 @@ class UserDetail extends Component {
         if (this.props.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/users/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/users';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/users/update';
         }
 
         this.setState({ errorText: "" });
@@ -130,12 +130,18 @@ class UserDetail extends Component {
                         <label>Příjmení</label>
                         <input placeholder='Příjmení' name = 'lastname' value={this.state.showData.lastname} onChange={ this.handleChange }/>
                     </Form.Field>
-                    <Form.Field inline>
-                        <Checkbox label='Editace dat'
-                                  name={'salesData'}
-                                  checked={this.state.showData.salesData === '1' ? true : false}
-                                  onChange={ this.handleChangeCheckbox }/>
-                    </Form.Field>
+                        <Form.Field inline>
+                            <Checkbox label='Právo na obchodní data'
+                                      name={'salesData'}
+                                      checked={this.state.showData.salesData === '1' ? true : false}
+                                      onChange={ this.handleChangeCheckbox }/>
+                        </Form.Field>
+                        <Form.Field inline>
+                            <Checkbox label='Právo na technická data'
+                                      name={'techData'}
+                                      checked={this.state.showData.techData === '1' ? true : false}
+                                      onChange={ this.handleChangeCheckbox }/>
+                        </Form.Field>
                     <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                     <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
             </Form>
@@ -144,7 +150,6 @@ class UserDetail extends Component {
     }
 }
 
-export default UserDetail;
 
 /*
                         <Form.Field>

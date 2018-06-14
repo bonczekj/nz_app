@@ -115,7 +115,7 @@ class Orders extends Component {
                 };
                 CustOptions.push(CustOption);
             }
-            console.log(CustOptions);
+            //console.log(CustOptions);
             this.setState({
                 Customers: CustOptions
             })
@@ -141,7 +141,7 @@ class Orders extends Component {
                 };
                 CentOptions.push(CentOption);
             }
-            console.log(CentOptions);
+            //console.log(CentOptions);
             this.setState({
                 Centers: CentOptions
             })
@@ -152,7 +152,7 @@ class Orders extends Component {
     readData(){
 
         this.setState({ isLoading: true });
-        console.log(PHP_url);
+        //console.log(PHP_url);
         //let url = this.state.is_archive ? '/nz_rest_api_slim/ordersarchive' : '/nz_rest_api_slim/orders';
         let urlSuffix = (this.state.is_archive) ? 'ordersarchive' : 'orders';
 
@@ -229,13 +229,14 @@ class Orders extends Component {
         }
     }
 
-    editItem(item){
+    //editItem(item){
+    editItem = (item) => {
         this.setState({
             showModal: true,
             newItem: false,
             showData: item
         });
-        console.log('Edit item '+ item.id + this.state.showModal);
+        //console.log('Edit item '+ item.id + this.state.showModal);
     }
 
     newItem(){
@@ -244,7 +245,7 @@ class Orders extends Component {
             newItem: true,
             showData: []}
             );
-        console.log('New item '+ this.state.showModal);
+        //console.log('New item '+ this.state.showModal);
     }
 
     deleteItem = () => {
@@ -266,7 +267,7 @@ class Orders extends Component {
             this.setState({ errorText: '' });
         }).catch(error => {
             this.setState({ errorText: error.toString() });
-            console.log(error.toString())
+            //console.log(error.toString())
         });
     }
 
@@ -302,6 +303,9 @@ class Orders extends Component {
     items(item, i){
         return(
             <Table.Row key={item.id}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.id}</Table.Cell>
                 <Table.Cell>{item.status}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
@@ -309,8 +313,6 @@ class Orders extends Component {
                 <Table.Cell>{item.idcenter}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.processdate)}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -366,13 +368,14 @@ class Orders extends Component {
                 <Table sortable padded celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
+                            <Table.HeaderCell width={1}/>
                             <Table.HeaderCell width={1} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'status' && direction} onClick={this.handleSort('status')}>Status</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>Středisko</Table.HeaderCell>
                             <Table.HeaderCell width={2}sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
-                            <Table.HeaderCell width={2}/>
+                            <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -388,7 +391,7 @@ class Orders extends Component {
                                 </Button>
                                 <OrdersExcel tableData={this.state.tableData} />
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='5' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

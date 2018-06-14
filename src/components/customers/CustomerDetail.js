@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import { Button, Modal, Form, Select} from 'semantic-ui-react';
 import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole} from "../validation";
-import {optionDealType} from "../constants";
+import {checkSalesRole, decodeOptionValue} from "../validation";
+import {optionDealType, optionDeliveryType} from "../constants";
 
 class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
@@ -17,7 +17,7 @@ class CustomerDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: ''},
+            showData: {ico: '', name: '', profession: '', address: '', sub: '', dealtype: '', mobil: '', email: ''},
             newItem: false,
             saved: false,
             errorText: ''
@@ -142,7 +142,6 @@ class CustomerDetail extends Component {
                             <label>IČO</label>
                             <input placeholder='IČO' name='ico' value={this.state.showData.ico} onChange={ this.handleChange }/>
                             <Button onClick={this.readAres.bind(this)}>ARES</Button>
-
                         </Form.Field>
                         <Form.Field required>
                             <label>Název</label>
@@ -156,7 +155,15 @@ class CustomerDetail extends Component {
                             <label>Profese</label>
                             <input placeholder='Profese' name = 'profession' value={this.state.showData.profession} onChange={ this.handleChange }/>
                         </Form.Field>
-                        <Form.Field control={Select} options={optionDealType} label='Smluvní vztah' name = 'dealtype' value={this.state.showData.deliverytype} onChange={this.handleChangeDD}/>
+                        <Form.Field control={Select} options={optionDealType} label='Smluvní vztah' name = 'dealtype' value={this.state.showData.dealtype} onChange={this.handleChangeDD}/>
+                        <Form.Field >
+                            <label>Telefon</label>
+                            <input name='mobil' value={this.state.showData.mobil} onChange={ this.handleChange }/>
+                        </Form.Field>
+                        <Form.Field >
+                            <label>e-mail</label>
+                            <input name='email' value={this.state.showData.email} onChange={ this.handleChange }/>
+                        </Form.Field>
                         <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                         <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                     </Form>

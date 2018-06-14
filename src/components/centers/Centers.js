@@ -169,11 +169,12 @@ class Centers extends Component {
     items(item, i){
         return(
             <Table.Row key={item.idcenter}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.idcenter}</Table.Cell>
                 <Table.Cell>{item.person}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -202,11 +203,12 @@ class Centers extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>
+                            <Table.HeaderCell width={1}/>
+                            <Table.HeaderCell width={2} sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>
                                 Středisko</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'Person' && direction} onClick={this.handleSort('person')}>
                                 Osoba</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -216,7 +218,7 @@ class Centers extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell >
+                            <Table.HeaderCell colSpan='2' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>

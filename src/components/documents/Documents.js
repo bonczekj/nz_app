@@ -205,14 +205,15 @@ class Documents extends Component {
     items(item, i){
         return(
             <Table.Row key={item.id}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.id}</Table.Cell>
                 <Table.Cell>{item.type}</Table.Cell>
                 <Table.Cell>{item.description}</Table.Cell>
                 <Table.Cell>{item.filename}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.expiration)}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -247,7 +248,8 @@ class Documents extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('id')}>
+                            <Table.HeaderCell width={1}/>
+                            <Table.HeaderCell width={2} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>
                                 ID</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'type' && direction} onClick={this.handleSort('type')}>
                                 Typ</Table.HeaderCell>
@@ -257,7 +259,7 @@ class Documents extends Component {
                                 Soubor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'expiration' && direction} onClick={this.handleSort('expiration')}>
                                 Platnost</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -267,12 +269,12 @@ class Documents extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell >
+                            <Table.HeaderCell  colSpan='2'>
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='5' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

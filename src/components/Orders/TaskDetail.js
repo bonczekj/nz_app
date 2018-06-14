@@ -16,7 +16,7 @@ class TaskDetail extends Component {
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0},
+            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, note: ''},
             taskdateNumber: '',
             finishedNumber: '',
             newItem: false,
@@ -70,7 +70,8 @@ class TaskDetail extends Component {
         this.props.onSubmit(e, this.state.showData);
     }
 
-    closeEdit(){
+    closeEdit(e){
+        e.preventDefault();
         this.props.onClose(this.state.showData);
     }
 
@@ -99,8 +100,12 @@ class TaskDetail extends Component {
                                 />
                             </Form.Field>
                             <Form.Field>
+                                <label>Poznámka</label>
+                                <input name='note' value={this.state.showData.note} onChange={ this.handleChange }/>
+                            </Form.Field>
+                            <Form.Field>
                                 <label>Cena</label>
-                                <input placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
+                                <input type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
                             </Form.Field>
                             <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>

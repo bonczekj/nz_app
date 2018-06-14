@@ -164,7 +164,7 @@ class OffersDetail extends Component {
                 throw new Error(response.body);
             }
         }).then(json => {
-            console.log(json['id'] + " "+json['name']);
+            //console.log(json['id'] + " "+json['name']);
             this.setState({ errorText: '' });
             let newState = {...this.state.showData, ['idorder']: json['id']};
             newState = {...newState, ['nameorder']: json['name']};

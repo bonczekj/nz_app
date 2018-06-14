@@ -4,7 +4,7 @@ import _ from 'lodash';
 //import DocumentDetail from './DocumentDetail';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, decodeOptionValue, getFormatDate} from '../validation';
+import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
 
@@ -43,7 +43,7 @@ class Tasks extends Component {
         }else{
             this.setState({loggedf: false})
         }
-        let role = checkSalesRole();
+        let role = checkSalesRole() || checkTechRole();
         this.setState({
             errorText: '',
             hasSalesRole: role,
@@ -178,18 +178,31 @@ class Tasks extends Component {
             flg_warning = true;
             rowStyle = 'bg-warning';
         };
-        return(
-
-            <Table.Row key={item.idtask} className={rowStyle}>
-                <Table.Cell>{item.idorder}</Table.Cell>
-                <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                <Table.Cell>{item.taskdesc}</Table.Cell>
-                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-            </Table.Row>
-        )
+        if (checkSalesRole()){
+            return(
+                <Table.Row key={item.idtask} className={rowStyle}>
+                    <Table.Cell>{item.idorder}</Table.Cell>
+                    <Table.Cell>{item.name}</Table.Cell>
+                    <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
+                    <Table.Cell>{item.taskdesc}</Table.Cell>
+                    <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
+                </Table.Row>
+            )
+        }else if (checkTechRole()){
+            return(
+                <Table.Row key={item.idtask} className={rowStyle}>
+                    <Table.Cell>{item.idorder}</Table.Cell>
+                    <Table.Cell>{item.name}</Table.Cell>
+                    <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
+                    <Table.Cell>{item.taskdesc}</Table.Cell>
+                    <Table.Cell/>
+                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
+                </Table.Row>
+            )
+        }
     }
 /*
             <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} inverted={true} className="bg-danger">
@@ -258,7 +271,7 @@ class Tasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='6' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

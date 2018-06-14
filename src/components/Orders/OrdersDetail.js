@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Modal, Tab } from 'semantic-ui-react'
-//import {optionYesNo, optionDeliveryType} from "../constants";
+import { Button, Modal, Tab, Form } from 'semantic-ui-react'
 import  MyMessage from '../MyMessage';
 import _ from 'lodash';
 import OrdersDetailHeader from "./OrdersDetailHeader";
@@ -10,9 +9,9 @@ import OrdersDetailTasks from "./OrdersDetailTasks";
 import OrdersDetailSub from "./OrdersDetailSub";
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, getArrayPos} from "../validation";
+import {checkSalesRole, checkTechRole, getArrayPos} from "../validation";
 
-class OrdersDetail extends Component {
+export default class OrdersDetail extends Component {
 
     texts = {
         detail: 'Detail zakázky',
@@ -55,7 +54,8 @@ class OrdersDetail extends Component {
                 this.setState({ processdateNumber: moment(nextProps.showData.processdate) });
             };
 
-            fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments', {
+            this.readDocuments(nextProps.showData);
+            /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments', {
                 //mode: 'no-cors',
                 method: 'POST',
                 body: JSON.stringify(nextProps.showData),
@@ -81,7 +81,7 @@ class OrdersDetail extends Component {
 
             }).catch(error => {
                 this.setState({ errorText: error.toString() });
-            });
+            });*/
 
             this.readTasks(nextProps.showData);
             /*fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
@@ -136,6 +136,33 @@ class OrdersDetail extends Component {
 
 
 
+    readDocuments = (showData) => {
+        fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify(showData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+            .then((response)  => {
+                return response.json();
+            }).then(json => {
+            const allDocuments = json;
+            this.setState({
+                documentsP: _.reject(allDocuments, function(el) { return el.typeRS !== 'P'; })}
+            );
+            this.setState({
+                documentsF: _.reject(allDocuments, function(el) { return el.typeRS !== 'F'; })}
+            );
+            this.setState({
+                documentsO: _.reject(allDocuments, function(el) { return el.typeRS !== 'O'; })}
+            );
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+    }
+
     readTasks = (showData) => {
         fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
             //mode: 'no-cors',
@@ -155,8 +182,8 @@ class OrdersDetail extends Component {
         });
     }
 
-        readSubs = (showData) => {
-        console.log("fetch orderssubsdetail ");
+    readSubs = (showData) => {
+        //console.log("fetch orderssubsdetail ");
         fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
             method: 'POST',
             body: JSON.stringify(showData),
@@ -167,7 +194,7 @@ class OrdersDetail extends Component {
             return response.json();
         }).then(json => {
             this.setState({subsDetail: json});
-            console.log(this.state.subsDetail);
+            //console.log(this.state.subsDetail);
         }).catch(error => {
             this.setState({ errorText: error.toString() });
         });
@@ -180,9 +207,9 @@ class OrdersDetail extends Component {
     };
 
     handleChangeNum = (e) => {
-        console.log(e.target.value);
+        //console.log(e.target.value);
         let newValue = e.target.value.replace(/\s+/g, '');
-        console.log(newValue);
+        //console.log(newValue);
         const newState = {...this.state.showData, [e.target.name]: newValue};
         this.setState({ showData: newState });
     };
@@ -199,7 +226,7 @@ class OrdersDetail extends Component {
     handleChangeDD = (e, { name, value }) => {
         const newState = {...this.state.showData, [name]: value};
         this.setState({ showData: newState });
-        console.log(name + value);
+        //console.log(name + value);
     };
 
     handleChangeCheckbox = (e, checkBox) => {
@@ -208,7 +235,8 @@ class OrdersDetail extends Component {
         this.setState({ showData: newState });
     };
 
-    closeEdit(){
+    closeEdit(e){
+        e.preventDefault();
         this.props.onClose(this.state.showData, this.state.saved);
     }
 
@@ -254,8 +282,8 @@ class OrdersDetail extends Component {
             return;
         }
 
-        console.log(PHP_url+'/nz_rest_api_slim/orderssubs/delete');
-        console.log(item);
+        //console.log(PHP_url+'/nz_rest_api_slim/orderssubs/delete');
+        //console.log(item);
         fetch(PHP_url+'/nz_rest_api_slim/orderssubs/delete', {
             method: 'POST',
             body: JSON.stringify(item),
@@ -356,21 +384,97 @@ class OrdersDetail extends Component {
                 items = this.state.documentsO;
                 break;
         }
-        let fileList = new Array();
+        //let fileList = new Array();
         let orderId = this.state.showData.id;
+        let ico = documents.ico;
         for (var i = 0; i < documents.files.length; i++) {
-            const file = documents.files[i];
+            let file = documents.files[i];
             let item = [];
+            let myFormData = [];
+            let docId = 0;
 
-            const formData = new FormData();
-            formData.append('document', file);
+            //const formData = new FormData();
+            //formData.append('document', file);
+            let xhr = new XMLHttpRequest();
+            //console.log('let xhr = new XMLHttpRequest()');
+            xhr.open('POST', PHP_url+'/nz_rest_api_slim/fileupload1', true);
+            //console.log('xhr.open');
+            xhr.onload = function () {
+                console.log('xhr.onload');
+                if (xhr.status === 200) {
+                    let docObj = {
+                        idorder: orderId,
+                        documentId: JSON.parse(xhr.response)["docID"],
+                        typeRS: typeRS,
+                        ico: ico,
+                    };
+                    fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
+                        method: 'POST',
+                        body: JSON.stringify(docObj),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(response => {
+                        this.setState({ errorText: ''});
+                        if (response.status === 200){
+                            //this.readDocuments(this.state.showData);
+                            this.setState({ saved: true });
+                            /*item.filename = file.name;
+                            item.iddocument = docObj.documentId;
+                            item.typeRS = docObj.typeRS;
+                            item.ico = ico;
+                            items.push(item);
+                            switch(typeRS){
+                                case "P":
+                                    this.setState({documentsP: items});
+                                    break;
+                                case "F":
+                                    this.setState({documentsF: items});
+                                    break;
+                                case "O":
+                                    this.setState({documentsO: items});
+                                    break;
+                            }*/
+                            this.readDocuments(this.state.showData);
+                        }else {
+                            throw new Error(response.body);
+                        }
+                    }).catch(error => {
+                        console.log(error.toString())
+                        this.setState({ errorText: error.toString() });
+                    });
+                } else {
+                    alert('An error occurred!');
+                }
+            }.bind(this);
 
-            fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
+            if(window.FileReader) {   //do this
+                var start = 0;
+                var stop = file.size - 1;
+                var reader = new FileReader();
+
+
+                reader.onload = function(event) {
+                    //alert('onload' + reader.result);
+                    console.log('reader.onload = function()');
+                    myFormData = {name: file.name, content: btoa(reader.result)};
+                    //console.log('myFormData = {name: file.name, content: btoa(reader.result) }');
+                    console.log(JSON.stringify(myFormData));
+                    xhr.send(JSON.stringify(myFormData));
+                };
+                reader.readAsBinaryString(file);
+            } else {
+                alert('FileReader is not supported!!!');
+            }
+
+
+
+            /*fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
                 method: 'POST',
                 body: formData,
-                /*headers: {
-                    'Content-Type': 'multipart/form-data'
-                }*/
+                //headers: {
+                //    'Content-Type': 'multipart/form-data'
+                //}
             }).then(response => {
                 this.setState({ errorText: ''});
                 if (response.status === 200){
@@ -418,7 +522,7 @@ class OrdersDetail extends Component {
             }).catch(error => {
                 console.log(error.toString())
                 this.setState({ errorText: error.toString() });
-            });
+            });*/
         }
 
     };
@@ -437,8 +541,8 @@ class OrdersDetail extends Component {
             task['idorder'] = this.state.showData.id;
         }
 
-        console.log(fetchUrl);
-        console.log(JSON.stringify(task));
+        //console.log(fetchUrl);
+        //console.log(JSON.stringify(task));
         fetch(fetchUrl, {
             headers: {'Content-Type': 'application/json'},
             method: 'POST',
@@ -488,7 +592,7 @@ class OrdersDetail extends Component {
             sub['idorder'] = this.state.showData.id;
         }
 
-        console.log(fetchUrl);
+        //console.log(fetchUrl);
         fetch(fetchUrl, {
             method: 'POST',
             body: JSON.stringify(sub),
@@ -674,9 +778,6 @@ class OrdersDetail extends Component {
                                                               onSubmit={this.onSubmit}
                                                           /> }
         );
-        if (this.props.hasSalesRole){
-            panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices showData={this.state.showData} handleChange={this.handleChange} handleChangeNum={this.handleChangeNum} handleChangeDD={this.handleChangeDD} handleChangeDate={this.handleChangeDate}/> });
-        }
         //panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks
@@ -686,9 +787,23 @@ class OrdersDetail extends Component {
                     onSubmitTask={this.onSubmitTask}
                 /> });
         }
-        panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsP} typeRS={'P'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
-        panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsF} typeRS={'F'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
-        if (this.props.hasSalesRole){
+        panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments
+                                                            shortVersion={true}
+                                                            documents={this.state.documentsP}
+                                                            typeRS={'P'}
+                                                            deleteDocument={this.deleteDocument}
+                                                            addDocument={this.addDocument}
+                                                            onSubmitDocument={this.onSubmitDocument}
+                                                         /> });
+        panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments
+                                                                        shortVersion={true}
+                                                                        documents={this.state.documentsF}
+                                                                        typeRS={'F'}
+                                                                        deleteDocument={this.deleteDocument}
+                                                                        addDocument={this.addDocument}
+                                                                        onSubmitDocument={this.onSubmitDocument}
+                                                                    /> });
+        if (checkSalesRole() || checkTechRole()){
             panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub
                                                                     subs={this.state.subs}
                                                                     subsDetail={this.state.subsDetail}
@@ -700,11 +815,59 @@ class OrdersDetail extends Component {
                                                                     onSubmitSub={this.onSubmitSub}
                                                                     onSubmitSubDetail={this.onSubmitSubDetail}
                                                                 /> });
-            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsO} typeRS={'O'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
+        }
+        if (checkSalesRole()){
+            panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments
+                                                                            shortVersion={true}
+                                                                            documents={this.state.documentsO}
+                                                                            typeRS={'O'}
+                                                                            deleteDocument={this.deleteDocument}
+                                                                            addDocument={this.addDocument}
+                                                                            subContractors={this.props.subContractors}
+                                                                            onSubmitDocument={this.onSubmitDocument}
+                                                                       /> });
+        }
+        if (this.props.hasSalesRole){
+            panes.push({ menuItem: 'Náklady', render: () => <OrdersDetailHeaderPrices
+                    showData={this.state.showData}
+                    handleChange={this.handleChange}
+                    handleChangeNum={this.handleChangeNum}
+                    handleChangeDD={this.handleChangeDD}
+                    handleChangeDate={this.handleChangeDate}
+                /> });
         }
 
         return (
             <div>
+                <Modal size={'large'}
+                       open={this.props.showModal}
+                       onClose={this.closeEdit.bind(this)}
+                       closeOnEscape={true}
+                       closeOnRootNodeClick={false}>
+                    <Modal.Header>{this.texts.detail} - {this.state.showData.name}</Modal.Header>
+                    <Modal.Content scrolling>
+                        <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                        <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
+                    </Modal.Actions>
+                </Modal>
+            </div>
+        )
+    }
+}
+
+
+/*
+
+
+                <p>{this.texts.detail} - {this.state.showData.name}</p>
+                    <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                    <Tab menu={{ pointing: true }} panes={panes} renderActiveOnly={true} />
+                    <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
+
+
             <Modal size={'large'}
                    open={this.props.showModal}
                    onClose={this.closeEdit.bind(this)}
@@ -719,10 +882,12 @@ class OrdersDetail extends Component {
                     <Button type='cancel' onClick={this.closeEdit}>Zavřít</Button>
                 </Modal.Actions>
             </Modal>
-            </div>
-        )
-    }
-}
+
+ */
+
+
+
+
 //                     <Button type='submit' onClick={this.onSubmit.bind(this) }>Uložit</Button>
 //                        <Field name="ico" component={semanticFormField} as={Form.Input} type="text" label="IČO" placeholder="IČO" validate={required} />
 //<Button type='createOrder' onClick={this.createOrder}>Vytvořit zakázku</Button>
@@ -769,6 +934,6 @@ export default compose(
  */
 
 
-export default OrdersDetail;
+
 
 

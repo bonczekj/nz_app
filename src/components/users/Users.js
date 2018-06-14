@@ -172,13 +172,14 @@ class Users extends Component {
     items(item, i){
         return(
             <Table.Row key={item.email}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.username}</Table.Cell>
                 <Table.Cell>{item.email}</Table.Cell>
                 <Table.Cell>{item.firstname}</Table.Cell>
                 <Table.Cell>{item.lastname}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -212,6 +213,7 @@ class Users extends Component {
                     <Table sortable celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
+                                <Table.HeaderCell width={1}/>
                                 <Table.HeaderCell sorted={column === 'username' && direction} onClick={this.handleSort('username')}>
                                     Zkratka</Table.HeaderCell>
                                 <Table.HeaderCell sorted={column === 'email' && direction} onClick={this.handleSort('email')}>
@@ -220,7 +222,7 @@ class Users extends Component {
                                     Jméno</Table.HeaderCell>
                                 <Table.HeaderCell sorted={column === 'lastname' && direction} onClick={this.handleSort('lastname')}>
                                     Příjmení</Table.HeaderCell>
-                                <Table.HeaderCell />
+                                <Table.HeaderCell width={1}/>
                             </Table.Row>
                         </Table.Header>
 
@@ -230,7 +232,7 @@ class Users extends Component {
 
                         <Table.Footer fullWidth >
                             <Table.Row >
-                                <Table.HeaderCell >
+                                <Table.HeaderCell colSpan='2'>
                                     <Button icon labelPosition='left' positive size='small' onClick={this.newItem.bind(this)}>
                                         <Icon name='file' /> {this.texts.newItem}
                                     </Button>

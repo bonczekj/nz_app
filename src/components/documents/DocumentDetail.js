@@ -6,6 +6,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
 import {checkSalesRole} from "../validation";
+import {Select} from "semantic-ui-react";
 
 class DocumentDetail extends Component {
 
@@ -18,7 +19,7 @@ class DocumentDetail extends Component {
         this.state = {
             file: null,
             files: [],
-            showData: {type: '', description: '', expiration: '', filename: '', files: []},
+            showData: {type: '', description: '', expiration: '', filename: '', files: [], ico: ''},
             expirationNumber: '',
             types: [],
             newItem: false,
@@ -101,74 +102,24 @@ class DocumentDetail extends Component {
     }
 
     onSubmit = (e) => {
-
+        e.preventDefault();
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
-
         this.props.onSubmit(e, this.state.showData);
-        /*
-        e.preventDefault(); // Stop form submit
-
-        let fetchUrl = '';
-        if (this.state.newItem === true){
-            fetchUrl = 'http://localhost/nz_rest_api_slim/documentcreate';
-        }else{
-            fetchUrl = 'http://localhost/nz_rest_api_slim/document';
-        }
-
-        fetch(fetchUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(this.state.showData),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then((res) => {
-            if (res.status === 0){
-                //console.log(res.toString());
-                this.setState({ saved: true });
-                //let item = res.json();
-                let body = res.json();
-                return body;
-                //this.closeEdit();
-            }
-        }).then(json => {
-            console.log('then data' + json);
-            //this.setState({tableData : json});
-            //this.setState({ isLoading: false });
-            //this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
-            this.closeEdit();
-        }).catch(err => {
-            console.log(err.toString());
-            this.closeEdit();
-        });
-        */
-        /*this.fileUpload(this.state.file).then((response)=>{
-            console.log(response.data);
-        })*/
     }
 
-    /*fileUpload(file){
-        const url = 'http://example.com/file-upload';
-        const formData = new FormData();
-        formData.append('file',file)
-        const config = {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
-        };
-        return post(url, formData,config)
-    }*/
 
-    closeEdit(){
+
+    closeEdit = (e) => {
+        e.preventDefault();
+        console.log("before closeEdit");
         this.props.onClose(this.state.showData);
+        console.log("after closeEdit");
     }
 
     render() {
-        //const { detailData, showModal } = this.state;
-        //const { showData } = this.props;
         if (this.state.shortVersion === true){
             return (
                 <div>
@@ -183,10 +134,11 @@ class DocumentDetail extends Component {
                             <Form>
                                 <Form.Field required>
                                     <label>Dokumenty</label>
-                                    <input type={"file"} onChange={this.onFileChange} multiple={true}/>
+                                    <input type="file" id="files" name="files[]" multiple onChange={this.onFileChange}/>
                                 </Form.Field>
+                                <Form.Field control={Select} width={8} search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />
                                 <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
-                                <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
+                                <Button type='cancel' onClick={this.closeEdit.bind(this)}>Zrušit</Button>
                             </Form>
                         </Modal.Content>
                     </Modal>
@@ -236,6 +188,13 @@ class DocumentDetail extends Component {
 }
 
 /*
+
+                                    <DatePicker
+                                        dateFormat="DD.MM.YYYY"
+                                        selected={this.state.expirationNumber}
+                                        onChange={this.handleChangeDate}
+                                    />
+
                              <input placeholder='Typ' name='type' value={this.state.showData.type} onChange={ this.handleChange }/>
 
 * */

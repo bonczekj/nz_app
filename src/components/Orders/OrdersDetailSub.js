@@ -3,7 +3,7 @@ import { Button,Icon, Table} from 'semantic-ui-react'
 import OrdersDetailSubDetail from '../Orders/OrdersDetailSubDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
-import {decodeOptionValue, getFormatDate} from '../validation';
+import {decodeOptionValue, getFormatDate, checkTechRole, checkSalesRole} from '../validation';
 import {optionYesNo} from "../constants";
 import {DelConfirm} from '../common/Confirmation';
 
@@ -87,14 +87,17 @@ class OrdersDetailSub extends Component {
         //console.log(item.idsubdetail);
         return(
             <Table.Row key={item.idsubdetail}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(item.price) : 0}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
                 <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
+                <Table.Cell>{item.mobil}</Table.Cell>
+                <Table.Cell>{item.email}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -107,15 +110,19 @@ class OrdersDetailSub extends Component {
     render() {
         return (
             <div style={{paddingTop:'1em'}}>
+                <MyMessage errText={this.state.errorText} infoText={this.state.infoText} isLoading = {this.state.isLoading}/>
                 <Table celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell>Subdodavatel</Table.HeaderCell>
-                            <Table.HeaderCell>Cena</Table.HeaderCell>
-                            <Table.HeaderCell>Termín</Table.HeaderCell>
-                            <Table.HeaderCell>Fakturace</Table.HeaderCell>
-                            <Table.HeaderCell>Dokončeno</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell/>
+                            <Table.HeaderCell width={3}>Subdodavatel</Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Cena</Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Termín</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Fakt.</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Dok.</Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Tel.</Table.HeaderCell>
+                            <Table.HeaderCell width={3}>Email</Table.HeaderCell>
+                            <Table.HeaderCell/>
                         </Table.Row>
                     </Table.Header>
 
@@ -125,7 +132,7 @@ class OrdersDetailSub extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='6' >
+                            <Table.HeaderCell colSpan='9' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>

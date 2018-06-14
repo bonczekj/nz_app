@@ -4,6 +4,7 @@ import DocumentDetail from '../documents/DocumentDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import { saveAs } from 'file-saver'
+import {DelConfirm} from '../common/Confirmation';
 
 class OffersDetailDocuments extends Component {
 
@@ -12,11 +13,13 @@ class OffersDetailDocuments extends Component {
         this.tabItems = this.tabItems.bind(this);
         this.state = {
             showModal: false,
+            showConf: false,
             newItem: false,
             showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
             saved: false,
             shortVersion: true,
-            typeRS: ''
+            typeRS: '',
+            item:[],
         }
     };
 
@@ -72,6 +75,19 @@ class OffersDetailDocuments extends Component {
             showModal: true,
             newItem: true,
             showData: []
+        });
+    }
+
+    deleteItem = () => {
+        let item = this.state.item;
+        this.setState({ showConf: false, errorText: "" });
+        this.props.deleteDocument(item);
+    }
+
+    deleteItemConf = (item) => {
+        this.setState({
+            showConf: true,
+            item: item
         });
     }
 
@@ -131,22 +147,26 @@ class OffersDetailDocuments extends Component {
         if (this.state.shortVersion === true) {
             return(
                 <Table.Row key={item.iddocument}>
-                    <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
-                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                    </Table.Cell>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
             )
         }else{
             return(
                 <Table.Row key={item.iddocument}>
+                    <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
+                    </Table.Cell>
                     <Table.Cell>{item.type}</Table.Cell>
                     <Table.Cell>{item.description}</Table.Cell>
                     <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
-                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
-                        <Icon link name='trash' onClick={this.props.deleteDocument.bind(this, item)}/>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
             )
@@ -162,9 +182,9 @@ class OffersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell>Popis</Table.HeaderCell>
+                                <Table.HeaderCell width={1}/>
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>
-                                <Table.HeaderCell />
+                                <Table.HeaderCell width={1}/>
                             </Table.Row>
                         </Table.Header>
 
@@ -182,6 +202,12 @@ class OffersDetailDocuments extends Component {
                             </Table.Row>
                         </Table.Footer>
                     </Table>
+                    <DelConfirm visible={this.state.showConf}
+                                confText={'Chcete odstranit dokument?'}
+                                onYes={this.deleteItem}
+                                onNo={() => {this.setState({showConf: false});}}
+                                onClose={() => {this.setState({showConf: false});}}
+                    />
                     <DocumentDetail
                         showData={this.state.showData}
                         showModal={this.state.showModal}
@@ -197,7 +223,7 @@ class OffersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell></Table.HeaderCell>
+                                <Table.HeaderCell/>
                                 <Table.HeaderCell>Typ</Table.HeaderCell>
                                 <Table.HeaderCell>Popis</Table.HeaderCell>
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>

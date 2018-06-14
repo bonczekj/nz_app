@@ -14,10 +14,10 @@ class OrdersDetailDocuments extends Component {
         this.state = {
             isLoading: false,
             error: null,
-            showModal: false,
+            showModalD: false,
             showConf: false,
             newItem: false,
-            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: ''},
+            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: '', name: '', ico: ''},
             saved: false,
             shortVersion: true,
             typeRS: '',
@@ -51,7 +51,7 @@ class OrdersDetailDocuments extends Component {
     }*/
 
     closeEdit = (item, saved) => {
-        this.setState({showModal: false});
+        this.setState({showModalD: false});
         /*if (saved === true){
             let items = [];
             if (this.state.newItem === true){
@@ -67,7 +67,7 @@ class OrdersDetailDocuments extends Component {
 
     editItem = (item) => {
         this.setState({
-            showModal: true,
+            showModalD: true,
             newItem: false,
             showData: item
         });
@@ -75,7 +75,7 @@ class OrdersDetailDocuments extends Component {
 
     newItem = () => {
         this.setState({
-            showModal: true,
+            showModalD: true,
             newItem: true,
             showData: []
         });
@@ -84,7 +84,7 @@ class OrdersDetailDocuments extends Component {
     onSubmitDocument = (e, item) => {
         //e.preventDefault(); // Stop form submit
         this.props.onSubmitDocument(e, item, this.state.typeRS);
-        this.setState({showModal: false});
+        this.setState({showModalD: false});
     }
 
     downloadDocument = (item) => {
@@ -151,9 +151,12 @@ class OrdersDetailDocuments extends Component {
         if (this.state.shortVersion === true) {
             return(
                 <Table.Row key={item.iddocument}>
-                    <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
+                    </Table.Cell>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    {this.props.typeRS ==='O' &&  <Table.Cell>{item.name}</Table.Cell>}
+                    <Table.Cell>
                         <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -161,9 +164,11 @@ class OrdersDetailDocuments extends Component {
         }else{
             return(
                 <Table.Row key={item.iddocument}>
-                    <Table.Cell>{item.filename}</Table.Cell>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
+                    </Table.Cell>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>
                         <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
                     </Table.Cell>
                 </Table.Row>
@@ -179,8 +184,10 @@ class OrdersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
+                                <Table.HeaderCell width={1} />
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>
-                                <Table.HeaderCell />
+                                {this.props.typeRS ==='O' &&  <Table.HeaderCell>Subdodavatel</Table.HeaderCell>}
+                                <Table.HeaderCell width={1} />
                             </Table.Row>
                         </Table.Header>
 
@@ -190,7 +197,7 @@ class OrdersDetailDocuments extends Component {
 
                         <Table.Footer fullWidth >
                             <Table.Row >
-                                <Table.HeaderCell colSpan='2' >
+                                <Table.HeaderCell colSpan='3' >
                                     <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                         <Icon name='file' /> {this.texts.newItem}
                                     </Button>
@@ -200,8 +207,10 @@ class OrdersDetailDocuments extends Component {
                     </Table>
                     <DocumentDetail
                         showData={this.state.showData}
-                        showModal={this.state.showModal}
+                        showModal={this.state.showModalD}
                         shortVersion={this.state.shortVersion}
+                        subContractors={this.props.subContractors}
+                        typeRS={this.props.typeRS}
                         newItem={this.state.newItem}
                         onSubmit={this.onSubmitDocument}
                         onClose={this.closeEdit}/>
@@ -220,10 +229,11 @@ class OrdersDetailDocuments extends Component {
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
+                                <Table.HeaderCell width={1} />
                                 <Table.HeaderCell>Typ</Table.HeaderCell>
                                 <Table.HeaderCell>Popis</Table.HeaderCell>
                                 <Table.HeaderCell>Dokument</Table.HeaderCell>
-                                <Table.HeaderCell />
+                                <Table.HeaderCell width={1} />
                             </Table.Row>
                         </Table.Header>
 
@@ -233,7 +243,7 @@ class OrdersDetailDocuments extends Component {
 
                         <Table.Footer fullWidth >
                             <Table.Row >
-                                <Table.HeaderCell colSpan='4' >
+                                <Table.HeaderCell colSpan='5' >
                                     <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                         <Icon name='file' /> {this.texts.newItem}
                                     </Button>
@@ -243,8 +253,10 @@ class OrdersDetailDocuments extends Component {
                     </Table>
                     <DocumentDetail
                         showData={this.state.showData}
-                        showModal={this.state.showModal}
+                        showModal={this.state.showModalD}
                         shortVersion={this.state.shortVersion}
+                        typeRS={this.props.typeRS}
+                        subContractors={this.props.subContractors}
                         newItem={this.state.newItem}
                         onSubmit={this.onSubmitDocument}
                         onClose={this.closeEdit}/>

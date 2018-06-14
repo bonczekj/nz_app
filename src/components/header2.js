@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {NavLink, Link} from "react-router-dom";
 import { Container, Dropdown, Menu, Button} from 'semantic-ui-react'
-import {checkSalesRole, getUserName, logout} from './validation';
+import {checkSalesRole, checkTechRole, getUserName, logout} from './validation';
 import AuthService from "./AuthService";
 
 export default class Header2 extends Component {
@@ -40,7 +40,7 @@ export default class Header2 extends Component {
         //const { activeItem } = this.state
         let headerText = 'Evidence nabídek:    ' + getUserName();
         return (
-            <Menu fixed='top' inverted>
+            <Menu fixed='top' inverted color='blue'>
                 <Menu.Item>{headerText}</Menu.Item>
                 <Header2_NavMenu/>
             </Menu>
@@ -65,29 +65,41 @@ class Header2_NavMenu extends Component{
         if (!auth.isLoggedIn()){
             return('');
         }else {
-            return(
-                <Container>
-                    Evidence nabídek
-                    <Menu.Item as={NavLink} to="/offers">Nabídky </Menu.Item>
-                    <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
-                    <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
-                    <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
-                    <Dropdown item simple text='Čísleníky'>
-                        <Dropdown.Menu>
-                            <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>
-                            <Dropdown.Item as={NavLink} to="/centers">Střediska</Dropdown.Item>
-                            <Dropdown.Item as={NavLink} to="/documents">Dokumenty</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item as={NavLink} to="/customers">Zákazníci</Dropdown.Item>
-                            <Dropdown.Item as={NavLink} to="/subcontractors">Subdodavatelé</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <Menu.Menu position='right'>
-                        <Menu.Item as={NavLink} to="/changepassword" to="/changepassword">Změna hesla</Menu.Item>
-                        <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
-                    </Menu.Menu>
-                </Container>
-            );
+            if (checkSalesRole() || checkTechRole()) {
+                return(
+                    <Container>
+                        <Menu.Item as={NavLink} to="/offers">Nabídky </Menu.Item>
+                        <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
+                        <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
+                        <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
+                        <Dropdown item simple text='Čísleníky'>
+                            <Dropdown.Menu>
+                                <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>
+                                <Dropdown.Item as={NavLink} to="/centers">Střediska</Dropdown.Item>
+                                <Dropdown.Item as={NavLink} to="/documents">Dokumenty</Dropdown.Item>
+                                <Dropdown.Divider />
+                                <Dropdown.Item as={NavLink} to="/customers">Zákazníci</Dropdown.Item>
+                                <Dropdown.Item as={NavLink} to="/subcontractors">Subdodavatelé</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <Menu.Menu position='right'>
+                            <Menu.Item as={NavLink} to="/changepassword" to="/changepassword">Změna hesla</Menu.Item>
+                            <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+                        </Menu.Menu>
+                    </Container>
+                )
+            }else{
+                return(
+                    <Container>
+                        <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
+                        <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
+                        <Menu.Menu position='right'>
+                            <Menu.Item as={NavLink} to="/changepassword" to="/changepassword">Změna hesla</Menu.Item>
+                            <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
+                        </Menu.Menu>
+                    </Container>
+                )
+            }
         }
     }
 }

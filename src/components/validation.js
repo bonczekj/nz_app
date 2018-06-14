@@ -61,6 +61,20 @@ export const checkSalesRole = () => {
     return role;
 }
 
+export const checkTechRole = () => {
+    let userData = sessionStorage.getItem('userData');
+    if(!userData){
+        return false;
+    }
+    let userDataObj = JSON.parse(userData);
+    let userDataDetail = userDataObj["userData"];
+    if (!userDataDetail["techData"]){
+        return false;
+    }
+    let role =  (userDataDetail["techData"] === "1") ? true : false ;
+    return role;
+}
+
 export const getUserName = () => {
     let userData = sessionStorage.getItem('userData');
     if(!userData){
@@ -79,4 +93,10 @@ export const getArrayPos = (arr, key, value) => {
         }
     }
     return -1;
+}
+
+export const IsSafariBrowser = () => {
+    var VendorName=window.navigator.vendor;
+    return ((VendorName.indexOf('Apple') > -1) &&
+        (window.navigator.userAgent.indexOf('Safari') > -1));
 }

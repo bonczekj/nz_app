@@ -22,7 +22,8 @@
     "react-scripts": "1.1.0",
     "redux": "^3.7.2",
     "redux-form": "^7.2.3",
-    "semantic-ui-react": "^0.77.2",
+    "semantic-ui-css": "^2.3.1",
+    "semantic-ui-react": "^0.81.1",
     "url-search-params-polyfill": "^4.0.0"
   },
   "scripts": {

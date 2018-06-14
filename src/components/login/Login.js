@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
-import {Form, Button} from 'semantic-ui-react'
+import {Form, Button, Grid, Header, Image, Segment} from 'semantic-ui-react'
 import {PostData} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
 import {myFetch} from "../../PHP_Connector";
 import  MyMessage from '../MyMessage';
 import  AuthService from '../AuthService';
 
-class Login extends Component {
-
-
+export default class Login extends Component {
 
     constructor(props){
         super(props);
@@ -71,6 +69,50 @@ class Login extends Component {
             return (<Redirect to={'/start'}/>)
         }
         return (
+
+            <div className='login-form'>
+                <style>{
+                 `body > div,
+                  body > div > div,
+                  body > div > div > div.login-form {
+                    height: 100%;
+                  }`
+                }</style>
+                <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
+                    <Grid.Column style={{ maxWidth: 450 }}>
+                        <Header as='h2' color='blue' textAlign='center'>
+                             Přihlášení do systému
+                        </Header>
+                        <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                        <Form size='large'>
+                            <Segment stacked>
+                                <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail' name='username' value={this.state.showData.username} onChange={this.handleChange}/>
+                                <Form.Input
+                                    fluid
+                                    icon='lock'
+                                    iconPosition='left'
+                                    placeholder='Heslo'
+                                    type='password'
+                                    name='password'
+                                    value={this.state.showData.password}
+                                    onChange={this.handleChange}
+                                />
+
+                                <Button color='blue' fluid size='large' type='submit' onClick={this.login}>
+                                     Přihlásit
+                                </Button>
+                            </Segment>
+                        </Form>
+                    </Grid.Column>
+                </Grid>
+            </div>
+        )
+    }
+}
+
+
+/*
+<Image src='/logo.png' />
             <div align="center">
             <Form >
                 <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
@@ -85,8 +127,6 @@ class Login extends Component {
                 <Button type='submit' onClick={this.login} >Přihlásit</Button>
             </Form>
             </div>
-        )
-    }
-}
 
-export default Login;
+
+ */

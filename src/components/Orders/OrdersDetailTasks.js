@@ -16,7 +16,7 @@ class OrdersDetailTasks extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, invoice: false},
+            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, invoice: false, note: ''},
             saved: false,
             item:[],
         }
@@ -92,14 +92,15 @@ class OrdersDetailTasks extends Component {
         };
         return(
             <Table.Row key={item.idtask} className={rowStyle}>
+                <Table.Cell>
+                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
+                </Table.Cell>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
                 <Table.Cell>{item.taskdesc}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
                 <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
                 <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
                     <Icon link name='trash' onClick={this.deleteItemConfT.bind(this, item)}/>
                 </Table.Cell>
             </Table.Row>
@@ -120,12 +121,13 @@ class OrdersDetailTasks extends Component {
                 <Table celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
+                            <Table.HeaderCell width={1}/>
                             <Table.HeaderCell>Termín</Table.HeaderCell>
                             <Table.HeaderCell>Popis</Table.HeaderCell>
                             <Table.HeaderCell>Cena</Table.HeaderCell>
                             <Table.HeaderCell>Dokončeno</Table.HeaderCell>
                             <Table.HeaderCell>Fakturace</Table.HeaderCell>
-                            <Table.HeaderCell />
+                            <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
 
@@ -135,7 +137,7 @@ class OrdersDetailTasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='6' >
+                            <Table.HeaderCell colSpan='7' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>

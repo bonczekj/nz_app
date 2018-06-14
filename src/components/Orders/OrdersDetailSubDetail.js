@@ -104,7 +104,8 @@ export default class OrdersDetailSubDetail extends Component {
         this.setState({showModal: false});
     };
 
-    closeEdit(){
+    closeEdit(e){
+        e.preventDefault();
         this.props.onClose(this.state.showData);
     };
 
