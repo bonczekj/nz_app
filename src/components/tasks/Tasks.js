@@ -69,7 +69,19 @@ class Tasks extends Component {
                     return response.json();
                 }
             }).then(json => {
-                    this.setState({tableData : json});
+                    let jsontasks = json;
+                    let tasks = [];
+                    for (let i = 0; i < jsontasks.length; i++) {
+                        let task = jsontasks[i];
+                        let pricej = task["price"] ? task["price"] : 0;
+                        let price = "000000000" + pricej;
+                        price = price.substr(price.length - 9);
+                        task["price_s"] = price;
+                        tasks.push(task);
+                    }
+                    //this.setState({tableData : json});
+                    this.setState({tableData : tasks});
+                    console.log("tasks: " +tasks);
                     this.setState({ isLoading: false });
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
@@ -148,12 +160,13 @@ class Tasks extends Component {
                 column: clickedColumn,
                 direction: 'ascending',
             });
-            if ((typeof tableData[0][clickedColumn]) === 'string'){
+            this.setState({tableData: _.orderBy(tableData, clickedColumn)})
+            /*if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
                 this.setState({tableData: _.orderBy(tableData, clickedColumn)})
-            }
+            }*/
         return
         }
         this.setState({
@@ -171,13 +184,15 @@ class Tasks extends Component {
         let flg_negative = false;
         let rowStyle = '';
 
-        if (taskDate  < today){
-            flg_negative = true;
-            rowStyle = 'bg-danger text-white';
-        }else if (taskDate < todayW){
-            flg_warning = true;
-            rowStyle = 'bg-warning';
-        };
+        if (item.invoice !== 'true') {
+            if (taskDate  < today){
+                flg_negative = true;
+                rowStyle = 'bg-danger text-white';
+            }else if (taskDate < todayW){
+                flg_warning = true;
+                rowStyle = 'bg-warning';
+            };
+        }
         if (checkSalesRole()){
             return(
                 <Table.Row key={item.idtask} className={rowStyle}>
@@ -249,19 +264,26 @@ class Tasks extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell sorted={column === 'idorder' && direction} onClick={this.handleSort('idorder')}>
-                                Zakázka</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'orderdesc' && direction} onClick={this.handleSort('orderdesc')}>
-                                Název</Table.HeaderCell>
+                                Zakázka
+                            </Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>
+                                Název
+                            </Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'taskdate' && direction} onClick={this.handleSort('taskdate')}>
-                                Termín</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'taskdescr' && direction} onClick={this.handleSort('taskdescr')}>
-                                Popis</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>
-                                Cena</Table.HeaderCell>
+                                Termín
+                            </Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'taskdesc' && direction} onClick={this.handleSort('taskdesc')}>
+                                Popis
+                            </Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'price_s' && direction} onClick={this.handleSort('price_s')}>
+                                Cena
+                            </Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'finished' && direction} onClick={this.handleSort('finished')}>
-                                Dokončeno</Table.HeaderCell>
+                                Dokončeno
+                            </Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'invoice' && direction} onClick={this.handleSort('invoice')}>
-                                Fakturace</Table.HeaderCell>
+                                Fakturace
+                            </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 

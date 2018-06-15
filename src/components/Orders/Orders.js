@@ -369,11 +369,11 @@ class Orders extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell width={1}/>
-                            <Table.HeaderCell width={1} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
+                            <Table.HeaderCell width={2} sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Zakázka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'status' && direction} onClick={this.handleSort('status')}>Status</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>Středisko</Table.HeaderCell>
+                            <Table.HeaderCell width={1} sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>Středisko</Table.HeaderCell>
                             <Table.HeaderCell width={2}sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín dokončení</Table.HeaderCell>
                             <Table.HeaderCell width={1}/>
                         </Table.Row>

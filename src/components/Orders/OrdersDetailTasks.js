@@ -83,13 +83,15 @@ class OrdersDetailTasks extends Component {
         let flg_negative = false;
         let rowStyle = '';
 
-        if (taskDate  < today){
-            flg_negative = true;
-            rowStyle = 'bg-danger text-white';
-        }else if (taskDate < todayW){
-            flg_warning = true;
-            rowStyle = 'bg-warning';
-        };
+        if (item.invoice !== 'true') {
+            if (taskDate  < today){
+                flg_negative = true;
+                rowStyle = 'bg-danger text-white';
+            }else if (taskDate < todayW){
+                flg_warning = true;
+                rowStyle = 'bg-warning';
+            };
+        }
         return(
             <Table.Row key={item.idtask} className={rowStyle}>
                 <Table.Cell>
