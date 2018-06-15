@@ -136,7 +136,7 @@ class DocumentDetail extends Component {
                                     <label>Dokumenty</label>
                                     <input type="file" id="files" name="files[]" multiple onChange={this.onFileChange}/>
                                 </Form.Field>
-                                <Form.Field control={Select} width={8} search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />
+                                {this.props.typeRS ==='O' &&  <Form.Field control={Select} width={8} search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />}
                                 <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                                 <Button type='cancel' onClick={this.closeEdit.bind(this)}>Zrušit</Button>
                             </Form>

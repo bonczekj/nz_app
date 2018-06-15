@@ -235,8 +235,8 @@ export default class OrdersDetail extends Component {
         this.setState({ showData: newState });
     };
 
-    closeEdit(e){
-        e.preventDefault();
+    closeEdit(){
+        //e.preventDefault();
         this.props.onClose(this.state.showData, this.state.saved);
     }
 
@@ -393,9 +393,10 @@ export default class OrdersDetail extends Component {
             let myFormData = [];
             let docId = 0;
 
-            //const formData = new FormData();
-            //formData.append('document', file);
-            let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append('document', file);
+
+            /*let xhr = new XMLHttpRequest();
             //console.log('let xhr = new XMLHttpRequest()');
             xhr.open('POST', PHP_url+'/nz_rest_api_slim/fileupload1', true);
             //console.log('xhr.open');
@@ -419,22 +420,6 @@ export default class OrdersDetail extends Component {
                         if (response.status === 200){
                             //this.readDocuments(this.state.showData);
                             this.setState({ saved: true });
-                            /*item.filename = file.name;
-                            item.iddocument = docObj.documentId;
-                            item.typeRS = docObj.typeRS;
-                            item.ico = ico;
-                            items.push(item);
-                            switch(typeRS){
-                                case "P":
-                                    this.setState({documentsP: items});
-                                    break;
-                                case "F":
-                                    this.setState({documentsF: items});
-                                    break;
-                                case "O":
-                                    this.setState({documentsO: items});
-                                    break;
-                            }*/
                             this.readDocuments(this.state.showData);
                         }else {
                             throw new Error(response.body);
@@ -459,17 +444,17 @@ export default class OrdersDetail extends Component {
                     console.log('reader.onload = function()');
                     myFormData = {name: file.name, content: btoa(reader.result)};
                     //console.log('myFormData = {name: file.name, content: btoa(reader.result) }');
-                    console.log(JSON.stringify(myFormData));
+                    //console.log(JSON.stringify(myFormData));
                     xhr.send(JSON.stringify(myFormData));
                 };
                 reader.readAsBinaryString(file);
             } else {
                 alert('FileReader is not supported!!!');
-            }
+            }*/
 
 
 
-            /*fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
+            fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
                 method: 'POST',
                 body: formData,
                 //headers: {
@@ -487,6 +472,7 @@ export default class OrdersDetail extends Component {
                     idorder: orderId,
                     documentId: json.docID,
                     typeRS: typeRS,
+                    ico: ico,
                 };
                 fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
                     method: 'POST',
@@ -498,7 +484,8 @@ export default class OrdersDetail extends Component {
                     this.setState({ errorText: ''});
                     if (response.status === 200){
                         this.setState({ saved: true });
-                        item.filename = file.name;
+                        this.readDocuments(this.state.showData);
+                        /*item.filename = file.name;
                         items.push(item);
                         switch(typeRS){
                             case "P":
@@ -510,7 +497,7 @@ export default class OrdersDetail extends Component {
                             case "O":
                                 this.setState({documentsO: items});
                                 break;
-                        }
+                        }*/
                     }else {
                         throw new Error(response.body);
                     }
@@ -522,7 +509,7 @@ export default class OrdersDetail extends Component {
             }).catch(error => {
                 console.log(error.toString())
                 this.setState({ errorText: error.toString() });
-            });*/
+            });
         }
 
     };
@@ -691,7 +678,7 @@ export default class OrdersDetail extends Component {
     };
 
     onSubmit = (e) => {
-        e.preventDefault();
+        //e.preventDefault();
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
@@ -775,6 +762,7 @@ export default class OrdersDetail extends Component {
                                                               handleChangeDD={this.handleChangeDD}
                                                               handleChangeDate={this.handleChangeDate}
                                                               handleChangeCheckbox={this.handleChangeCheckbox}
+                                                              newItem={this.state.newItem}
                                                               onSubmit={this.onSubmit}
                                                           /> }
         );
