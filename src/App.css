@@ -35,6 +35,21 @@
   background-color: #dc3545 !important;
 }
 
+.bg-ok {
+  background-color: white !important;
+  color: black;
+}
+
 .text-white {
   color: #fff !important;
+}
+
+.row_ST {
+  background-color: #b3ffb3 !important;
+}
+.row_Uk {
+  background-color: #ffb3b3 !important;
+}
+.row_Su {
+  background-color: #b3d9ff !important;
 }

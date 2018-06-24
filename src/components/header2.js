@@ -72,6 +72,7 @@ class Header2_NavMenu extends Component{
                         <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
                         <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
                         <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
+                        <Menu.Item as={NavLink} to="/invoices">Fakturace</Menu.Item>
                         <Dropdown item simple text='Čísleníky'>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={NavLink} to="/users">Uživatelé</Dropdown.Item>

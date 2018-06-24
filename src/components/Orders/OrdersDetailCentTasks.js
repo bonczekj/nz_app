@@ -6,8 +6,9 @@ import  MyMessage from '../MyMessage';
 import {decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
 import {DelConfirm} from '../common/Confirmation';
+import OrdersDetailCentTaskDetail from "./OrdersDetailCentTaskDetail";
 
-class OrdersDetailTasks extends Component {
+export default class OrdersDetailCentTasks extends Component {
 
     constructor(props){
         super(props);
@@ -16,29 +17,20 @@ class OrdersDetailTasks extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, invoice: false, note: '', planinvdate: ''},
+            showData: {idorder: '', idtask: '', taskdate: '', taskcentdesc: '', finished: '', idcenter: ''},
             saved: false,
             item:[],
         }
     };
 
     texts = {
-        newItem: 'Nový termín',
+        newItem: 'Nový úkol',
     };
-
-/*    componentWillReceiveProps(nextProps){
-        this.setState({
-                typeRS: nextProps.typeRS,
-                shortVersion: nextProps.shortVersion,
-            },
-        );
-    }*/
-
 
     deleteItemT = () => {
         let item = this.state.item;
         this.setState({ showConf: false, errorText: "" });
-        this.props.deleteTask(item)
+        this.props.deleteCentTask(item)
     }
 
     deleteItemConfT = (item) => {
@@ -69,8 +61,7 @@ class OrdersDetailTasks extends Component {
     }
 
     onSubmitTask = (e, item) => {
-        //e.preventDefault(); // Stop form submit
-        this.props.onSubmitTask(e, item);
+        this.props.onSubmitCentTask(e, item);
         this.setState({showModal: false});
     }
 
@@ -83,7 +74,7 @@ class OrdersDetailTasks extends Component {
         let flg_negative = false;
         let rowStyle = '';
 
-        if (item.invoice !== 'true') {
+        if (item.finished !== 'true') {
             if (taskDate  < today){
                 flg_negative = true;
                 rowStyle = 'bg-danger text-white';
@@ -98,10 +89,9 @@ class OrdersDetailTasks extends Component {
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                 </Table.Cell>
                 <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                <Table.Cell>{item.taskdesc}</Table.Cell>
-                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
+                <Table.Cell>{item.taskcentdesc}</Table.Cell>
+                <Table.Cell>{item.idcenter + "-" + item.person}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.finished, optionYesNo)}</Table.Cell>
                 <Table.Cell>
                     <Icon link name='trash' onClick={this.deleteItemConfT.bind(this, item)}/>
                 </Table.Cell>
@@ -124,11 +114,10 @@ class OrdersDetailTasks extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell width={1}/>
-                            <Table.HeaderCell>Termín</Table.HeaderCell>
+                            <Table.HeaderCell>Datum</Table.HeaderCell>
                             <Table.HeaderCell>Popis</Table.HeaderCell>
-                            <Table.HeaderCell>Cena</Table.HeaderCell>
+                            <Table.HeaderCell>Středisko</Table.HeaderCell>
                             <Table.HeaderCell>Dokončeno</Table.HeaderCell>
-                            <Table.HeaderCell>Fakturace</Table.HeaderCell>
                             <Table.HeaderCell width={1}/>
                         </Table.Row>
                     </Table.Header>
@@ -139,7 +128,7 @@ class OrdersDetailTasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='7' >
+                            <Table.HeaderCell colSpan='6' >
                                 <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
@@ -147,9 +136,10 @@ class OrdersDetailTasks extends Component {
                         </Table.Row>
                     </Table.Footer>
                 </Table>
-                <TaskDetail
+                <OrdersDetailCentTaskDetail
                     showData={this.state.showData}
                     showModal={this.state.showModal}
+                    Centers={this.props.Centers}
                     newItem={this.state.newItem}
                     onSubmit={this.onSubmitTask}
                     onClose={this.closeEdit}
@@ -165,7 +155,7 @@ class OrdersDetailTasks extends Component {
     }
 }
 
-export default OrdersDetailTasks;
+
 
 /*
                         {this.state.documents.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}

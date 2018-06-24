@@ -1,27 +1,22 @@
 import React, {Component} from 'react';
 import { Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
-//import DocumentDetail from './DocumentDetail';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
 
-class Tasks extends Component {
+export default class Invoices extends Component {
 
     texts = {
-        newItem: 'Nový termín',
-        header: 'Termíny'
+        header: 'Přehled plánované fakturace'
     };
 
     constructor(){
         super();
         this.state = {
             logged: false,
-            showModal: false,
-            newItem: false,
-            showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: '', invoice: false},
             tableData: [],
             isLoading: false,
             error: null,
@@ -30,7 +25,6 @@ class Tasks extends Component {
             totalPages: 10,
             column: '',
             direction: 'ascending',
-            saved: false,
             hasSalesRole: false,
         };
         this.items = this.items.bind(this);
@@ -41,7 +35,7 @@ class Tasks extends Component {
         if(sessionStorage.getItem('userData')){
             this.setState({logged: true})
         }else{
-            this.setState({loggedf: false})
+            this.setState({logged: false})
         }
         let role = checkSalesRole() || checkTechRole();
         this.setState({
@@ -71,23 +65,111 @@ class Tasks extends Component {
             }).then(json => {
                     let jsontasks = json;
                     let tasks = [];
+
+                    let plan = [];
+                    let price_t = 0;
+                    let month = '';
+                    let invdate = '';
                     for (let i = 0; i < jsontasks.length; i++) {
                         let task = jsontasks[i];
+
                         let pricej = task["price"] ? task["price"] : 0;
                         let price = "000000000" + pricej;
                         price = price.substr(price.length - 9);
                         task["price_s"] = price;
-                        tasks.push(task);
+
+                        invdate = new Date(task.taskdate);
+                        invdate = new Date(invdate.getFullYear(), invdate.getMonth(), 1);
+                        let inv = {
+                            month: invdate.getMonth()+"/"+invdate.getFullYear(),
+                            date: invdate,
+                            price_t: task["price"],
+                            price_ts: task["price_s"],
+                        };
+                        let found = false;
+                        for (let j in plan){
+                            if (plan[j]['month'] === inv.month){
+                                let sum = parseInt(plan[j]['price_t'] | 0) + parseInt(task["price"] | 0)
+                                plan[j]['price_t'] = sum;
+
+                                pricej = plan[j]['price_t'];
+                                price = "000000000" + pricej;
+                                price = price.substr(price.length - 9);
+                                plan[j]['price_ts'] = price;
+                                found = true;
+                            }
+                        }
+                        if (found === false){
+                            plan.push(inv);
+                        }
                     }
-                    //this.setState({tableData : json});
-                    this.setState({tableData : tasks});
-                    console.log("tasks: " +tasks);
+                    this.setState({tableData : _.orderBy(plan, 'date')});
                     this.setState({ isLoading: false });
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
                 this.setState({ error, isLoading: false });
                 console.log("error")
             });
+
+        fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetailall', {
+            //mode: 'no-cors',
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+            .then((response)  => {
+                if (response.status === 200){
+                    return response.json();
+                }
+            }).then(json => {
+            let jsontasks = json;
+            let tasks = [];
+
+            let plan = this.state.tableData;
+            let price_t = 0;
+            let month = '';
+            let invdate = '';
+            for (let i = 0; i < jsontasks.length; i++) {
+                let task = jsontasks[i];
+
+                let pricej = task["price"] | 0;
+                let price = "000000000" + pricej;
+                price = price.substr(price.length - 9);
+                task["price_s"] = price;
+
+                invdate = new Date(task.taskdate);
+                invdate = new Date(invdate.getFullYear(), invdate.getMonth(), 1);
+                let inv = {
+                    month: invdate.getMonth()+"/"+invdate.getFullYear(),
+                    date: invdate,
+                    price_s: task["price"],
+                    price_ss: task["price_s"],
+                };
+                let found = false;
+                for (let j in plan){
+                    if (plan[j]['month'] === inv.month){
+                        let sum = parseInt(plan[j]['price_s'] | 0) + parseInt(task["price"])
+                        plan[j]['price_s'] = sum;
+
+                        pricej = plan[j]['price_s'];
+                        price = "000000000" + pricej;
+                        price = price.substr(price.length - 9);
+                        plan[j]['price_ss'] = price;
+                        found = true;
+                    }
+                }
+                if (found === false){
+                    plan.push(inv);
+                }
+            }
+            this.setState({tableData : _.orderBy(plan, 'date')});
+            this.setState({ isLoading: false });
+            this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+        }).catch(error => {
+            this.setState({ error, isLoading: false });
+            console.log("error")
+        });
     };
 
     handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
@@ -112,47 +194,6 @@ class Tasks extends Component {
         }
     }
 
-    editItem(item){
-        this.setState({
-            showModal: true,
-            newItem: false,
-            showData: item,
-            saved: false,
-        });
-    }
-
-    newItem(){
-        this.setState({
-            showModal: true,
-            newItem: true,
-            showData: [],
-            saved: false,
-        });
-    }
-
-    deleteItem(item){
-        fetch(PHP_url+'/nz_rest_api_slim/tasks/delete', {
-            method: 'POST',
-            //mode: 'no-cors',
-            body: JSON.stringify(item),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.status === 200){
-                this.setState({
-                    tableData: _.reject(this.state.tableData, function(el) { return el.idtask === item.idtask; })}
-                );
-            }
-        }).catch(error => {
-            console.log(error.toString())
-        });
-    }
-
-    /*getFormatDate = (date) => {
-        return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
-    };*/
-
     handleSort = clickedColumn => () => {
         const { column, tableData, direction } = this.state;
         if (column !== clickedColumn) {
@@ -176,9 +217,9 @@ class Tasks extends Component {
     };
 
     items(item, i){
-        if (item.status === 'Dokončená v projekci') {
-            return null;
-        }
+        //if (item.status === 'Dokončená v projekci') {
+        //    return null;
+        //}
         let today = new Date();
         let todayW = new Date();
         todayW.setDate(todayW.getDate() + 7);
@@ -186,56 +227,15 @@ class Tasks extends Component {
         let flg_warning = false;
         let flg_negative = false;
         let rowStyle = '';
-
-        if (item.invoice !== 'true') {
-            if (taskDate  < today){
-                flg_negative = true;
-                rowStyle = 'bg-danger text-white';
-            }else if (taskDate < todayW){
-                flg_warning = true;
-                rowStyle = 'bg-warning';
-            };
-        }
-        if (checkSalesRole()){
-            return(
-                <Table.Row key={item.idtask} className={rowStyle}>
-                    <Table.Cell>{item.idorder}</Table.Cell>
-                    <Table.Cell>{item.name}</Table.Cell>
-                    <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                    <Table.Cell>{item.taskdesc}</Table.Cell>
-                    <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-                </Table.Row>
-            )
-        }else if (checkTechRole()){
-            return(
-                <Table.Row key={item.idtask} className={rowStyle}>
-                    <Table.Cell>{item.idorder}</Table.Cell>
-                    <Table.Cell>{item.name}</Table.Cell>
-                    <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                    <Table.Cell>{item.taskdesc}</Table.Cell>
-                    <Table.Cell/>
-                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-                </Table.Row>
-            )
-        }
+        return(
+            <Table.Row key={item.month} >
+                <Table.Cell>{item.month}</Table.Cell>
+                <Table.Cell>{item.price_t > 0 ? new Intl.NumberFormat('cs-CS').format(item.price_t) : 0}</Table.Cell>
+                <Table.Cell>{item.price_s > 0 ? new Intl.NumberFormat('cs-CS').format(item.price_s) : 0}</Table.Cell>
+            </Table.Row>
+        )
     }
-/*
-            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} inverted={true} className="bg-danger">
-                <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
-                </Table.Cell>
 
-
-                    <Button.Group>
-                        <Button basic compact={true} icon={'edit'} size='mini' onClick={this.editItem.bind(this, item)}></Button>
-                        <Button basic compact={true} icon={'trash'} size='mini' onClick={this.deleteItem.bind(this, item.id)}></Button>
-                    </Button.Group>
- */
     render(){
         if (this.state.logged !== true ){
             return(<Redirect to={"/login"}/>);
@@ -266,26 +266,14 @@ class Tasks extends Component {
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'idorder' && direction} onClick={this.handleSort('idorder')}>
-                                Zakázka
+                            <Table.HeaderCell sorted={column === 'month' && direction} onClick={this.handleSort('date')} width={2}>
+                                Měsíc
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>
-                                Název
+                            <Table.HeaderCell sorted={column === 'price_t' && direction} onClick={this.handleSort('price_ts')}>
+                                Plánovaná smluvní fakturace
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'taskdate' && direction} onClick={this.handleSort('taskdate')}>
-                                Termín
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'taskdesc' && direction} onClick={this.handleSort('taskdesc')}>
-                                Popis
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price_s' && direction} onClick={this.handleSort('price_s')}>
-                                Cena
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'finished' && direction} onClick={this.handleSort('finished')}>
-                                Dokončeno
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'invoice' && direction} onClick={this.handleSort('invoice')}>
-                                Fakturace
+                            <Table.HeaderCell sorted={column === 'price_s' && direction} onClick={this.handleSort('price_ss')}>
+                                Plánovaná fakturace subdodávek
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -296,7 +284,7 @@ class Tasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='3' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -312,15 +300,5 @@ class Tasks extends Component {
     }
 }
 
-export default Tasks;
-/*
-                <DocumentDetail
-                    showData={this.state.showData}
-                    showModal={this.state.showModal}
-                    shortVersion={false}
-                    newItem={this.state.newItem}
-                    onClose={this.closeEdit}
-                    onSubmit={this.onSubmitDocument}/>
 
-* */
 

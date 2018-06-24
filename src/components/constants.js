@@ -21,4 +21,5 @@ export const optionOrdStatus = [
     { key: '04', text: 'Archív', value: 'Archív' },
     { key: '05', text: 'Autorský dozor', value: 'Autorský dozor' },
     { key: '06', text: 'Technický dozor', value: 'Technický dozor' },
+    { key: '07', text: 'KBOZP', value: 'KBOZP' },
 ]

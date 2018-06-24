@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Input, Form } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Input, Form, Accordion } from 'semantic-ui-react'
 import _ from 'lodash';
 import OrdersDetail from './OrdersDetail';
-import {optionYesNo, optionDeliveryType} from "../constants";
+import {optionYesNo, optionDeliveryType, optionOrdStatus} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
@@ -12,7 +12,7 @@ import OrdersExcel from "./OrdersExcel";
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
 
-class Orders extends Component {
+export default class Orders extends Component {
 
     texts = {
         newItem: 'Nová zakázka',
@@ -42,9 +42,12 @@ class Orders extends Component {
             subContractors: [],
             Customers: [],
             Centers: [],
+            Orders: [],
             item:[],
+            showFilter: false,
         };
         this.items = this.items.bind(this);
+        this.applyFilter = this.applyFilter.bind(this);
         this.closeEdit = this.closeEdit.bind(this);
     };
 
@@ -186,6 +189,7 @@ class Orders extends Component {
                 }
             }).then(json => {
             this.setState({tableData : json});
+            this.setState({Orders : json});
             this.setState({ isLoading: false });
             this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             this.setState({ errorText: '' });
@@ -286,12 +290,13 @@ class Orders extends Component {
                 //tableData: _.sortBy(tableData, clickedColumn),
                 direction: 'ascending',
             });
-            if ((typeof tableData[0][clickedColumn]) === 'string'){
+            this.setState({tableData: _.orderBy(tableData, clickedColumn)})
+            /*if ((typeof tableData[0][clickedColumn]) === 'string'){
                 this.setState({tableData: _.orderBy(tableData, [row => row[clickedColumn].toLowerCase()])})
             }
             else {
                 this.setState({tableData: _.orderBy(tableData, clickedColumn)})
-            }
+            }*/
         return
         }
         this.setState({
@@ -340,6 +345,34 @@ class Orders extends Component {
         this.readData();
     };
 
+    handleFilter = () => {
+        this.setState({showFilter: this.state.showFilter === true ? false : true})
+    };
+
+    applyFilter = (items) => {
+      let orders = this.state.Orders;
+      if (items === undefined){
+          this.setState({tableData: orders});
+          return;
+      }
+      let newOrders = [];
+      let i = 0;
+        for (i in items){
+            if (items[i].filter){
+                let filtOrders = orders.filter(c => c.status == items[i]["value"]);
+                if (filtOrders.length > 0){
+                    let j = 0;
+                    for (j in filtOrders){
+                        newOrders.push(filtOrders[j]);
+                    }
+                }
+
+            }
+        }
+      this.setState({tableData: newOrders});
+      //  this.setState({showFilter: this.state.showFilter === true ? false : true})
+    };
+
     render(){
         if (this.state.logged !== true ){
             return(<Redirect to={"/login"}/>);
@@ -364,7 +397,15 @@ class Orders extends Component {
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.state.is_archive ? this.texts.headerArch : this.texts.header}</Header>
                 </Segment>
-                <SearchBox search={this.state.search} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
+                <Form>
+                    <Form.Group>
+                        <SearchBox search={this.state.search} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
+                        &nbsp;&nbsp;&nbsp;
+                        <Button icon={'filter'} size='mini' onClick={this.handleFilter}>
+                        </Button>
+                    </Form.Group>
+                </Form>
+                <Filter showFilter={this.state.showFilter} applyFilter={this.applyFilter}/>
                 <Table sortable padded celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
@@ -423,15 +464,61 @@ class Orders extends Component {
     }
 }
 
-export default Orders;
 
-/*
+class Filter extends Component {
+    constructor(props){
+        super(props);
+        this.status = this.status.bind(this);
+        this.addStatus = this.addStatus.bind(this);
+        this.state = {
+            statuses: []
+        }
+        optionOrdStatus.map(this.addStatus);
+    };
 
-                            <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
+    addStatus(item, i){
+        let statuses = this.state.statuses;
+        statuses.push({ id: i, key: item.key, value: item.value, filter: true});
+        this.setState({statuses : statuses});
+    };
 
-                            <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'winprice' && direction} onClick={this.handleSort('winprice')}>Vítězná cena</Table.HeaderCell>
+    statusClick = (item, i) => {
+        let statuses = this.state.statuses;
+        statuses[i]['filter'] = !statuses[i]['filter'];
+        this.setState({statuses: statuses});
+    };
 
-*
-* */
+    status(item, i){
+        return(
+            <Form.Checkbox label={item.text} name={item.key} value='red' checked={this.state.statuses[i]['filter']} onChange={this.statusClick.bind(this, item, i)}/>
+        )
+    };
+
+
+    applyFilter = () => {
+        this.props.applyFilter(this.state.statuses);
+    };
+
+    clearFilter = () => {
+        this.props.applyFilter();
+    };
+    //optionOrdStatus
+    render(){
+        if (this.props.showFilter === true){
+            return(
+                <Form>
+                    <Form.Group>
+                        { optionOrdStatus != undefined && optionOrdStatus.map(this.status)}
+                    </Form.Group>
+                    <Button onClick={this.applyFilter.bind(this)}>Filtrovat</Button>
+
+                    <Button onClick={this.clearFilter.bind(this)}>Zrušit filtrN</Button>
+                </Form>
+            )
+        }else {
+            return null
+        }
+    }
+}
+
+

@@ -142,6 +142,11 @@ export default class UserDetail extends Component {
                                       checked={this.state.showData.techData === '1' ? true : false}
                                       onChange={ this.handleChangeCheckbox }/>
                         </Form.Field>
+
+                    <Form.Field inline>
+                        <label>Povolená IP adresa</label>
+                        <input name = 'allowedIP' value={this.state.showData.allowedIP} onChange={ this.handleChange }/>
+                    </Form.Field>
                     <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                     <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
             </Form>

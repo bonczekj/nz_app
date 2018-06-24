@@ -21,7 +21,7 @@ class Users extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {username: '', email: '', password: '', firstname: '', lastname: ''},
+            showData: {username: '', email: '', password: '', firstname: '', lastname: '', allowedIP: ''},
             tableData: [],
             isLoading: false,
             error: null,

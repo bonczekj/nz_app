@@ -1,18 +1,15 @@
 import React, {Component} from 'react';
 import {Button, Modal, Form, Dropdown, Select, Input, Table, Icon} from 'semantic-ui-react'
-import DatePicker from 'react-datepicker';
+//import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import {PHP_url} from './../../PHP_Connector';
+//import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {optionYesNo} from "../constants";
 import {getSubContractors, subContractorsOption} from "../common/SubContractors";
 import {decodeOptionValue, getFormatDate} from '../validation';
 import {DelConfirm} from '../common/Confirmation';
-
-
 //import 'react-datepicker/dist/react-datepicker.css';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 import MomentLocaleUtils, {
     formatDate,
@@ -32,7 +29,7 @@ export default class OrdersDetailSubDetail extends Component {
         super(props);
         this.tabItems = this.tabItems.bind(this);
         this.state = {
-            showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false},
+            showData: {idorder: '', idsub: '', ico: '', name: '', taskdate: '', price: 0, finished: '', invoice: false, planinvdate: ''},
             showModal: false,
             showConfSD: false,
             taskdateNumber: '',
@@ -74,9 +71,9 @@ export default class OrdersDetailSubDetail extends Component {
         this.setState({ showData: newState });
     }
 
-    handleChangeDate = (date) => {
+    handleChangeDate = (date, name) => {
         const selDate = moment(date).format('YYYY-MM-DD');
-        const newState = {...this.state.showData, ['taskdate']: selDate};
+        const newState = {...this.state.showData, [name]: selDate};
         this.setState({ showData: newState });
         this.setState({ taskdateNumber: date });
     }
@@ -187,20 +184,36 @@ export default class OrdersDetailSubDetail extends Component {
                     <Modal.Content>
                         <Form>
                             <Form.Field control={Select} required search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />
+                            <Form.Group>
                             <Form.Field>
                                 <label>Termín</label>
                                 <DayPickerInput
                                     formatDate={formatDate}
                                     parseDate={parseDate}
-                                    onDayChange={this.handleChangeDate}
+                                    onDayChange={(e)=>this.handleChangeDate(e,'taskdate')}
                                     value={moment(this.state.showData.taskdate).format('DD.MM.YYYY')}
                                     dayPickerProps={{
                                         locale: 'cs',
                                         localeUtils: MomentLocaleUtils,
                                     }}/>
                             </Form.Field>
-                            <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
-                            <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
+                            <Form.Field>
+                                <label>Plánované datum fakturace</label>
+                                <DayPickerInput
+                                    formatDate={formatDate}
+                                    parseDate={parseDate}
+                                    onDayChange={(e)=>this.handleChangeDate(e,'planinvdate')}
+                                    value={moment(this.state.showData.planinvdate).format('DD.MM.YYYY')}
+                                    dayPickerProps={{
+                                        locale: 'cs',
+                                        localeUtils: MomentLocaleUtils,
+                                    }}/>
+                            </Form.Field>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Field control={Input} label="Cena" placeholder='' type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3} />
+                                <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
+                            </Form.Group>
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                             <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                         </Form>

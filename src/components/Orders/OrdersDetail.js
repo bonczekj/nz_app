@@ -6,10 +6,12 @@ import OrdersDetailHeader from "./OrdersDetailHeader";
 import OrdersDetailHeaderPrices from "./OrdersDetailHeaderPrices";
 import OrdersDetailDocuments from "./OrdersDetailDocuments";
 import OrdersDetailTasks from "./OrdersDetailTasks";
+import OrdersDetailCentTasks from "./OrdersDetailCentTasks";
 import OrdersDetailSub from "./OrdersDetailSub";
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, getArrayPos} from "../validation";
+import OrdersDetailTSOverview from "./OrdersDetailTSOverview";
 
 export default class OrdersDetail extends Component {
 
@@ -33,6 +35,7 @@ export default class OrdersDetail extends Component {
             documentsF: [],
             documentsO: [],
             tasks: [],
+            centTasks: [],
             //subs: [],
             subsDetail: [],
         };
@@ -48,89 +51,12 @@ export default class OrdersDetail extends Component {
         );
         if (nextProps.showData.id > 0){
             if (nextProps.showData.processdate !== null){
-                //const newState = {...this.state.showData, ['processdateNumber']: moment(nextProps.showData.processdate)};
-                //this.setState({ showData: newState });
-
                 this.setState({ processdateNumber: moment(nextProps.showData.processdate) });
             };
-
             this.readDocuments(nextProps.showData);
-            /*fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments', {
-                //mode: 'no-cors',
-                method: 'POST',
-                body: JSON.stringify(nextProps.showData),
-                headers: {
-                    'Accept': 'application/json',
-                }
-            })
-                .then((response)  => {
-                    return response.json();
-                }).then(json => {
-                    //this.setState({documents : json});
-                //this.setState({ errorText: '' });
-                const allDocuments = json;
-                this.setState({
-                    documentsP: _.reject(allDocuments, function(el) { return el.typeRS !== 'P'; })}
-                );
-                this.setState({
-                    documentsF: _.reject(allDocuments, function(el) { return el.typeRS !== 'F'; })}
-                );
-                this.setState({
-                    documentsO: _.reject(allDocuments, function(el) { return el.typeRS !== 'O'; })}
-                );
-
-            }).catch(error => {
-                this.setState({ errorText: error.toString() });
-            });*/
-
             this.readTasks(nextProps.showData);
-            /*fetch(PHP_url+'/nz_rest_api_slim/orderstasks', {
-                //mode: 'no-cors',
-                method: 'POST',
-                body: JSON.stringify(nextProps.showData),
-                headers: {
-                    'Accept': 'application/json',
-                }
-            })
-                .then((response)  => {
-                    return response.json();
-                }).then(json => {
-                this.setState({tasks: json});
-                //this.setState({ errorText: '' });
-            }).catch(error => {
-                this.setState({ errorText: error.toString() });
-            });*/
-
-            /*fetch(PHP_url+'/nz_rest_api_slim/orderssubs', {
-                method: 'POST',
-                body: JSON.stringify(nextProps.showData),
-                headers: {
-                    'Accept': 'application/json',
-                }
-            })
-                .then((response)  => {
-                    return response.json();
-                }).then(json => {
-                this.setState({subs: json});
-                //this.setState({ errorText: '' });
-            }).catch(error => {
-                this.setState({ errorText: error.toString() });
-            });*/
-
+            this.readCentTasks(nextProps.showData);
             this.readSubs(nextProps.showData);
-            /*fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
-                method: 'POST',
-                body: JSON.stringify(nextProps.showData),
-                headers: {
-                    'Accept': 'application/json',
-                }
-            }).then((response)  => {
-                    return response.json();
-            }).then(json => {
-                this.setState({subsDetail: json});
-            }).catch(error => {
-                this.setState({ errorText: error.toString() });
-            });*/
         }
     }
 
@@ -176,6 +102,25 @@ export default class OrdersDetail extends Component {
                 return response.json();
             }).then(json => {
             this.setState({tasks: json});
+            //this.setState({ errorText: '' });
+        }).catch(error => {
+            this.setState({ errorText: error.toString() });
+        });
+    }
+
+    readCentTasks = (showData) => {
+        fetch(PHP_url+'/nz_rest_api_slim/orderscenttasks', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify(showData),
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+            .then((response)  => {
+                return response.json();
+            }).then(json => {
+            this.setState({centTasks: json});
             //this.setState({ errorText: '' });
         }).catch(error => {
             this.setState({ errorText: error.toString() });
@@ -330,6 +275,31 @@ export default class OrdersDetail extends Component {
                 this.setState({
                     tasks: _.reject(this.state.tasks, function(el) { return el.idtask === item.idtask; })}
                 );*/
+            }else {
+                throw new Error(response.body);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
+
+    deleteCentTask = (item) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        fetch(PHP_url+'/nz_rest_api_slim/orderscenttasks/delete', {
+            method: 'POST',
+            body: JSON.stringify(item),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+                this.setState({ saved: true });
+                this.readCentTasks(this.state.showData);
             }else {
                 throw new Error(response.body);
             }
@@ -564,6 +534,36 @@ export default class OrdersDetail extends Component {
         });*/
     };
 
+    addCentTask = (task) => {
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        let fetchUrl;
+        let newTask = (task['idtask']) ? false : true;
+        if (task['idorder']){
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderscenttasks/update';
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderscenttasks/create';
+            task['idorder'] = this.state.showData.id;
+        }
+
+        fetch(fetchUrl, {
+            headers: {'Content-Type': 'application/json'},
+            method: 'POST',
+            body: JSON.stringify(task),
+        }).then(response => {
+            this.setState({ errorText: ''});
+            if (response.status === 200){
+
+                this.readCentTasks(this.state.showData);
+            }
+        }).catch(error => {
+            console.log(error.toString())
+            this.setState({ errorText: error.toString() });
+        });
+    };
+
     addSub = (sub) => {
         if (!checkSalesRole()) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
@@ -732,6 +732,15 @@ export default class OrdersDetail extends Component {
         this.addTask(item)
     };
 
+    onSubmitCentTask = (e, item) => {
+        //e.preventDefault(); // Stop form submit
+        if (!checkSalesRole()) {
+            this.setState({ errorText: 'Nemáte právo na změnu dat' });
+            return;
+        }
+        this.addCentTask(item)
+    };
+
     onSubmitSub = (e, item) => {
         //e.preventDefault(); // Stop form submit
         if (!checkSalesRole()) {
@@ -768,13 +777,20 @@ export default class OrdersDetail extends Component {
         );
         //panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
-            panes.push({ menuItem: 'Termíny', render: () => <OrdersDetailTasks
+            panes.push({ menuItem: 'Smluvní termíny', render: () => <OrdersDetailTasks
                     tasks={this.state.tasks}
                     deleteTask={this.deleteTask}
                     addTask={this.addTask}
                     onSubmitTask={this.onSubmitTask}
                 /> });
         }
+        panes.push({ menuItem: 'Úkoly', render: () => <OrdersDetailCentTasks
+                tasks={this.state.centTasks}
+                deleteCentTask={this.deleteCentTask}
+                addCentTask={this.addCentTask}
+                onSubmitCentTask={this.onSubmitCentTask}
+                Centers={this.props.Centers}
+            /> });
         panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments
                                                             shortVersion={true}
                                                             documents={this.state.documentsP}
@@ -822,6 +838,12 @@ export default class OrdersDetail extends Component {
                     handleChangeNum={this.handleChangeNum}
                     handleChangeDD={this.handleChangeDD}
                     handleChangeDate={this.handleChangeDate}
+                /> });
+            panes.push({ menuItem: 'Přehled termínů', render: () => <OrdersDetailTSOverview
+                    tasks={this.state.tasks}
+                    centTasks={this.state.centTasks}
+                    subsDetail={this.state.subsDetail}
+                    Centers={this.props.Centers}
                 /> });
         }
 

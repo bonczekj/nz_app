@@ -27,7 +27,7 @@ class OrdersDetailSubDetailEdit extends Component {
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idsub: '', idsubdetail: '', taskdate: '', price: 0, finished: '', invoice: false},
+            showData: {idorder: '', idsub: '', idsubdetail: '', taskdate: '', price: 0, finished: '', invoice: false, planinvdate: ''},
             taskdateNumber: '',
             finishedNumber: '',
             subsDetail: [],
@@ -113,6 +113,18 @@ class OrdersDetailSubDetailEdit extends Component {
                                     parseDate={parseDate}
                                     onDayChange={this.handleChangeDate}
                                     value={moment(this.state.showData.taskdate).format('DD.MM.YYYY')}
+                                    dayPickerProps={{
+                                        locale: 'cs',
+                                        localeUtils: MomentLocaleUtils,
+                                    }}/>
+                            </Form.Field>
+                            <Form.Field>
+                                <label>Plánované datum fakturace</label>
+                                <DayPickerInput
+                                    formatDate={formatDate}
+                                    parseDate={parseDate}
+                                    onDayChange={this.handleChangeDate}
+                                    value={moment(this.state.showData.planinvdate).format('DD.MM.YYYY')}
                                     dayPickerProps={{
                                         locale: 'cs',
                                         localeUtils: MomentLocaleUtils,

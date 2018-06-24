@@ -13,20 +13,16 @@ import MomentLocaleUtils, {
 import 'moment/locale/cs';
 
 
-//import 'react-datepicker/dist/react-datepicker.css';
-//import {formatDate, parseDate} from "react-day-picker/moment";
-//import MomentLocaleUtils from "react-day-picker/moment";
-
-class TaskDetail extends Component {
+export default class OrdersDetailCentTaskDetail extends Component {
 
     texts = {
-        detail: 'Detail termínu',
+        detail: 'Detail úkolu',
     };
 
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, note: '', planinvdate: ''},
+            showData: {idorder: '', idtask: '', taskdate: '', taskcentdesc: '', finished: '', idcenter: ''},
             taskdateNumber: '',
             finishedNumber: '',
             newItem: false,
@@ -44,12 +40,12 @@ class TaskDetail extends Component {
                 finishedNumber: 0,
             },
         );
-        if (nextProps.showData.taskdate !== null){
+        /*if (nextProps.showData.taskdate !== null){
             this.setState({ taskdateNumber: moment(nextProps.showData.taskdate) });
         }
         if (nextProps.showData.finished !== null){
             this.setState({ finishedNumber: moment(nextProps.showData.finished) });
-        }
+        }*/
     }
 
     handleChange = (e) => {
@@ -57,26 +53,26 @@ class TaskDetail extends Component {
         this.setState({ showData: newState });
     }
 
-    handleChangeDate = (date) => {
+    /*handleChangeDate = (date) => {
         const selDate = moment(date).format('YYYY-MM-DD');
         const newState = {...this.state.showData, ['taskdate']: selDate};
         this.setState({ showData: newState });
-        this.setState({ taskdateNumber: date });
-    }
+        //this.setState({ taskdateNumber: date });
+    }*/
 
     handleChangeDate = (date, name) => {
         const selDate = moment(date).format('YYYY-MM-DD');
         const newState = {...this.state.showData, [name]: selDate};
         this.setState({ showData: newState });
-        this.setState({ taskdateNumber: date });
+        //this.setState({ taskdateNumber: date });
     }
 
-    handleChangeDateF = (date) => {
+    /*handleChangeDateF = (date) => {
         const selDate = moment(date).format('YYYY-MM-DD');
         const newState = {...this.state.showData, ['finished']: selDate};
         this.setState({ showData: newState });
-        this.setState({ finishedNumber: date });
-    }
+        //this.setState({ finishedNumber: date });
+    }*/
 
     handleChangeDD = (e, { name, value }) => {
         const newState = {...this.state.showData, [name]: value};
@@ -106,7 +102,7 @@ class TaskDetail extends Component {
                         <Form>
                             <Form.Field required>
                                 <label>Popis</label>
-                                <input placeholder='Popis' name='taskdesc' value={this.state.showData.taskdesc} onChange={ this.handleChange }/>
+                                <input placeholder='Popis' name='taskcentdesc' value={this.state.showData.taskcentdesc} onChange={ this.handleChange }/>
                             </Form.Field>
                             <Form.Group>
                                 <Form.Field>
@@ -121,30 +117,9 @@ class TaskDetail extends Component {
                                             localeUtils: MomentLocaleUtils,
                                         }}/>
                                 </Form.Field>
-                                <Form.Field>
-                                    <label>Plánované datum fakturace</label>
-                                    <DayPickerInput
-                                        formatDate={formatDate}
-                                        parseDate={parseDate}
-                                        onDayChange={(e)=>this.handleChangeDate(e,'planinvdate')}
-                                        value={moment(this.state.showData.planinvdate).format('DD.MM.YYYY')}
-                                        dayPickerProps={{
-                                            locale: 'cs',
-                                            localeUtils: MomentLocaleUtils,
-                                        }}/>
-                                </Form.Field>
                             </Form.Group>
-                            <Form.Field>
-                                <label>Poznámka</label>
-                                <input name='note' value={this.state.showData.note} onChange={ this.handleChange }/>
-                            </Form.Field>
-                            <Form.Group>
-                                <Form.Field>
-                                    <label>Cena</label>
-                                    <input type='number' name='price' value={this.state.showData.price} onChange={ this.handleChange } width={3}/>
-                                </Form.Field>
-                                <Form.Field control={Select} options={optionYesNo} label='Fakturace' name='invoice' value={this.state.showData.invoice} onChange={this.handleChangeDD } />
-                            </Form.Group>
+                            <Form.Field control={Select} search options={this.props.Centers} label='Střediko' name='idcenter' value={this.state.showData.idcenter} onChange={this.handleChangeDD } />
+                            <Form.Field control={Select} options={optionYesNo} label='Dokončeno' name='finished' value={this.state.showData.finished} onChange={this.handleChangeDD } />
                             <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>
                             <Button type='cancel' onClick={this.closeEdit}>Zrušit</Button>
                         </Form>
@@ -170,6 +145,6 @@ class TaskDetail extends Component {
                              <input placeholder='Typ' name='type' value={this.state.showData.type} onChange={ this.handleChange }/>
 
 * */
-export default TaskDetail;
+
 
 
