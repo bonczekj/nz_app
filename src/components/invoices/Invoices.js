@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import { Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
+import { Select, Table, Pagination, Header, Segment, Dropdown, Form } from 'semantic-ui-react';
 import _ from 'lodash';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate} from '../validation';
+import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDateMonth} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
 
@@ -13,11 +13,36 @@ export default class Invoices extends Component {
         header: 'Přehled plánované fakturace'
     };
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
+        let today = new Date();
+        let actmonth = getFormatDateMonth(today);
+        let months = [];
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let kmonth = '';
+            month--;
+        if (month < 0) {
+            month = 12;
+            year--;
+        }
+        for(let i = 0; i <= 12; i++){
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            };
+            kmonth = getFormatDateMonth(new Date(year, month, 1));
+            months.push({ key: kmonth, text: kmonth, value: kmonth });
+        };
+        months.push({ key: 'Prázdné', text: 'Prázdné', value: '' });
+
         this.state = {
             logged: false,
             tableData: [],
+            tableDataOrig: [],
+            months: months,
+            month: actmonth,
             isLoading: false,
             error: null,
             activePage: 1,
@@ -68,12 +93,30 @@ export default class Invoices extends Component {
 
                     let plan = [];
                     let price_t = 0;
-                    let month = '';
-                    let invdate = '';
+                    //let month = '';
+                    //let invdate = '';
+                    let counter = 0;
                     for (let i = 0; i < jsontasks.length; i++) {
                         let task = jsontasks[i];
 
-                        let pricej = task["price"] ? task["price"] : 0;
+                        //let invdate = new Date(task.planinvdate);
+                        //let month = invdate.getMonth()+"/"+invdate.getFullYear();
+                        let month = getFormatDateMonth(task.planinvdate);
+
+                        counter++;
+                        let inv = {
+                            id: counter,
+                            type: 'ST',
+                            month: month,
+                            date: task['planinvdate'],
+                            idorder: task['idorder'],
+                            desc: task['taskdesc'],
+                            finished: task['invoice'],
+                            price: task['price'],
+                        };
+                        plan.push(inv);
+
+                        /*let pricej = task["price"] ? task["price"] : 0;
                         let price = "000000000" + pricej;
                         price = price.substr(price.length - 9);
                         task["price_s"] = price;
@@ -101,9 +144,10 @@ export default class Invoices extends Component {
                         }
                         if (found === false){
                             plan.push(inv);
-                        }
+                        }*/
                     }
                     this.setState({tableData : _.orderBy(plan, 'date')});
+                    this.setState({tableDataOrig : _.orderBy(plan, 'date')});
                     this.setState({ isLoading: false });
                     this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
             }).catch(error => {
@@ -128,12 +172,29 @@ export default class Invoices extends Component {
 
             let plan = this.state.tableData;
             let price_t = 0;
-            let month = '';
-            let invdate = '';
+            let counter = 1000000;
             for (let i = 0; i < jsontasks.length; i++) {
                 let task = jsontasks[i];
 
-                let pricej = task["price"] | 0;
+                //let invdate = new Date(task.planinvdate);
+                //let month = invdate.getMonth()+"/"+invdate.getFullYear();
+                let month = getFormatDateMonth(task.planinvdate);
+
+                counter++;
+                let inv = {
+                    id: counter,
+                    type: 'Su',
+                    month: month,
+                    idorder: task['idorder'],
+                    date: task['planinvdate'],
+                    desc: task['name'],
+                    finished: task['invoice'],
+                    center: task['idcenter'],
+                    price: task['price'],
+                };
+                plan.push(inv);
+
+                /*let pricej = task["price"] | 0;
                 let price = "000000000" + pricej;
                 price = price.substr(price.length - 9);
                 task["price_s"] = price;
@@ -161,11 +222,13 @@ export default class Invoices extends Component {
                 }
                 if (found === false){
                     plan.push(inv);
-                }
+                }*/
             }
             this.setState({tableData : _.orderBy(plan, 'date')});
+            this.setState({tableDataOrig : _.orderBy(plan, 'date')});
             this.setState({ isLoading: false });
             this.setState({ totalPages: Math.ceil(this.state.tableData.length / this.state.rowsPerPage) });
+            this.applyFilter(this.state.month);
         }).catch(error => {
             this.setState({ error, isLoading: false });
             console.log("error")
@@ -177,6 +240,35 @@ export default class Invoices extends Component {
     handleChangeRowsPerPage = (e, { value }) => {
         this.setState({ rowsPerPage: value })
     };
+
+    handleChangeDD = (e, { name, value }) => {
+        this.setState({ [name]: value });
+        this.applyFilter(value);
+    }
+
+    getSumPrice = () => {
+        let sum = 0;
+        for (let i in this.state.tableData){
+            let item = this.state.tableData[i];
+            if (item['type'] === 'Su'){
+                sum = sum - parseInt(item['price']);
+            }else {
+                sum = sum + parseInt(item['price']);
+            }
+        }
+        return sum;
+    }
+
+    applyFilter = (month) => {
+        let td = this.state.tableDataOrig;
+        let newTd = [];
+        let i = 0;
+
+        console.log(month);
+        let filtTd = td.filter(c => c.month === month);
+
+        this.setState({tableData: filtTd});
+    }
 
     closeEdit(item){
         this.setState({showModal: false});
@@ -227,13 +319,34 @@ export default class Invoices extends Component {
         let flg_warning = false;
         let flg_negative = false;
         let rowStyle = '';
+
+        if (item.type === 'ST'){
+            rowStyle = 'row_ST';
+        }else if (item.type === 'Su'){
+            rowStyle = 'row_Su';
+        }else if (item.type === 'Uk'){
+            rowStyle = 'row_Uk';
+        };
+
         return(
+            <Table.Row key={item.counter} className={rowStyle}>
+                <Table.Cell>{getFormatDate(item.date)}</Table.Cell>
+                <Table.Cell>{item.idorder}</Table.Cell>
+                <Table.Cell>{item.type}</Table.Cell>
+                <Table.Cell>{item.desc}</Table.Cell>
+                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                <Table.Cell>{item.center}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.finished, optionYesNo)}</Table.Cell>
+            </Table.Row>
+        )
+    /*
             <Table.Row key={item.month} >
                 <Table.Cell>{item.month}</Table.Cell>
                 <Table.Cell>{item.price_t > 0 ? new Intl.NumberFormat('cs-CS').format(item.price_t) : 0}</Table.Cell>
                 <Table.Cell>{item.price_s > 0 ? new Intl.NumberFormat('cs-CS').format(item.price_s) : 0}</Table.Cell>
             </Table.Row>
-        )
+
+     */
     }
 
     render(){
@@ -263,28 +376,39 @@ export default class Invoices extends Component {
                 <Segment textAlign='center'>
                     <Header as='h1'>{this.texts.header}</Header>
                 </Segment>
+                <Form>
+                    <Form.Field width={2} control={Select} search options={this.state.months} label='Měsíc' name='month' value={this.state.month} onChange={this.handleChangeDD } />
+                </Form>
+
                 <Table sortable celled fixed={true} compact={true} selectable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell sorted={column === 'month' && direction} onClick={this.handleSort('date')} width={2}>
-                                Měsíc
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price_t' && direction} onClick={this.handleSort('price_ts')}>
-                                Plánovaná smluvní fakturace
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price_s' && direction} onClick={this.handleSort('price_ss')}>
-                                Plánovaná fakturace subdodávek
-                            </Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Datum</Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Zakázka</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Typ</Table.HeaderCell>
+                            <Table.HeaderCell>Popis</Table.HeaderCell>
+                            <Table.HeaderCell>Cena</Table.HeaderCell>
+                            <Table.HeaderCell>Středisko</Table.HeaderCell>
+                            <Table.HeaderCell>Dokončeno</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
                         {this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
+                        <Table.Row key={'XXXXXXXX'} >
+                            <Table.Cell>Celkem</Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell>{new Intl.NumberFormat('cs-CS').format(this.getSumPrice())}</Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
+                        </Table.Row>
                     </Table.Body>
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='3' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

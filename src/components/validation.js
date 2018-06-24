@@ -9,6 +9,7 @@ export const email = value => {
 };
 
 export const getFormatDate = date => (date == null) ? '' : moment(date).format('DD.MM.YYYY');
+export const getFormatDateMonth = date => (date == null) ? '' : moment(date).format('MM/YYYY');
 
 
 export const decodeOptionValue = ( value, optionArray ) => {
