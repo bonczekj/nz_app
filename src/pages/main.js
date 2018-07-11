@@ -13,6 +13,7 @@ import Invoices from '../components/invoices/Invoices';
 import Login from '../components/login/Login';
 import ChangePassword from '../components/login/ChangePassword';
 import Start from '../components/start/Start';
+import MySQLAccess from "../components/configurations/MySQLAccess";
 
 class Main extends Component {
     render() {
@@ -32,6 +33,7 @@ class Main extends Component {
                 <Route exact path="/centers" component={Centers}/>
                 <Route exact path="/login" component={Login}/>
                 <Route exact path="/changepassword" component={ChangePassword}/>
+                <Route exact path="/dbsettings" component={MySQLAccess}/>
             </Container>
         );
     }

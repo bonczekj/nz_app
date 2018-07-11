@@ -97,6 +97,12 @@ export function myFetch(type, url, userData) {
                 })
             }
 
+            if (contentType.includes('text/plain')) {
+                return response.text().catch(error => {
+                    return Promise.reject(new Error('HTML error: ' + error.message));
+                })
+            }
+
             return Promise.reject(new Error('Invalid content type: ' + contentType));
         }
 

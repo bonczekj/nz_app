@@ -49,7 +49,8 @@ class Documents extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch(PHP_url+'/nz_rest_api_slim/documents', {
+        //fetch(PHP_url+'/nz_rest_api_slim/documents', {
+        fetch(PHP_url+'/nz_rest_api_slim/docs', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -145,7 +146,7 @@ class Documents extends Component {
         if (this.state.newItem === true){
             fetchUrl = PHP_url+'/nz_rest_api_slim/documents/create';
         }else{
-            fetchUrl = PHP_url+'/nz_rest_api_slim/documents';
+            fetchUrl = PHP_url+'/nz_rest_api_slim/documents/update';
         }
 
         fetch(fetchUrl, {
@@ -274,7 +275,7 @@ class Documents extends Component {
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='4' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='5' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
