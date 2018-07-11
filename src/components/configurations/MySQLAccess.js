@@ -19,7 +19,7 @@ export default class MySQLAccess extends Component {
             dbname: '',
             pass: '',
             pass1: '',
-            showData: {host: '', dbname: '', user: '', pass: '', pass1: ''},
+            showData: {host: '', dbname: '', user: '', pass: '', pass1: '', seccode: ''},
             logged: false,
             isLoading: false,
             error: null,
@@ -125,6 +125,10 @@ export default class MySQLAccess extends Component {
                 <Form.Field inline width={8}>
                     <label>Potvrzení hesla</label>
                     <input type='password' name='pass1' value={this.state.showData.pass1} onChange={this.handleChange}/>
+                </Form.Field>
+                <Form.Field inline width={8}>
+                    <label>Bezpečnostní kód</label>
+                    <input type='password' name='seccode' value={this.state.showData.seccode} onChange={this.handleChange}/>
                 </Form.Field>
                 <Button type='submit' onClick={this.changePassword}>Změnit nastavení</Button>
             </Form>
