@@ -334,7 +334,7 @@ export default class Invoices extends Component {
                 <Table.Cell>{item.idorder}</Table.Cell>
                 <Table.Cell>{item.type}</Table.Cell>
                 <Table.Cell>{item.desc}</Table.Cell>
-                <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
+                <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(item.price) : 0}</Table.Cell>
                 <Table.Cell>{item.center}</Table.Cell>
                 <Table.Cell>{decodeOptionValue(item.finished, optionYesNo)}</Table.Cell>
             </Table.Row>
@@ -400,7 +400,7 @@ export default class Invoices extends Component {
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
-                            <Table.Cell>{new Intl.NumberFormat('cs-CS').format(this.getSumPrice())}</Table.Cell>
+                            <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(this.getSumPrice()) : 0}</Table.Cell>
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
                         </Table.Row>

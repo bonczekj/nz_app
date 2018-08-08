@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="956d178f-9652-4981-9042-25822aa94d1b" name="atris" url="http://nz.atris.cz">
-        <fileTransfer host="nz.atris.cz" port="21" rootFolder="/www">
+        <fileTransfer host="nz.atris.cz" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
           </advancedOptions>
