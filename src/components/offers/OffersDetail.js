@@ -9,7 +9,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {arrToObject} from './../validation';
-import {checkSalesRole} from "../validation";
+import {checkSalesRole, checkTechRole} from "../validation";
 
 class OffersDetail extends Component {
 
@@ -98,7 +98,7 @@ class OffersDetail extends Component {
 
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
@@ -137,7 +137,7 @@ class OffersDetail extends Component {
     }
 
     createOrder = () => {
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
@@ -164,13 +164,10 @@ class OffersDetail extends Component {
                 throw new Error(response.body);
             }
         }).then(json => {
-            //console.log(json['id'] + " "+json['name']);
             this.setState({ errorText: '' });
             let newState = {...this.state.showData, ['idorder']: json['id']};
             newState = {...newState, ['nameorder']: json['name']};
             this.setState({ showData: newState });
-            //const newState1 = {...this.state.showData, ['nameorder']: json['name']};
-            //this.setState({ showData: newState1 });
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
@@ -178,7 +175,7 @@ class OffersDetail extends Component {
     };
 
     deleteDocument = (item) => {
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
@@ -210,7 +207,7 @@ class OffersDetail extends Component {
     };
 
     addDocument = (documents, typeRS) => {
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
@@ -284,7 +281,7 @@ class OffersDetail extends Component {
 
     onSubmitDocument = (e, item, typeRS) => {
         //e.preventDefault(); // Stop form submit
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
