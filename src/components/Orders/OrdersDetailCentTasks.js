@@ -129,7 +129,7 @@ export default class OrdersDetailCentTasks extends Component {
                     <Table.Footer fullWidth >
                         <Table.Row >
                             <Table.HeaderCell colSpan='6' >
-                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem}>
+                                <Button icon labelPosition='left' positive size='small' onClick={this.newItem} disabled={this.props.showData.id === undefined}>
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>

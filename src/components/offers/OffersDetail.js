@@ -300,8 +300,8 @@ class OffersDetail extends Component {
                             handleChangeDate={this.handleChangeDate}
                             onSubmit={this.onSubmit}
                             createOrder={this.createOrder} /> },
-            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
-            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Nabídkové dokumenty', render: () => <OffersDetailDocuments showData={this.state.showData} shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
+            { menuItem: 'Podklady nabídky', render: () => <OffersDetailDocuments showData={this.state.showData} shortVersion={true} documents={this.state.documentsS} typeRS={'S'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> },
         ];
 
         return (

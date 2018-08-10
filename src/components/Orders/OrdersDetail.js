@@ -423,7 +423,7 @@ export default class OrdersDetail extends Component {
             }*/
 
 
-
+            this.setState({ isLoading: true });
             fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
                 method: 'POST',
                 body: formData,
@@ -431,6 +431,7 @@ export default class OrdersDetail extends Component {
                 //    'Content-Type': 'multipart/form-data'
                 //}
             }).then(response => {
+                this.setState({ isLoading: false });
                 this.setState({ errorText: ''});
                 if (response.status === 200){
                     return response.json();
@@ -472,12 +473,12 @@ export default class OrdersDetail extends Component {
                         throw new Error(response.body);
                     }
                 }).catch(error => {
-                    console.log(error.toString())
+                    this.setState({ isLoading: false });
                     this.setState({ errorText: error.toString() });
                 });
 
             }).catch(error => {
-                console.log(error.toString())
+                this.setState({ isLoading: false });
                 this.setState({ errorText: error.toString() });
             });
         }
@@ -778,6 +779,7 @@ export default class OrdersDetail extends Component {
         //panes.push({ menuItem: 'Technické dokumenty', render: () => <OrdersDetailDocuments shortVersion={true} documents={this.state.documentsR} typeRS={'R'} deleteDocument={this.deleteDocument} addDocument={this.addDocument} onSubmitDocument={this.onSubmitDocument} /> });
         if (this.props.hasSalesRole){
             panes.push({ menuItem: 'Smluvní termíny', render: () => <OrdersDetailTasks
+                    showData={this.state.showData}
                     tasks={this.state.tasks}
                     deleteTask={this.deleteTask}
                     addTask={this.addTask}
@@ -785,6 +787,7 @@ export default class OrdersDetail extends Component {
                 /> });
         }
         panes.push({ menuItem: 'Úkoly', render: () => <OrdersDetailCentTasks
+                showData={this.state.showData}
                 tasks={this.state.centTasks}
                 deleteCentTask={this.deleteCentTask}
                 addCentTask={this.addCentTask}
@@ -792,6 +795,7 @@ export default class OrdersDetail extends Component {
                 Centers={this.props.Centers}
             /> });
         panes.push({ menuItem: 'Podklady', render: () => <OrdersDetailDocuments
+                                                            showData={this.state.showData}
                                                             shortVersion={true}
                                                             documents={this.state.documentsP}
                                                             typeRS={'P'}
@@ -800,6 +804,7 @@ export default class OrdersDetail extends Component {
                                                             onSubmitDocument={this.onSubmitDocument}
                                                          /> });
         panes.push({ menuItem: 'Finální dokumentace', render: () => <OrdersDetailDocuments
+                                                                        showData={this.state.showData}
                                                                         shortVersion={true}
                                                                         documents={this.state.documentsF}
                                                                         typeRS={'F'}
@@ -809,6 +814,7 @@ export default class OrdersDetail extends Component {
                                                                     /> });
         if (checkSalesRole() || checkTechRole()){
             panes.push({ menuItem: 'Subdodávky', render: () => <OrdersDetailSub
+                                                                    showData={this.state.showData}
                                                                     subs={this.state.subs}
                                                                     subsDetail={this.state.subsDetail}
                                                                     subContractors={this.props.subContractors}
@@ -822,6 +828,7 @@ export default class OrdersDetail extends Component {
         }
         if (checkSalesRole()){
             panes.push({ menuItem: 'Obchodní dokumenty', render: () => <OrdersDetailDocuments
+                                                                            showData={this.state.showData}
                                                                             shortVersion={true}
                                                                             documents={this.state.documentsO}
                                                                             typeRS={'O'}

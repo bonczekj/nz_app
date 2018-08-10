@@ -283,7 +283,7 @@ class Offers extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell width={1}/>
-                            <Table.HeaderCell sorted={column === 'ico' && direction} onClick={this.handleSort('ico')}>Nabídka</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'id' && direction} onClick={this.handleSort('id')}>Nabídka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>Název akce</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>

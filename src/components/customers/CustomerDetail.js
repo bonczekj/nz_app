@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { Button, Modal, Form, Select} from 'semantic-ui-react';
 import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, decodeOptionValue} from "../validation";
+import {checkSalesRole, checkTechRole, decodeOptionValue} from "../validation";
 import {optionDealType, optionDeliveryType} from "../constants";
 
 class CustomerDetail extends Component {
@@ -48,7 +48,7 @@ class CustomerDetail extends Component {
     onSubmit = (e) => {
         e.preventDefault(); // Stop form submit
 
-        if (!checkSalesRole()) {
+        if (!(checkSalesRole() || checkTechRole())) {
             this.setState({ errorText: 'Nemáte právo na změnu dat' });
             return;
         }
