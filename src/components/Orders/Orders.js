@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Input, Form, Accordion } from 'semantic-ui-react'
+import { Button, Icon, Table, Pagination, Header, Segment, Dropdown, Form } from 'semantic-ui-react'
 import _ from 'lodash';
 import OrdersDetail from './OrdersDetail';
-import {optionYesNo, optionDeliveryType, optionOrdStatus} from "../constants";
+import {optionOrdStatus} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import moment from "moment/moment";
-import {getFormatDate, decodeOptionValue, checkSalesRole} from '../validation';
+//import moment from "moment/moment";
+import {getFormatDate, checkSalesRole} from '../validation';
 import  SearchBox from '../common/SearchBox';
 import OrdersExcel from "./OrdersExcel";
 import {Redirect} from 'react-router-dom';
@@ -216,7 +216,7 @@ export default class Orders extends Component {
             let items = [];
 
             let myCusts = this.state.Customers;
-            let myCust = myCusts.filter(c => c.key == item["ico"]);
+            let myCust = myCusts.filter(c => c.key === item["ico"]);
             let myCust0 = myCust[0];
             if (myCust0){
                 item.customer = myCust0["text"];
@@ -359,7 +359,7 @@ export default class Orders extends Component {
       let i = 0;
         for (i in items){
             if (items[i].filter){
-                let filtOrders = orders.filter(c => c.status == items[i]["value"]);
+                let filtOrders = orders.filter(c => c.status === items[i]["value"]);
                 if (filtOrders.length > 0){
                     let j = 0;
                     for (j in filtOrders){
@@ -379,7 +379,7 @@ export default class Orders extends Component {
         }
 
         const { rowsPerPage, activePage, showModal, column, direction } = this.state;
-        if (this.state.tableData != undefined){
+        if (this.state.tableData !== undefined){
             const emptyRows = rowsPerPage - Math.min(rowsPerPage, this.state.tableData.length - activePage* rowsPerPage);
         }
         const pageSize = [
@@ -421,7 +421,7 @@ export default class Orders extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        { this.state.tableData != undefined && this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
+                        { this.state.tableData !== undefined && this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
                     </Table.Body>
 
                     <Table.Footer fullWidth >
@@ -508,7 +508,7 @@ class Filter extends Component {
             return(
                 <Form>
                     <Form.Group>
-                        { optionOrdStatus != undefined && optionOrdStatus.map(this.status)}
+                        { optionOrdStatus !== undefined && optionOrdStatus.map(this.status)}
                     </Form.Group>
                     <Button onClick={this.applyFilter.bind(this)}>Filtrovat</Button>
 

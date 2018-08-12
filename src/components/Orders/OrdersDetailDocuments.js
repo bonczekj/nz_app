@@ -88,7 +88,7 @@ class OrdersDetailDocuments extends Component {
     }
 
     downloadDocument = (item) => {
-        this.setState({ errorText: '' });
+        this.setState({ errorText: '', isLoading: true });
         fetch(PHP_url+'/nz_rest_api_slim/filedownload', {
             //mode: 'no-cors',
             method: 'POST',
@@ -97,6 +97,7 @@ class OrdersDetailDocuments extends Component {
                 'Accept': 'application/json',
             }
         }).then(response => {
+            this.setState({isLoading: false});
             if (response.status === 200) {
                 return response.blob()
             }else {
@@ -105,7 +106,8 @@ class OrdersDetailDocuments extends Component {
         }).then(blob => {
             saveAs(blob, item['filename'])
         }).catch(error => {
-            this.setState({ errorText: error.toString() });
+            this.setState({ errorText: error.toString(),
+                            isLoading: false});
         });
 
     }

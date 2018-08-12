@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Button, Modal, Form, Select} from 'semantic-ui-react'
-import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import  MyMessage from '../MyMessage';
 import {optionYesNo} from "../constants";

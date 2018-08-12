@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import {Form, Button, Segment, Header} from 'semantic-ui-react'
-import {PostData} from './../../PHP_Connector';
-import {Redirect} from 'react-router-dom';
 import {myFetch, PHP_url} from "../../PHP_Connector";
 import  MyMessage from '../MyMessage';
 import  AuthService from '../AuthService';
