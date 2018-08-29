@@ -26,7 +26,7 @@ class TaskDetail extends Component {
     constructor(props){
         super(props);
         this.state = {
-            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, note: '', planinvdate: ''},
+            showData: {idorder: '', idtask: '', taskdate: '', taskdesc: '', finished: '', price: 0, note: '', planinvdate: '', invoice: false },
             taskdateNumber: '',
             finishedNumber: '',
             newItem: false,
@@ -50,6 +50,14 @@ class TaskDetail extends Component {
         if (nextProps.showData.finished !== null){
             this.setState({ finishedNumber: moment(nextProps.showData.finished) });
         }
+        if (nextProps.newItem === true){
+            this.setDefaultValues();
+        }
+    }
+
+    setDefaultValues = () => {
+        const newState = {...this.state.showData, ['invoice']: "false"};
+        this.setState({ showData: newState });
     }
 
     handleChange = (e) => {
