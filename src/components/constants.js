@@ -7,6 +7,7 @@ export const optionDeliveryType = [
     { key: 'p', text: 'Poštou', value: 'post' },
     { key: 'e', text: 'Emailem', value: 'email' },
     { key: 'o', text: 'Osobně', value: 'person' },
+    { key: 'l', text: 'Elektronicky', value: 'online' },
 ]
 
 export const optionDealType = [
