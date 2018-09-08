@@ -221,8 +221,25 @@ class Offers extends Component {
 
 
     items(item, i){
+        let today = new Date();
+        let todayW = new Date();
+        todayW.setDate(todayW.getDate() + 7);
+        let taskDate = new Date(item.processdate);
+        let flg_warning = false;
+        let flg_negative = false;
+        let rowStyle = '';
+
+        if (item.delivered !== 'true') {
+            if (taskDate  < today){
+                flg_negative = true;
+                rowStyle = 'bg-danger text-white';
+            }else if (taskDate < todayW){
+                flg_warning = true;
+                rowStyle = 'bg-warning';
+            };
+        }
         return(
-            <Table.Row key={item.id}>
+            <Table.Row key={item.id} className={rowStyle}>
                 <Table.Cell>
                     <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
                 </Table.Cell>

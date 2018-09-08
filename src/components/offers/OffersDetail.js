@@ -21,7 +21,7 @@ class OffersDetail extends Component {
         super(props);
         this.state = {
             file:null,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idorder: '', nameorder: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', idorder: '', nameorder: '', delivered: ''},
             processdateNumber: 0,
             newItem: false,
             saved: false,
