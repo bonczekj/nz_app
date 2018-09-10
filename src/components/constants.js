@@ -3,6 +3,12 @@ export const optionYesNo = [
     { key: 'false', text: 'Ne', value: 'false' },
 ]
 
+export const optionYesNoCancel = [
+    { key: 'true', text: 'Ano', value: 'true' },
+    { key: 'false', text: 'Ne', value: 'false' },
+    { key: 'canc', text: 'Zrušeno', value: 'canc' },
+]
+
 export const optionDeliveryType = [
     { key: 'p', text: 'Poštou', value: 'post' },
     { key: 'e', text: 'Emailem', value: 'email' },

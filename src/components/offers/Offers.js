@@ -229,7 +229,7 @@ class Offers extends Component {
         let flg_negative = false;
         let rowStyle = '';
 
-        if (item.delivered !== 'true') {
+        if (item.delivered !== 'true' && item.delivered !== 'canc') {
             if (taskDate  < today){
                 flg_negative = true;
                 rowStyle = 'bg-danger text-white';

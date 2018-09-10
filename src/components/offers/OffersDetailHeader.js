@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Input, Form, Select, Button } from 'semantic-ui-react'
-import {optionYesNo, optionDeliveryType} from "../constants";
+import {optionYesNo, optionYesNoCancel, optionDeliveryType} from "../constants";
 import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
@@ -40,7 +40,7 @@ export default class OffersDetailHeader extends Component {
                         <Form.Field control={Input} type='time' label='Čas podání' name='processtime' value={this.props.showData.processtime} onChange={this.props.handleChange} />
                         <Form.Field control={Select} options={optionDeliveryType} label='Způsob podání' placeholder='Způsob podání' name = 'deliverytype' value={this.props.showData.deliverytype} onChange={this.props.handleChangeDD} />
                         <Form.Field control={Select} options={optionYesNo} label='Pochůzka' placeholder='Pochůzka' name='errand' value={this.props.showData.errand} onChange={this.props.handleChangeDD } />
-                        <Form.Field control={Select} options={optionYesNo} label='Podáno' name = 'delivered' value={this.props.showData.delivered} onChange={this.props.handleChangeDD} />
+                        <Form.Field control={Select} options={optionYesNoCancel} label='Podáno' name = 'delivered' value={this.props.showData.delivered} onChange={this.props.handleChangeDD} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Field control={Input} label='Cena' placeholder='Cena' name='price' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price)} onChange={this.props.handleChangeNum} />
