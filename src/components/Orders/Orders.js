@@ -27,7 +27,7 @@ export default class Orders extends Component {
             showModal: false,
             showConf: false,
             newItem: false,
-            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: '', idcenter: '', status: ''},
+            showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '', archive: '', idcenter: '', status: '', custid: ''},
             tableData: [],
             isLoading: false,
             error: null,

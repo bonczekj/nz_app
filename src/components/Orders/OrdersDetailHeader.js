@@ -46,7 +46,11 @@ class OrdersDetailHeader extends Component {
                         <Form.Field control={Input} readOnly label='Nabídka' name='idoffer' value={this.props.showData.idoffer} width={3}/>
                         <Form.Field control={Input} readOnly label='Název' name='idofferdesc' value={this.props.showData.idofferdesc} width={10}/>
                     </Form.Group>
-                    <Form.Field width={4} control={Select} options={optionOrdStatus} label='Status' name='status' value={this.props.showData.status} onChange={this.props.handleChangeDD}/>
+                    <Form.Group>
+                        <Form.Field width={4} control={Select} options={optionOrdStatus} label='Status' name='status' value={this.props.showData.status} onChange={this.props.handleChangeDD}/>
+                        <Form.Field width={8} control={Input} label='Číslo smlouvy' name='custid' value={this.props.showData.custid} onChange={this.props.handleChange}/>
+                    </Form.Group>
+
                     <Form.Field control={Input} label='Umístění' placeholder='Umístění v archívu' name='archiveloc' value={this.props.showData.archiveloc} onChange={this.props.handleChange}/>
                     <Button type='submit' onClick={this.props.onSubmit}>Uložit</Button>
                 </Form>

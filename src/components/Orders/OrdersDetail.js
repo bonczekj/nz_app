@@ -26,7 +26,7 @@ export default class OrdersDetail extends Component {
             showData: {id: '', name: '', customer: '', processdate: '', processtime: '', deliverytype: '', errand: '', winprice: '', price: '',
                        idoffer: '', idofferdesc: '', status: '',
                        price_w: 0, price_d: 0, price_r: 0, price_s: 0, price_s_pl: 0, price_c: 0, price_c_pl: 0,
-                       archive: '', archiveloc: '', idcenter: ''},
+                       archive: '', archiveloc: '', idcenter: '', custid: ''},
             processdateNumber: 0,
             newItem: false,
             errorText: '',
