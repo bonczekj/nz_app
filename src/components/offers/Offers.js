@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { Button, Icon, Table, Pagination, Header, Segment, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash';
 import OffersDetail from './OffersDetail';
-import {optionYesNo, optionDeliveryType} from "../constants";
+import {optionYesNo, optionDeliveryType, optionYesNoCancel} from "../constants";
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import {getFormatDate, decodeOptionValue} from '../validation';
@@ -248,6 +248,7 @@ class Offers extends Component {
                 <Table.Cell>{item.customer}</Table.Cell>
                 <Table.Cell>{getFormatDate(item.processdate)}</Table.Cell>
                 <Table.Cell>{decodeOptionValue(item.deliverytype, optionDeliveryType)}</Table.Cell>
+                <Table.Cell>{decodeOptionValue(item.delivered, optionYesNoCancel)}</Table.Cell>
                 <Table.Cell>{decodeOptionValue(item.errand, optionYesNo)}</Table.Cell>
                 <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
                 <Table.Cell>{item.winprice}</Table.Cell>
@@ -305,6 +306,7 @@ class Offers extends Component {
                             <Table.HeaderCell sorted={column === 'customer' && direction} onClick={this.handleSort('customer')}>Investor</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'processdate' && direction} onClick={this.handleSort('processdate')}>Termín zpracování</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'deliverytype' && direction} onClick={this.handleSort('deliverytype')}>Způsob podání</Table.HeaderCell>
+                            <Table.HeaderCell sorted={column === 'delivered' && direction} onClick={this.handleSort('delivered')}>Podáno</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'errand' && direction} onClick={this.handleSort('errand')}>Pochůzka</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'price' && direction} onClick={this.handleSort('price')}>Cena</Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'winprice' && direction} onClick={this.handleSort('winprice')}>Vítězná cena</Table.HeaderCell>
@@ -323,7 +325,7 @@ class Offers extends Component {
                                     <Icon name='file' /> {this.texts.newItem}
                                 </Button>
                             </Table.HeaderCell>
-                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='8' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
