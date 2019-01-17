@@ -492,11 +492,12 @@ export default class OrdersDetail extends Component {
         }
         let fetchUrl;
         let newTask = (task['idtask']) ? false : true;
-        if (task['idorder']){
-            fetchUrl = PHP_url+'/nz_rest_api_slim/orderstasks/update';
-        }else{
+        //if (task['idorder']){
+        if (newTask){
             fetchUrl = PHP_url+'/nz_rest_api_slim/orderstasks/create';
             task['idorder'] = this.state.showData.id;
+        }else{
+            fetchUrl = PHP_url+'/nz_rest_api_slim/orderstasks/update';
         }
 
         //console.log(fetchUrl);

@@ -141,6 +141,18 @@ class TaskDetail extends Component {
                                             localeUtils: MomentLocaleUtils,
                                         }}/>
                                 </Form.Field>
+                                <Form.Field>
+                                    <label>Datum dokončení</label>
+                                    <DayPickerInput
+                                        formatDate={formatDate}
+                                        parseDate={parseDate}
+                                        onDayChange={(e)=>this.handleChangeDate(e,'finished')}
+                                        value={moment(this.state.showData.finished).format('DD.MM.YYYY')}
+                                        dayPickerProps={{
+                                            locale: 'cs',
+                                            localeUtils: MomentLocaleUtils,
+                                        }}/>
+                                </Form.Field>
                             </Form.Group>
                             <Form.Field>
                                 <label>Poznámka</label>
