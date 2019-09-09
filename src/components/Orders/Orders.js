@@ -351,8 +351,12 @@ export default class Orders extends Component {
 
     applyFilter = (items) => {
       let orders = this.state.Orders;
+      let totalPages = this.state.totalPages;
       if (items === undefined){
           this.setState({tableData: orders});
+          totalPages = Math.ceil(orders.length / this.state.rowsPerPage);
+          totalPages = (totalPages === 0) ? 1 : totalPages;
+          this.setState({ totalPages: totalPages });
           return;
       }
       let newOrders = [];
@@ -370,6 +374,10 @@ export default class Orders extends Component {
             }
         }
       this.setState({tableData: newOrders});
+      totalPages = Math.ceil(newOrders.length / this.state.rowsPerPage);
+      totalPages = (totalPages === 0) ? 1 : totalPages;
+      this.setState({ totalPages: totalPages });
+      console.log(totalPages);
       //  this.setState({showFilter: this.state.showFilter === true ? false : true})
     };
 
