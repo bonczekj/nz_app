@@ -6,7 +6,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url, myFetchAuth} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class Centers extends Component {
 
@@ -129,7 +129,7 @@ class Centers extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

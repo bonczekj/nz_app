@@ -4,7 +4,7 @@ import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue} from "../validation";
 import {optionDealType, optionDeliveryType} from "../constants";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class CustomerDetail extends Component {
 //class CustomerDetail extends MyComponent {
@@ -72,7 +72,7 @@ class CustomerDetail extends Component {
             body: JSON.stringify(this.state.showData),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){
@@ -100,7 +100,7 @@ class CustomerDetail extends Component {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ isLoading: false });

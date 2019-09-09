@@ -5,7 +5,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import { saveAs } from 'file-saver'
 import {DelConfirm} from '../common/Confirmation';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class OffersDetailDocuments extends Component {
 
@@ -107,7 +107,7 @@ class OffersDetailDocuments extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({isLoading: false});

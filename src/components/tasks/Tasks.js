@@ -7,7 +7,7 @@ import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDate2} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 export default class Tasks extends Component {
 
@@ -63,7 +63,7 @@ export default class Tasks extends Component {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                    'Authorization' : 'Bearer ' + getToken()
                 }
         })
             .then((response)  => {
@@ -139,7 +139,7 @@ export default class Tasks extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

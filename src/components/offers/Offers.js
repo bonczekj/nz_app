@@ -10,7 +10,7 @@ import {Redirect} from 'react-router-dom';
 import  SearchBox from '../common/SearchBox';
 import 'url-search-params-polyfill';
 import {DelConfirm} from '../common/Confirmation';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class Offers extends Component {
 
@@ -63,7 +63,7 @@ class Offers extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             if (response.status === 200){
@@ -107,7 +107,7 @@ class Offers extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {
@@ -175,7 +175,7 @@ class Offers extends Component {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

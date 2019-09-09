@@ -6,7 +6,7 @@ import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDateMonth} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
-import AuthService from "../AuthService";
+import {getToken} from '../AuthService';
 
 export default class Invoices extends Component {
 
@@ -82,7 +82,7 @@ export default class Invoices extends Component {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                    'Authorization' : 'Bearer ' + getToken()
                 }
         })
             .then((response)  => {
@@ -163,7 +163,7 @@ export default class Invoices extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {

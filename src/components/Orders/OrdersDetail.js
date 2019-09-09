@@ -12,7 +12,7 @@ import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, getArrayPos} from "../validation";
 import OrdersDetailTSOverview from "./OrdersDetailTSOverview";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 export default class OrdersDetail extends Component {
 
@@ -70,7 +70,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(showData),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {
@@ -98,7 +98,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(showData),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {
@@ -118,7 +118,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(showData),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {
@@ -138,7 +138,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(showData),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             return response.json();
@@ -202,7 +202,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(fileDel),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -240,7 +240,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -272,7 +272,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -302,7 +302,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -329,7 +329,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -439,7 +439,7 @@ export default class OrdersDetail extends Component {
                 body: formData,
                 headers: {
                 //    'Content-Type': 'multipart/form-data'
-                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                    'Authorization' : 'Bearer ' + getToken()
                 }
             }).then(response => {
                 this.setState({ isLoading: false });
@@ -461,7 +461,7 @@ export default class OrdersDetail extends Component {
                     body: JSON.stringify(docObj),
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization' : 'Bearer ' + AuthService.getToken()
+                        'Authorization' : 'Bearer ' + getToken()
                     }
                 }).then(response => {
                     this.setState({ errorText: ''});
@@ -517,7 +517,7 @@ export default class OrdersDetail extends Component {
         fetch(fetchUrl, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             },
             method: 'POST',
             body: JSON.stringify(task),
@@ -568,7 +568,7 @@ export default class OrdersDetail extends Component {
         fetch(fetchUrl, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             },
             method: 'POST',
             body: JSON.stringify(task),
@@ -605,7 +605,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(sub),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -675,7 +675,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(subDetail),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -722,7 +722,7 @@ export default class OrdersDetail extends Component {
             body: JSON.stringify(this.state.showData),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});

@@ -6,7 +6,7 @@ import  MyMessage from '../MyMessage';
 import {PHP_url, myFetchAuth} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class Users extends Component {
 
@@ -132,7 +132,7 @@ class Users extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

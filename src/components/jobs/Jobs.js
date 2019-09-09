@@ -63,7 +63,7 @@ export default class Jobs extends Component {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                    'Authorization' : 'Bearer ' + getToken()
                 }
         })
             .then((response)  => {

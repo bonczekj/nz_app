@@ -4,7 +4,7 @@ import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
 import {checkSalesRole} from "../validation";
 import {myFetchAuth} from "../../PHP_Connector";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 export default class UserDetail extends Component {
 
@@ -79,7 +79,7 @@ export default class UserDetail extends Component {
             body: JSON.stringify(this.state.showData),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             this.setState({ isLoading: false });

@@ -11,7 +11,7 @@ import  SearchBox from '../common/SearchBox';
 import OrdersExcel from "./OrdersExcel";
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 export default class Orders extends Component {
 
@@ -79,7 +79,7 @@ export default class Orders extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             if (response.status === 200){
@@ -105,7 +105,7 @@ export default class Orders extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             if (response.status === 200){
@@ -132,7 +132,7 @@ export default class Orders extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             if (response.status === 200){
@@ -185,7 +185,7 @@ export default class Orders extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {
@@ -266,7 +266,7 @@ export default class Orders extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

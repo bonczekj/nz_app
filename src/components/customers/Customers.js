@@ -7,7 +7,7 @@ import {PHP_url} from './../../PHP_Connector';
 import {Redirect} from 'react-router-dom';
 import {DelConfirm} from '../common/Confirmation';
 import {checkSalesRole} from "../validation";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class Customers extends Component {
 
@@ -65,7 +65,7 @@ class Customers extends Component {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                    'Authorization' : 'Bearer ' + getToken()
                 }
         })
             .then((response)  => {
@@ -134,7 +134,7 @@ class Customers extends Component {
             body: JSON.stringify(item),
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then(response => {
             if (response.status === 200){

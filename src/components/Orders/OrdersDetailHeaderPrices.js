@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import  MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
 import moment from "moment/moment";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 export default class OrdersDetailHeaderPrices extends Component {
 
@@ -36,7 +36,7 @@ export default class OrdersDetailHeaderPrices extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         })
             .then((response)  => {

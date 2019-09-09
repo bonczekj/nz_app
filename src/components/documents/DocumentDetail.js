@@ -7,7 +7,7 @@ import  MyMessage from '../MyMessage';
 import 'react-datepicker/dist/react-datepicker.css';
 import {checkSalesRole, checkTechRole} from "../validation";
 import {Select} from "semantic-ui-react";
-import AuthService from "../AuthService";
+import {getToken} from "../AuthService";
 
 class DocumentDetail extends Component {
 
@@ -39,7 +39,7 @@ class DocumentDetail extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
                 return response.json();
