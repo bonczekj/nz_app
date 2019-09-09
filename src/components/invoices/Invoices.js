@@ -266,10 +266,12 @@ export default class Invoices extends Component {
         let newTd = [];
         let i = 0;
 
-        console.log(month);
         let filtTd = td.filter(c => c.month === month);
 
         this.setState({tableData: filtTd});
+        let totalPages = Math.ceil(filtTd.length / this.state.rowsPerPage);
+        totalPages = (totalPages === 0) ? 1 : totalPages;
+        this.setState({ totalPages: totalPages });
     }
 
     closeEdit(item){

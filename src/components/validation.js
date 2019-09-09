@@ -8,9 +8,8 @@ export const email = value => {
         : undefined;
 };
 
-export const getFormatDate = date => (date == null) ? '' : moment(date).format('DD.MM.YYYY');
-export const getFormatDateMonth = date => (date == null) ? '' : moment(date).format('MM/YYYY');
-
+export const getFormatDate = date => (date == null || date == '0000-00-00') ? '' : moment(date).format('DD.MM.YYYY');
+export const getFormatDateMonth = date => (date == null || date == '0000-00-00') ? '' : moment(date).format('MM/YYYY');
 
 export const decodeOptionValue = ( value, optionArray ) => {
     if (value === null) {

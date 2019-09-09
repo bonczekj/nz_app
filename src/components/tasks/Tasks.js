@@ -4,7 +4,7 @@ import _ from 'lodash';
 //import DocumentDetail from './DocumentDetail';
 import MyMessage from '../MyMessage';
 import {PHP_url} from './../../PHP_Connector';
-import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate} from '../validation';
+import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDate2} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
 
