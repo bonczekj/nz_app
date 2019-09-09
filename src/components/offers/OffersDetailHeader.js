@@ -43,8 +43,8 @@ export default class OffersDetailHeader extends Component {
                         <Form.Field control={Select} options={optionYesNoCancel} label='Podáno' name = 'delivered' value={this.props.showData.delivered} onChange={this.props.handleChangeDD} />
                     </Form.Group>
                     <Form.Group>
-                        <Form.Field control={Input} label='Cena' placeholder='Cena' name='price' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price)} onChange={this.props.handleChangeNum} />
-                        <Form.Field control={Input} label='Výtězná cena' placeholder='Vítězní cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange} />
+                        <Form.Field control={Input} label='Cena' name='price' value={new Intl.NumberFormat('cs-CS').format(this.props.showData.price)} onChange={this.props.handleChangeNum} />
+                        <Form.Field control={Input} label='Vítězná cena' name='winprice' value={this.props.showData.winprice} onChange={this.props.handleChange} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Field control={Input} readOnly label='Zakázka' name='idorder' value={this.props.showData.idorder} width={3}/>

@@ -113,6 +113,7 @@ export default class Invoices extends Component {
                             desc: task['taskdesc'],
                             finished: task['invoice'],
                             price: task['price'],
+                            name: task['name'],
                         };
                         plan.push(inv);
 
@@ -191,6 +192,7 @@ export default class Invoices extends Component {
                     finished: task['invoice'],
                     center: task['idcenter'],
                     price: task['price'],
+                    name: task['order_name'],
                 };
                 plan.push(inv);
 
@@ -333,6 +335,7 @@ export default class Invoices extends Component {
                 <Table.Cell>{getFormatDate(item.date)}</Table.Cell>
                 <Table.Cell>{item.idorder}</Table.Cell>
                 <Table.Cell>{item.type}</Table.Cell>
+                <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.desc}</Table.Cell>
                 <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(item.price) : 0}</Table.Cell>
                 <Table.Cell>{item.center}</Table.Cell>
@@ -386,6 +389,7 @@ export default class Invoices extends Component {
                             <Table.HeaderCell width={2}>Datum</Table.HeaderCell>
                             <Table.HeaderCell width={2}>Zakázka</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Typ</Table.HeaderCell>
+                            <Table.HeaderCell>Název</Table.HeaderCell>
                             <Table.HeaderCell>Popis</Table.HeaderCell>
                             <Table.HeaderCell>Cena</Table.HeaderCell>
                             <Table.HeaderCell>Středisko</Table.HeaderCell>
@@ -396,10 +400,11 @@ export default class Invoices extends Component {
                     <Table.Body>
                         {this.state.tableData.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
                         <Table.Row key={'XXXXXXXX'} >
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell></Table.Cell>
                             <Table.Cell>Celkem</Table.Cell>
-                            <Table.Cell></Table.Cell>
-                            <Table.Cell></Table.Cell>
-                            <Table.Cell></Table.Cell>
                             <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(this.getSumPrice()) : 0}</Table.Cell>
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
