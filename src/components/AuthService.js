@@ -1,7 +1,19 @@
 import {Component} from "react";
 import {myFetch} from './../PHP_Connector';
 
-class AuthService extends Component {
+export const getToken = () => {
+    let userData = sessionStorage.getItem('userData');
+    if(userData){
+        let userDataObj = JSON.parse(userData);
+        let userDataDetail = userDataObj["userData"];
+        if (userDataDetail["token"]){
+            return userDataDetail["token"];
+        }
+    }
+}
+
+
+export default class AuthService extends Component {
 
     login = (username, password, myFuncOK, myFuncErr) => {
         if(username && password){
@@ -24,6 +36,7 @@ class AuthService extends Component {
         let responseJson = result;
         if(responseJson.userData){
             sessionStorage.setItem('userData',JSON.stringify(responseJson));
+            console.log(responseJson.userData);
             this.setState({redirect: true});
         }
     };
@@ -44,6 +57,17 @@ class AuthService extends Component {
         return false;
     }
 
+    getTokenX(){
+        let userData = sessionStorage.getItem('userData');
+        if(userData){
+            let userDataObj = JSON.parse(userData);
+            let userDataDetail = userDataObj["userData"];
+            if (userDataDetail["token"]){
+                return userDataDetail["token"];
+            }
+        }
+    }
+
     isTokenExpired(token) {
         /*try {
             const decoded = decode(token);
@@ -59,5 +83,3 @@ class AuthService extends Component {
     }
 
 }
-
-export default AuthService;

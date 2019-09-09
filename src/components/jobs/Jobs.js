@@ -7,13 +7,13 @@ import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDate2} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
-import AuthService from "../AuthService";
+import {getToken} from '../AuthService';
 
-export default class Tasks extends Component {
+export default class Jobs extends Component {
 
     texts = {
-        newItem: 'Nový termín',
-        header: 'Termíny'
+        //newItem: 'Nový úkol',
+        header: 'Úkoly'
     };
 
     constructor(){
@@ -22,7 +22,7 @@ export default class Tasks extends Component {
             logged: false,
             showModal: false,
             newItem: false,
-            showData: {idorder: '', name: '', idtask: '', taskdate: '', taskdesc: '', finished: '', invoice: false},
+            showData: {idtask: '', idorder: '', taskdate: '', taskcentdesc: '', finished: '', idcenter: '', person: '',oder_name: ''},
             tableData: [],
             isLoading: false,
             error: null,
@@ -44,12 +44,12 @@ export default class Tasks extends Component {
         }else{
             this.setState({loggedf: false})
         }
-        let role = checkSalesRole() || checkTechRole();
+        /*let role = checkSalesRole() || checkTechRole();
         this.setState({
             errorText: '',
             hasSalesRole: role,
         });
-        /*if(role === false){
+        if(role === false){
             this.setState({
                     errorText: 'Nemáte oprávnění k prohlížení',
             })
@@ -58,7 +58,7 @@ export default class Tasks extends Component {
 
     componentDidMount(){
         this.setState({ isLoading: true });
-        fetch(PHP_url+'/nz_rest_api_slim/tasks', {
+        fetch(PHP_url+'/nz_rest_api_slim/jobs', {
                 //mode: 'no-cors',
                 method: 'GET',
                 headers: {
@@ -132,14 +132,13 @@ export default class Tasks extends Component {
         });
     }
 
-    deleteItem(item){
+    /*deleteItem(item){
         fetch(PHP_url+'/nz_rest_api_slim/tasks/delete', {
             method: 'POST',
             //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization' : 'Bearer ' + AuthService.getToken()
+                'Content-Type': 'application/json'
             }
         }).then(response => {
             if (response.status === 200){
@@ -150,7 +149,7 @@ export default class Tasks extends Component {
         }).catch(error => {
             console.log(error.toString())
         });
-    }
+    }*/
 
     /*getFormatDate = (date) => {
         return ((date == null) ? '' : moment(date).format('DD.MM.YYYY'));
@@ -179,7 +178,7 @@ export default class Tasks extends Component {
     };
 
     items(item, i){
-        if (item.status === 'Dokončená v projekci') {
+        if (item.finished === 'true') {
             return null;
         }
         let today = new Date();
@@ -190,7 +189,7 @@ export default class Tasks extends Component {
         let flg_negative = false;
         let rowStyle = '';
 
-        if (item.invoice !== 'true') {
+        if (item.finished !== 'true') {
             if (taskDate  < today){
                 flg_negative = true;
                 rowStyle = 'bg-danger text-white';
@@ -199,46 +198,20 @@ export default class Tasks extends Component {
                 rowStyle = 'bg-warning';
             };
         }
-        if (checkSalesRole()){
-            return(
+        return(
                 <Table.Row key={item.idtask} className={rowStyle}>
                     <Table.Cell>{item.idorder}</Table.Cell>
-                    <Table.Cell>{item.name}</Table.Cell>
+                    <Table.Cell>{item.order_name}</Table.Cell>
                     <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                    <Table.Cell>{item.taskdesc}</Table.Cell>
-                    <Table.Cell>{new Intl.NumberFormat('cs-CS').format(item.price)}</Table.Cell>
-                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
+                    <Table.Cell>{item.taskcentdesc}</Table.Cell>
+
+                    <Table.Cell>{item.idcenter}</Table.Cell>
+                    <Table.Cell>{item.person}</Table.Cell>
                 </Table.Row>
             )
-        }else {//if (checkTechRole()){
-            return(
-                <Table.Row key={item.idtask} className={rowStyle}>
-                    <Table.Cell>{item.idorder}</Table.Cell>
-                    <Table.Cell>{item.name}</Table.Cell>
-                    <Table.Cell>{getFormatDate(item.taskdate)}</Table.Cell>
-                    <Table.Cell>{item.taskdesc}</Table.Cell>
-                    <Table.Cell/>
-                    <Table.Cell>{getFormatDate(item.finished)}</Table.Cell>
-                    <Table.Cell>{decodeOptionValue(item.invoice, optionYesNo)}</Table.Cell>
-                </Table.Row>
-            )
-        }
+        //<Table.Cell>{decodeOptionValue(item.finished, optionYesNo)}</Table.Cell>
     }
-/*
-            <Table.Row key={item.idtask} negative={flg_negative} warning={flg_warning} inverted={true} className="bg-danger">
-                <Table.Cell>
-                    <Icon link name='edit' onClick={this.editItem.bind(this, item)}/>
-                    {'   '}
-                    <Icon link name='trash' onClick={this.deleteItem.bind(this, item)}/>
-                </Table.Cell>
 
-
-                    <Button.Group>
-                        <Button basic compact={true} icon={'edit'} size='mini' onClick={this.editItem.bind(this, item)}></Button>
-                        <Button basic compact={true} icon={'trash'} size='mini' onClick={this.deleteItem.bind(this, item.id)}></Button>
-                    </Button.Group>
- */
     render(){
         if (this.state.logged !== true ){
             return(<Redirect to={"/login"}/>);
@@ -252,13 +225,13 @@ export default class Tasks extends Component {
             { key: 20, text: '20', value: 20 },
         ];
 
-        if (this.state.hasSalesRole === false){
+        /*if (this.state.hasSalesRole === false){
             return(
                 <div>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 </div>
             )
-        }
+        }*/
 
         return (
             <div>
@@ -272,23 +245,20 @@ export default class Tasks extends Component {
                             <Table.HeaderCell sorted={column === 'idorder' && direction} onClick={this.handleSort('idorder')}>
                                 Zakázka
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'name' && direction} onClick={this.handleSort('name')}>
+                            <Table.HeaderCell sorted={column === 'order_name' && direction} onClick={this.handleSort('order_name')}>
                                 Název
                             </Table.HeaderCell>
                             <Table.HeaderCell sorted={column === 'taskdate' && direction} onClick={this.handleSort('taskdate')}>
                                 Termín
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'taskdesc' && direction} onClick={this.handleSort('taskdesc')}>
+                            <Table.HeaderCell sorted={column === 'taskcentdesc' && direction} onClick={this.handleSort('taskcentdesc')}>
                                 Popis
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'price_s' && direction} onClick={this.handleSort('price_s')}>
-                                Cena
+                            <Table.HeaderCell sorted={column === 'idcenter' && direction} onClick={this.handleSort('idcenter')}>
+                                Středisko
                             </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'finished' && direction} onClick={this.handleSort('finished')}>
-                                Dokončeno
-                            </Table.HeaderCell>
-                            <Table.HeaderCell sorted={column === 'invoice' && direction} onClick={this.handleSort('invoice')}>
-                                Fakturace
+                            <Table.HeaderCell sorted={column === 'person' && direction} onClick={this.handleSort('person')}>
+                                Pracovník
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -299,7 +269,7 @@ export default class Tasks extends Component {
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='6' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'
@@ -314,5 +284,4 @@ export default class Tasks extends Component {
         )
     }
 }
-
 

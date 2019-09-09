@@ -10,6 +10,7 @@ import moment from 'moment';
 import {PHP_url} from './../../PHP_Connector';
 import {arrToObject} from './../validation';
 import {checkSalesRole, checkTechRole} from "../validation";
+import AuthService from "../AuthService";
 
 class OffersDetail extends Component {
 
@@ -52,6 +53,7 @@ class OffersDetail extends Component {
                 body: JSON.stringify(nextProps.showData),
                 headers: {
                     'Accept': 'application/json',
+                    'Authorization' : 'Bearer ' + AuthService.getToken()
                 }
             }).then((response)  => {
                     return response.json();
@@ -114,7 +116,9 @@ class OffersDetail extends Component {
             //mode: 'no-cors',
             body: JSON.stringify(this.state.showData),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -153,7 +157,9 @@ class OffersDetail extends Component {
             method: 'POST',
             body: JSON.stringify(this.state.showData),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -185,7 +191,9 @@ class OffersDetail extends Component {
             method: 'POST',
             body: JSON.stringify(fileDel),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then(response => {
             this.setState({ errorText: ''});
@@ -225,9 +233,9 @@ class OffersDetail extends Component {
             fetch(PHP_url+'/nz_rest_api_slim/fileupload', {
                 method: 'POST',
                 body: formData,
-                /*headers: {
-                    'Content-Type': 'multipart/form-data'
-                }*/
+                headers: {
+                    'Authorization' : 'Bearer ' + AuthService.getToken()
+                }
             }).then(response => {
                 this.setState({ errorText: ''});
                 if (response.status === 200){
@@ -245,7 +253,8 @@ class OffersDetail extends Component {
                     method: 'POST',
                     body: JSON.stringify(docObj),
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization' : 'Bearer ' + AuthService.getToken()
                     }
                 }).then(response => {
                     this.setState({ errorText: ''});

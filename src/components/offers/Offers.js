@@ -10,6 +10,7 @@ import {Redirect} from 'react-router-dom';
 import  SearchBox from '../common/SearchBox';
 import 'url-search-params-polyfill';
 import {DelConfirm} from '../common/Confirmation';
+import AuthService from "../AuthService";
 
 class Offers extends Component {
 
@@ -62,6 +63,7 @@ class Offers extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then((response)  => {
             if (response.status === 200){
@@ -88,7 +90,6 @@ class Offers extends Component {
     readData(){
         this.setState({ isLoading: true });
         console.log(PHP_url);
-        //fetch(PHP_url+'/nz_rest_api_slim/offers', {
 
         var url = PHP_url+'/nz_rest_api_slim/offers';
         if (this.state.search){
@@ -106,6 +107,7 @@ class Offers extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         })
             .then((response)  => {
@@ -171,7 +173,9 @@ class Offers extends Component {
             //mode: 'no-cors',
             body: JSON.stringify(item),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then(response => {
             if (response.status === 200){

@@ -6,6 +6,7 @@ import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole, checkTechRole, decodeOptionValue, getFormatDate, getFormatDateMonth} from '../validation';
 import {optionYesNo} from "../constants";
 import {Redirect} from 'react-router-dom';
+import AuthService from "../AuthService";
 
 export default class Invoices extends Component {
 
@@ -81,6 +82,7 @@ export default class Invoices extends Component {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
+                    'Authorization' : 'Bearer ' + AuthService.getToken()
                 }
         })
             .then((response)  => {
@@ -161,6 +163,7 @@ export default class Invoices extends Component {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         })
             .then((response)  => {
@@ -184,14 +187,14 @@ export default class Invoices extends Component {
                 counter++;
                 let inv = {
                     id: counter,
-                    type: 'Su',
+                    type: 'SU',
                     month: month,
                     idorder: task['idorder'],
                     date: task['planinvdate'],
                     desc: task['name'],
                     finished: task['invoice'],
                     center: task['idcenter'],
-                    price: task['price'],
+                    price: (task['price'] === null) ? 0 : task['price'],
                     name: task['order_name'],
                 };
                 plan.push(inv);
@@ -248,13 +251,17 @@ export default class Invoices extends Component {
         this.applyFilter(value);
     }
 
-    getSumPrice = () => {
+    getSumPrice = (item_type) => {
         let sum = 0;
+        //let sum_st = 0;
         for (let i in this.state.tableData){
             let item = this.state.tableData[i];
-            if (item['type'] === 'Su'){
-                sum = sum - parseInt(item['price']);
+            /*if (item['type'] === 'Su'){
+                sum_su = sum_su - parseInt(item['price']);
             }else {
+                sum_su = sum_su + parseInt(item['price']);
+            }*/
+            if (item['type'] === item_type){
                 sum = sum + parseInt(item['price']);
             }
         }
@@ -326,8 +333,8 @@ export default class Invoices extends Component {
 
         if (item.type === 'ST'){
             rowStyle = 'row_ST';
-        }else if (item.type === 'Su'){
-            rowStyle = 'row_Su';
+        }else if (item.type === 'SU'){
+            rowStyle = 'row_SU';
         }else if (item.type === 'Uk'){
             rowStyle = 'row_Uk';
         };
@@ -405,17 +412,17 @@ export default class Invoices extends Component {
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
                             <Table.Cell></Table.Cell>
-                            <Table.Cell></Table.Cell>
-                            <Table.Cell>Celkem</Table.Cell>
-                            <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(this.getSumPrice()) : 0}</Table.Cell>
-                            <Table.Cell></Table.Cell>
+                            <Table.Cell>Celkem fak.</Table.Cell>
+                            <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(this.getSumPrice('ST')) : 0}</Table.Cell>
+                            <Table.Cell>Celkem sub.</Table.Cell>
+                            <Table.Cell>{checkSalesRole() ? new Intl.NumberFormat('cs-CS').format(this.getSumPrice('SU')) : 0}</Table.Cell>
                             <Table.Cell></Table.Cell>
                         </Table.Row>
                     </Table.Body>
 
                     <Table.Footer fullWidth >
                         <Table.Row >
-                            <Table.HeaderCell colSpan='7' style={{overflow: "visible"}}>
+                            <Table.HeaderCell colSpan='8' style={{overflow: "visible"}}>
                                 <Dropdown  placeholder='Záznamů/str' options={pageSize} selection value={this.state.rowsPerPage} onChange={this.handleChangeRowsPerPage}/>
                                 <Pagination
                                     floated='right'

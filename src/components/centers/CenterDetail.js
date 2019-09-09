@@ -4,6 +4,7 @@ import MyMessage from "../MyMessage";
 import {PHP_url} from './../../PHP_Connector';
 import {checkSalesRole} from "../validation";
 import {optionDealType} from "../constants";
+import AuthService from "../AuthService";
 
 export default class CenterDetail extends Component {
 
@@ -65,7 +66,8 @@ export default class CenterDetail extends Component {
             //mode: 'no-cors',
             body: JSON.stringify(this.state.showData),
             headers: {
-                'Content-Type': 'application/json'
+                'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + AuthService.getToken()
             }
         }).then(response => {
             if (response.status === 200){

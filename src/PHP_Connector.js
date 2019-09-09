@@ -75,6 +75,7 @@ export function myFetch(type, url, userData) {
         body: JSON.stringify(userData),
         headers: {
             'Accept': 'application/json',
+            'Authorization' : 'Bearer ' + AuthService.getToken()
         }
     }).then(response => {
         const contentType = response.headers.get('Content-Type') || '';
