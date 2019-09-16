@@ -20,7 +20,7 @@ class DocumentDetail extends Component {
         this.state = {
             file: null,
             files: [],
-            showData: {type: '', description: '', expiration: '', filename: '', files: [], ico: ''},
+            showData: {type: '', description: '', expiration: '', filename: '', files: [], fullpath: [], ico: ''},
             expirationNumber: '',
             types: [],
             newItem: false,
@@ -30,6 +30,7 @@ class DocumentDetail extends Component {
         this.closeEdit = this.closeEdit.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onFileChange = this.onFileChange.bind(this);
+        this.onDirChange = this.onDirChange.bind(this);
         //this.handleChangeDate = this.handleChangeDate.bind(this);
     };
 
@@ -103,6 +104,25 @@ class DocumentDetail extends Component {
         this.setState({ files: Array.from(e.target.files)});
     }
 
+    onDirChange(e) {
+        let files = e.target.files;
+        let file;
+        for (var i = 0; i < files.length; i++) {
+            file = files[i];
+            console.log(file.webkitRelativePath + " " +file.name);
+        }
+
+        let newState = {...this.state.showData, filename: e.target.value};
+        this.setState({ showData: newState });
+
+
+        let newStateFiles = {...this.state.showData, files: Array.from(e.target.files)};
+        this.setState({ showData: newStateFiles });
+
+        this.setState({ file: e.target.files[0]});
+        this.setState({ files: Array.from(e.target.files)});
+    }
+
     onSubmit = (e) => {
         e.preventDefault();
         if (!(checkSalesRole() || checkTechRole())) {
@@ -137,6 +157,9 @@ class DocumentDetail extends Component {
                                 <Form.Field required>
                                     <label>Dokumenty</label>
                                     <input type="file" id="files" name="files[]" multiple onChange={this.onFileChange}/>
+                                    <input type="file" id="directory" name="directory[]" webkitdirectory directory onChange={this.onDirChange}/>
+                                    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
+                                    <input type="file" directory="" webkitdirectory="" onChange={this.onDirChange}/>
                                 </Form.Field>
                                 {this.props.typeRS ==='O' &&  <Form.Field control={Select} width={8} search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />}
                                 <Button type='submit' onClick={this.onSubmit.bind(this)}>Uložit</Button>

@@ -248,6 +248,7 @@ class OffersDetail extends Component {
                     idoffer: offerId,
                     documentId: json.docID,
                     typeRS: typeRS,
+                    path: file.webkitRelativePath,
                 };
                 fetch(PHP_url+'/nz_rest_api_slim/offersdocuments/create', {
                     method: 'POST',
