@@ -455,6 +455,7 @@ export default class OrdersDetail extends Component {
                     documentId: json.docID,
                     typeRS: typeRS,
                     ico: ico,
+                    path: file.webkitRelativePath,
                 };
                 fetch(PHP_url+'/nz_rest_api_slim/ordersdocuments/create', {
                     method: 'POST',
