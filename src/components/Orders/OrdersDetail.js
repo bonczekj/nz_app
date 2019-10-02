@@ -35,6 +35,7 @@ export default class OrdersDetail extends Component {
             documentsP: [],
             documentsF: [],
             documentsO: [],
+            documentsZ: [],
             tasks: [],
             centTasks: [],
             //subs: [],
@@ -85,6 +86,9 @@ export default class OrdersDetail extends Component {
             );
             this.setState({
                 documentsO: _.reject(allDocuments, function(el) { return el.typeRS !== 'O'; })}
+            );
+            this.setState({
+                documentsZ: _.reject(allDocuments, function(el) { return el.typeRS !== 'Z'; })}
             );
         }).catch(error => {
             this.setState({ errorText: error.toString() });
@@ -216,6 +220,9 @@ export default class OrdersDetail extends Component {
                 }
                 if (item["typeRS"] === "O"){
                     this.setState({documentsO: _.reject(this.state.documentsO, function(el) { return el.iddocument === item.iddocument; })});
+                }
+                if (item["typeRS"] === "Z"){
+                    this.setState({documentsZ: _.reject(this.state.documentsZ, function(el) { return el.iddocument === item.iddocument; })});
                 }
             }else {
                 throw new Error(response.body);
@@ -363,6 +370,9 @@ export default class OrdersDetail extends Component {
             case "O":
                 items = this.state.documentsO;
                 break;
+            case "Z":
+                items = this.state.documentsZ;
+                break;
         }
         //let fileList = new Array();
         let orderId = this.state.showData.id;
@@ -469,19 +479,6 @@ export default class OrdersDetail extends Component {
                     if (response.status === 200){
                         this.setState({ saved: true });
                         this.readDocuments(this.state.showData);
-                        /*item.filename = file.name;
-                        items.push(item);
-                        switch(typeRS){
-                            case "P":
-                                this.setState({documentsP: items});
-                                break;
-                            case "F":
-                                this.setState({documentsF: items});
-                                break;
-                            case "O":
-                                this.setState({documentsO: items});
-                                break;
-                        }*/
                     }else {
                         throw new Error(response.body);
                     }
@@ -525,31 +522,12 @@ export default class OrdersDetail extends Component {
         }).then(response => {
             this.setState({ errorText: ''});
             if (response.status === 200){
-
-                /*const items = this.state.tasks;
-                if (newTask) {
-                    items.push(task);
-                }else{
-                    let pos = getArrayPos(items, 'idtask', task['idtask']);
-                    items.splice(pos, 1, task);
-                }
-                this.setState({
-                    tasks: items
-                });
-                this.setState({ saved: true });
-                //this.closeEdit();*/
                 this.readTasks(this.state.showData);
             }
         }).catch(error => {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
         });
-
-        /*const items = this.state.tasks;
-        items.push(task);
-        this.setState({
-            tasks: items
-        });*/
     };
 
     addCentTask = (task) => {
@@ -612,23 +590,6 @@ export default class OrdersDetail extends Component {
             this.setState({ errorText: ''});
             if (response.status === 200){
                 this.setState({ saved: true });
-                //this.closeEdit();
-                /*const items = this.state.subsDetail;
-
-                let subConts = this.props.subContractors;
-                let subCont = subConts.filter(c => c.key == sub["ico"]);
-                let subCont0 = subCont[0];
-                sub.name = subCont0["text"];
-
-
-                if (newSub) {
-                    items.push(sub);
-                }else{
-                    let pos = getArrayPos(items, 'idsub', sub['idsub']);
-                    items.splice(pos, 1, sub);
-                }
-                //this.setState({subs: items});
-                this.setState({subsDetail: items});*/
                 this.readSubs(this.state.showData);
 
 
@@ -637,22 +598,6 @@ export default class OrdersDetail extends Component {
             console.log(error.toString())
             this.setState({ errorText: error.toString() });
         });
-
-        //this.readSubs(this.state.showData)
-        /*fetch(PHP_url+'/nz_rest_api_slim/orderssubsdetail', {
-            method: 'POST',
-            body: JSON.stringify(this.state.showData),
-            headers: {
-                'Accept': 'application/json',
-            }
-        }).then((response)  => {
-            return response.json();
-        }).then(json => {
-            this.setState({subsDetail: json});
-            console.log(this.state.subsDetail);
-        }).catch(error => {
-            this.setState({ errorText: error.toString() });
-        });*/
 
     };
 
@@ -876,10 +821,20 @@ export default class OrdersDetail extends Component {
                     Centers={this.props.Centers}
                 /> });
         }
+        panes.push({ menuItem: 'Zápisy', render: () => <OrdersDetailDocuments
+                showData={this.state.showData}
+                shortVersion={true}
+                documents={this.state.documentsZ}
+                typeRS={'Z'}
+                deleteDocument={this.deleteDocument}
+                addDocument={this.addDocument}
+                subContractors={this.props.subContractors}
+                onSubmitDocument={this.onSubmitDocument}
+            /> });
 
         return (
             <div>
-                <Modal size={'large'}
+                <Modal size={'fullscreen'}
                        open={this.props.showModal}
                        onClose={this.closeEdit.bind(this)}
                        closeOnEscape={true}

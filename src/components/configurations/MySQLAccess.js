@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Form, Button, Segment, Header} from 'semantic-ui-react'
 import {myFetch, PHP_url} from "../../PHP_Connector";
 import  MyMessage from '../MyMessage';
-import  AuthService from '../AuthService';
+import AuthService, {getToken} from '../AuthService';
 
 export default class MySQLAccess extends Component {
 
@@ -26,11 +26,11 @@ export default class MySQLAccess extends Component {
         };
 
         this.setState({ isLoading: true });
-        //fetch(PHP_url+'/nz_rest_api_slim/documents', {
         fetch(PHP_url+'/nz_rest_api_slim/configuration/getdb', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'Authorization' : 'Bearer ' + getToken()
             }
         }).then((response)  => {
             if (response.status === 200){

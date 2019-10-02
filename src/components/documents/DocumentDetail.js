@@ -96,7 +96,6 @@ class DocumentDetail extends Component {
         let newState = {...this.state.showData, filename: e.target.value};
         this.setState({ showData: newState });
 
-
         let newStateFiles = {...this.state.showData, files: Array.from(e.target.files)};
         this.setState({ showData: newStateFiles });
 
@@ -114,7 +113,6 @@ class DocumentDetail extends Component {
 
         let newState = {...this.state.showData, filename: e.target.value};
         this.setState({ showData: newState });
-
 
         let newStateFiles = {...this.state.showData, files: Array.from(e.target.files)};
         this.setState({ showData: newStateFiles });
@@ -155,10 +153,11 @@ class DocumentDetail extends Component {
                             <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                             <Form>
                                 <Form.Field required>
-                                    <label>Dokumenty</label>
+                                    <label>Výběr dokumentu</label>
                                     <input type="file" id="files" name="files[]" multiple onChange={this.onFileChange}/>
-                                    <input type="file" id="directory" name="directory[]" webkitdirectory directory onChange={this.onDirChange}/>
-                                    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
+                                </Form.Field>
+                                <Form.Field required>
+                                    <label>Výběr adresáře</label>
                                     <input type="file" directory="" webkitdirectory="" onChange={this.onDirChange}/>
                                 </Form.Field>
                                 {this.props.typeRS ==='O' &&  <Form.Field control={Select} width={8} search options={this.props.subContractors} label='Subdodavatel' name='ico' value={this.state.showData.ico} onChange={this.handleChangeDD } />}

@@ -18,7 +18,7 @@ class OrdersDetailDocuments extends Component {
             showModalD: false,
             showConf: false,
             newItem: false,
-            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: '', name: '', ico: ''},
+            showData: {idoffer: '', iddocument: '', id: '', type: '', description: '', expiration: '', filename: '', typeRS: '', name: '', ico: '', path:''},
             saved: false,
             shortVersion: true,
             typeRS: '',
@@ -152,13 +152,19 @@ class OrdersDetailDocuments extends Component {
     }
     */
     tabItems(item, i){
+        let attName = item.path;
+        if (attName != null && attName.length > 0){
+            attName = attName.replace(new RegExp("/", "g"), "\\");
+        }else {
+            attName = item.filename;
+        }
         if (this.state.shortVersion === true) {
             return(
                 <Table.Row key={item.iddocument}>
                     <Table.Cell>
                         <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
                     </Table.Cell>
-                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>{attName}</Table.Cell>
                     {this.props.typeRS ==='O' &&  <Table.Cell>{item.name}</Table.Cell>}
                     <Table.Cell>
                         <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
