@@ -253,11 +253,11 @@ export default class Tasks extends Component {
         ];
 
         if (this.state.hasSalesRole === false){
-            return(
+            /*return(
                 <div>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
                 </div>
-            )
+            )*/
         }
 
         return (

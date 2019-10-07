@@ -95,6 +95,8 @@ class Header2_NavMenu extends Component{
                     <Container>
                         <Menu.Item as={NavLink} to="/orders">Zakázky</Menu.Item>
                         <Menu.Item as={NavLink} to="/ordersarchive">Archív zakázek</Menu.Item>
+                        <Menu.Item as={NavLink} to="/tasks">Termíny</Menu.Item>
+                        <Menu.Item as={NavLink} to="/jobs">Úkoly</Menu.Item>
                         <Menu.Menu position='right'>
                             <Menu.Item as={NavLink} to="/changepassword" to="/changepassword">Změna hesla</Menu.Item>
                             <Menu.Item as={NavLink} to="/login" onClick={logout}>Odhlásit</Menu.Item>
