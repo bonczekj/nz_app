@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button,Icon, Table} from 'semantic-ui-react'
+import { Button,Icon, List, Table} from 'semantic-ui-react'
 import DocumentDetail from '../documents/DocumentDetail';
 import {PHP_url} from './../../PHP_Connector';
 import  MyMessage from '../MyMessage';
@@ -186,11 +186,132 @@ class OrdersDetailDocuments extends Component {
         }
     }
 
+    renderList(documents){
+        let i;
+        let docfiles = [];
+        for(i=0; i < documents.length; i++){
+            if(documents[i].path !== '' ){
+                console.log(documents[i].path.split("/").length);
+                docfiles.push([documents[i].path.substr(0, documents[i].path.lastIndexOf("/")), documents[i].path.split("/").length-1]);
+            }else{
+                docfiles.push(["",0]);
+            }
+        }
+        let dirs = [...new Set(docfiles)];
+        console.log(docfiles);
+        console.log(dirs);
+
+        return(
+            <List divided>
+                {dirs.map(function (dir) {
+                    return(
+                        <List.Item>
+                            <List.Icon name='folder' />
+                            <List.Content>
+                                <List.Header>{dir[0]}</List.Header>
+                                <List.Description></List.Description>
+                                {documents.map(function (document){
+                                    if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
+                                        return(
+                                            <List.Description>
+                                                {document.filename}
+                                            </List.Description>
+                                        )
+                                    }
+                                })}
+                            </List.Content>
+                        </List.Item>
+                    )
+                })}
+            </List>
+        );
+    }
+
     render() {
         if (this.state.shortVersion === true) {
             return (
                 <div style={{paddingTop:'1em'}}>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+                    <List divided>
+                        <List.Item >
+                            <List.Icon name='folder'  />
+                            <List.Content>
+                                <List.Header>src</List.Header>
+                                <List.Description>Source files for project</List.Description>
+                                <List.List celled={true}>
+                                    <List.Item>
+                                        <List.Icon name='folder' />
+                                        <List.Content>
+                                            <List.Header>site</List.Header>
+                                            <List.Description>Your site's theme</List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                    <List.Item>
+                                        <List.Icon name='folder' verticalAlign='middle'/>
+                                        <List.Content>
+                                            <List.Header>themes</List.Header>
+                                            <List.Description>Packaged theme files</List.Description>
+                                            <List.List>
+                                                <List.Item>
+                                                    <List.Icon name='folder' />
+                                                    <List.Content>
+                                                        <List.Header>default</List.Header>
+                                                        <List.Description>Default packaged theme</List.Description>
+                                                    </List.Content>
+                                                </List.Item>
+                                                <List.Item>
+                                                    <List.Icon name='folder' />
+                                                    <List.Content>
+                                                        <List.Header>my_theme</List.Header>
+                                                        <List.Description>
+                                                            Packaged themes are also available in this folder
+                                                        </List.Description>
+                                                    </List.Content>
+                                                </List.Item>
+                                            </List.List>
+                                        </List.Content>
+                                    </List.Item>
+                                    <List.Item>
+                                        <List.Icon name='file' />
+                                        <List.Content>
+                                            <List.Header>theme.config</List.Header>
+                                            <List.Description>
+                                                Config file for setting packaged themes
+                                            </List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                </List.List>
+                            </List.Content>
+                        </List.Item>
+                        <List.Item>
+                            <List.Icon name='folder' />
+                            <List.Content>
+                                <List.Header>dist</List.Header>
+                                <List.Description>Compiled CSS and JS files</List.Description>
+                                <List.List>
+                                    <List.Item>
+                                        <List.Icon name='folder' />
+                                        <List.Content>
+                                            <List.Header>components</List.Header>
+                                            <List.Description>
+                                                Individual component CSS and JS
+                                            </List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                </List.List>
+                            </List.Content>
+                        </List.Item>
+                        <List.Item>
+                            <List.Icon name='file' />
+                            <List.Content>
+                                <List.Header>semantic.json</List.Header>
+                                <List.Description>Contains build settings for gulp</List.Description>
+                            </List.Content>
+                        </List.Item>
+                    </List>
+
+                    {this.renderList(this.props.documents)}
+
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
@@ -236,6 +357,7 @@ class OrdersDetailDocuments extends Component {
             return (
                 <div style={{paddingTop:'1em'}}>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
+
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
                             <Table.Row>
