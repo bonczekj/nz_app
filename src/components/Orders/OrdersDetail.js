@@ -78,6 +78,18 @@ export default class OrdersDetail extends Component {
                 return response.json();
             }).then(json => {
             const allDocuments = json;
+
+            let i;
+            for(i=0; i < allDocuments.length; i++){
+                if(allDocuments[i].path !== null ){
+                    allDocuments[i].level = allDocuments[i].path.split("/").length-1;
+                    allDocuments[i].folder = allDocuments[i].path.substr(0, allDocuments[i].path.lastIndexOf("/"));
+                }else{
+                    allDocuments[i].level = 0;
+                    allDocuments[i].folder = "";
+                }
+            }
+
             this.setState({
                 documentsP: _.reject(allDocuments, function(el) { return el.typeRS !== 'P'; })}
             );

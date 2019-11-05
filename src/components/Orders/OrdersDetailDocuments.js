@@ -152,6 +152,7 @@ class OrdersDetailDocuments extends Component {
     }
     */
     tabItems(item, i){
+        return;
         let attName = item.path;
         if (attName != null && attName.length > 0){
             attName = attName.replace(new RegExp("/", "g"), "\\");
@@ -186,45 +187,177 @@ class OrdersDetailDocuments extends Component {
         }
     }
 
-    renderList(documents){
+    tabItemsList(documents){
         let i;
         let docfiles = [];
         for(i=0; i < documents.length; i++){
-            if(documents[i].path !== '' ){
-                console.log(documents[i].path.split("/").length);
+            if(documents[i].path !== null ){
                 docfiles.push([documents[i].path.substr(0, documents[i].path.lastIndexOf("/")), documents[i].path.split("/").length-1]);
             }else{
                 docfiles.push(["",0]);
             }
         }
         let dirs = [...new Set(docfiles)];
-        console.log(docfiles);
+        //console.log(docfiles);
         console.log(dirs);
-
         return(
-            <List divided>
-                {dirs.map(function (dir) {
-                    return(
-                        <List.Item>
-                            <List.Icon name='folder' />
-                            <List.Content>
-                                <List.Header>{dir[0]}</List.Header>
-                                <List.Description></List.Description>
-                                {documents.map(function (document){
+            <a>
+            {dirs.map(function (dir) {
+                return(
+                    <Table.Row key={dir[0]}>
+                        <Table.Cell>
+                            <Icon link name='folder' />
+                        </Table.Cell>
+                        <Table.Cell>{dir[0]}</Table.Cell>
+                        <Table.Cell>
+                        </Table.Cell>
+                        <Table attached='bottom'>
+                        {
+                            documents.map(function (document){
+                                if (document.path !== null){
                                     if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
                                         return(
-                                            <List.Description>
-                                                {document.filename}
-                                            </List.Description>
+                                            <Table.Row key={dir[0]}>
+                                                <Table.Cell>
+                                                    <Icon link name='file outline' />
+                                                </Table.Cell>
+                                                <Table.Cell>{document.filename}</Table.Cell>
+                                                <Table.Cell>
+                                                    <Icon link name='trash' />
+                                                </Table.Cell>
+                                            </Table.Row>
                                         )
                                     }
-                                })}
-                            </List.Content>
-                        </List.Item>
-                    )
-                })}
-            </List>
+                                }
+                            })
+                        }
+                        </Table>
+                    </Table.Row>
+                )
+            })}
+            </a>
         );
+    }
+
+    renderList(documents, startLevel, startDirectory, locThis){
+        console.log("renderList startdir="+startDirectory+"startlevel="+startLevel);
+        console.log(documents);
+        let i;
+        let docfiles = [];
+        let dirStruct = [];
+        let dirStructTmp = [];
+        let locDocuments = [];
+        for(i=0; i < documents.length; i++){
+
+            //podmínka kvůli rekurzi
+            if (documents[i].level < startLevel ){
+                //continue;
+            }
+            //if (startDirectory === '' || documents[i].folder.substr(0, startDirectory.length-1) !== startDirectory ){
+            if (startDirectory !== '' && documents[i].folder.substr(0, startDirectory.length-1) !== startDirectory ){
+                //continue;
+            }
+
+            if(documents[i].path !== null ){
+                let splitDirs = documents[i].folder.split("/");
+                let prefix = "";
+                let j;
+                for(j=0; j < splitDirs.length; j++){
+                    let actDir = prefix+splitDirs[j];
+                    if(dirStructTmp.indexOf(actDir) === -1  ){
+                        dirStructTmp.push(actDir);
+                    }else{
+                    }
+                    prefix = actDir+"/";
+                }
+                docfiles.push([documents[i].folder, documents[i].level]);
+            }else{
+                docfiles.push(["",0]);
+            }
+        }
+        let dirs = [...new Set(docfiles)];
+        //console.log("dirs");
+        //console.log(dirs);
+        //console.log("dirStructTmp");
+        //console.log(dirStructTmp);
+
+        for(i=0; i < dirStructTmp.length; i++){
+            dirStruct.push([dirStructTmp[i], dirStructTmp[i].split("/").length]);
+        }
+        console.log("dirStruct");
+        console.log(dirStruct);
+
+        if (startLevel === 0){
+            return(
+                <List>
+                    {dirStruct.map(function (dir) {
+                        if (dir[1] === startLevel+1){
+
+                            return(
+                                <List.Item>
+                                    <List.Icon name='folder' />
+                                    <List.Content>
+                                        <List.Header>{dir[0]}</List.Header>
+                                            {
+                                                documents.map(function (document){
+                                                    if (document.path !== null){
+                                                        if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
+                                                            return(
+                                                                <List.Item>
+                                                                    <List.icon name='file outline'/>
+                                                                    <List.Content>
+                                                                        <List.Header>{document.filename}</List.Header>
+                                                                    </List.Content>
+                                                                </List.Item>
+                                                            )
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        {locThis.renderList(documents, startLevel+1, dir[0], locThis)}
+
+                                    </List.Content>
+                                </List.Item>
+                            )
+                        }
+                    })}
+                </List>
+            );
+        }else {
+            return(
+                <List.List>
+                    {dirStruct.map(function (dir) {
+                        if (dir[1] === startLevel+1){
+                            return(
+                                <List.Item>
+                                    <List.Icon name='folder' />
+                                    <List.Content>
+                                        <List.Header>{dir[0]}</List.Header>
+                                        {
+                                            documents.map(function (document){
+                                                if (document.path !== null){
+                                                    if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
+                                                        return(
+                                                            <List.Item>
+                                                            <List.icon name='file outline'/>
+                                                                <List.Content>
+                                                                    <List.Header>{document.filename}</List.Header>
+                                                                </List.Content>
+                                                            </List.Item>
+                                                        )
+                                                    }else {console.log("skip:"+dir[0]+"path:"+document.path);}
+                                                }
+                                            })
+                                        }
+                                        {locThis.renderList(documents, startLevel+1, dir[0], locThis)}
+                                    </List.Content>
+                                </List.Item>
+                            )
+                        }
+                    })}
+                </List.List>
+            );
+        }
     }
 
     render() {
@@ -232,85 +365,8 @@ class OrdersDetailDocuments extends Component {
             return (
                 <div style={{paddingTop:'1em'}}>
                     <MyMessage errText={this.state.errorText} isLoading = {this.state.isLoading}/>
-                    <List divided>
-                        <List.Item >
-                            <List.Icon name='folder'  />
-                            <List.Content>
-                                <List.Header>src</List.Header>
-                                <List.Description>Source files for project</List.Description>
-                                <List.List celled={true}>
-                                    <List.Item>
-                                        <List.Icon name='folder' />
-                                        <List.Content>
-                                            <List.Header>site</List.Header>
-                                            <List.Description>Your site's theme</List.Description>
-                                        </List.Content>
-                                    </List.Item>
-                                    <List.Item>
-                                        <List.Icon name='folder' verticalAlign='middle'/>
-                                        <List.Content>
-                                            <List.Header>themes</List.Header>
-                                            <List.Description>Packaged theme files</List.Description>
-                                            <List.List>
-                                                <List.Item>
-                                                    <List.Icon name='folder' />
-                                                    <List.Content>
-                                                        <List.Header>default</List.Header>
-                                                        <List.Description>Default packaged theme</List.Description>
-                                                    </List.Content>
-                                                </List.Item>
-                                                <List.Item>
-                                                    <List.Icon name='folder' />
-                                                    <List.Content>
-                                                        <List.Header>my_theme</List.Header>
-                                                        <List.Description>
-                                                            Packaged themes are also available in this folder
-                                                        </List.Description>
-                                                    </List.Content>
-                                                </List.Item>
-                                            </List.List>
-                                        </List.Content>
-                                    </List.Item>
-                                    <List.Item>
-                                        <List.Icon name='file' />
-                                        <List.Content>
-                                            <List.Header>theme.config</List.Header>
-                                            <List.Description>
-                                                Config file for setting packaged themes
-                                            </List.Description>
-                                        </List.Content>
-                                    </List.Item>
-                                </List.List>
-                            </List.Content>
-                        </List.Item>
-                        <List.Item>
-                            <List.Icon name='folder' />
-                            <List.Content>
-                                <List.Header>dist</List.Header>
-                                <List.Description>Compiled CSS and JS files</List.Description>
-                                <List.List>
-                                    <List.Item>
-                                        <List.Icon name='folder' />
-                                        <List.Content>
-                                            <List.Header>components</List.Header>
-                                            <List.Description>
-                                                Individual component CSS and JS
-                                            </List.Description>
-                                        </List.Content>
-                                    </List.Item>
-                                </List.List>
-                            </List.Content>
-                        </List.Item>
-                        <List.Item>
-                            <List.Icon name='file' />
-                            <List.Content>
-                                <List.Header>semantic.json</List.Header>
-                                <List.Description>Contains build settings for gulp</List.Description>
-                            </List.Content>
-                        </List.Item>
-                    </List>
 
-                    {this.renderList(this.props.documents)}
+                    {this.renderList(this.props.documents, 0, '', this)}
 
                     <Table celled fixed={true} compact={true} selectable>
                         <Table.Header>
@@ -324,6 +380,7 @@ class OrdersDetailDocuments extends Component {
 
                         <Table.Body>
                             {this.props.documents.map(this.tabItems)}
+                            {this.tabItemsList(this.props.documents)}
                         </Table.Body>
 
                         <Table.Footer fullWidth >
@@ -405,6 +462,119 @@ class OrdersDetailDocuments extends Component {
 }
 
 export default OrdersDetailDocuments;
+
+/*
+
+
+        /*if (this.state.shortVersion === true) {
+            return(
+                <Table.Row key={item.iddocument}>
+                    <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
+                    </Table.Cell>
+                    <Table.Cell>{attName}</Table.Cell>
+                    {this.props.typeRS ==='O' &&  <Table.Cell>{item.name}</Table.Cell>}
+                    <Table.Cell>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
+                    </Table.Cell>
+                </Table.Row>
+            )
+        }else{
+            return(
+                <Table.Row key={item.iddocument}>
+                    <Table.Cell>
+                        <Icon link name='cloud download' onClick={this.downloadDocument.bind(this, item)}/>
+                    </Table.Cell>
+                    <Table.Cell>{item.filename}</Table.Cell>
+                    <Table.Cell>
+                        <Icon link name='trash' onClick={this.deleteItemConf.bind(this, item)}/>
+                    </Table.Cell>
+                </Table.Row>
+            )
+        }*/
+
+
+/*
+
+                    <List divided>
+                        <List.Item >
+                            <List.Icon name='folder'  />
+                            <List.Content>
+                                <List.Header>src</List.Header>
+                                <List.Description>Source files for project</List.Description>
+                                <List.List celled={true}>
+                                    <List.Item>
+                                        <List.Icon name='folder' />
+                                        <List.Content>
+                                            <List.Header>site</List.Header>
+                                            <List.Description>Your site's theme</List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                    <List.Item>
+                                        <List.Icon name='folder' verticalAlign='middle'/>
+                                        <List.Content>
+                                            <List.Header>themes</List.Header>
+                                            <List.Description>Packaged theme files</List.Description>
+                                            <List.List>
+                                                <List.Item>
+                                                    <List.Icon name='folder' />
+                                                    <List.Content>
+                                                        <List.Header>default</List.Header>
+                                                        <List.Description>Default packaged theme</List.Description>
+                                                    </List.Content>
+                                                </List.Item>
+                                                <List.Item>
+                                                    <List.Icon name='folder' />
+                                                    <List.Content>
+                                                        <List.Header>my_theme</List.Header>
+                                                        <List.Description>
+                                                            Packaged themes are also available in this folder
+                                                        </List.Description>
+                                                    </List.Content>
+                                                </List.Item>
+                                            </List.List>
+                                        </List.Content>
+                                    </List.Item>
+                                    <List.Item>
+                                        <List.Icon name='file' />
+                                        <List.Content>
+                                            <List.Header>theme.config</List.Header>
+                                            <List.Description>
+                                                Config file for setting packaged themes
+                                            </List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                </List.List>
+                            </List.Content>
+                        </List.Item>
+                        <List.Item>
+                            <List.Icon name='folder' />
+                            <List.Content>
+                                <List.Header>dist</List.Header>
+                                <List.Description>Compiled CSS and JS files</List.Description>
+                                <List.List>
+                                    <List.Item>
+                                        <List.Icon name='folder' />
+                                        <List.Content>
+                                            <List.Header>components</List.Header>
+                                            <List.Description>
+                                                Individual component CSS and JS
+                                            </List.Description>
+                                        </List.Content>
+                                    </List.Item>
+                                </List.List>
+                            </List.Content>
+                        </List.Item>
+                        <List.Item>
+                            <List.Icon name='file' />
+                            <List.Content>
+                                <List.Header>semantic.json</List.Header>
+                                <List.Description>Contains build settings for gulp</List.Description>
+                            </List.Content>
+                        </List.Item>
+                    </List>
+
+*/
 
 /*
                         {this.state.documents.slice((this.state.activePage - 1) * this.state.rowsPerPage, (this.state.activePage - 1) * this.state.rowsPerPage + this.state.rowsPerPage).map(this.items)}
