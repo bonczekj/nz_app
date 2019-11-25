@@ -7,7 +7,7 @@ import { saveAs } from 'file-saver'
 import {DelConfirm} from '../common/Confirmation';
 import {getToken} from "../AuthService";
 
-class OrdersDetailDocuments extends Component {
+export default class OrdersDetailDocuments extends Component {
 
     constructor(props){
         super(props);
@@ -23,6 +23,8 @@ class OrdersDetailDocuments extends Component {
             shortVersion: true,
             typeRS: '',
             item:[],
+            dirStruct: [],
+            docfiles: [],
         }
     };
 
@@ -31,21 +33,61 @@ class OrdersDetailDocuments extends Component {
     };
 
     componentWillReceiveProps(nextProps){
+        console.log("componentWillReceiveProps");
+
         this.setState({
                 typeRS: nextProps.typeRS,
                 shortVersion: nextProps.shortVersion,
             },
         );
+        this.prepareStructure(nextProps.documents);
     }
 
     componentWillMount(){
+        console.log("componentWillMount");
+
         this.setState({
                 typeRS: this.props.typeRS,
                 shortVersion: this.props.shortVersion,
             },
         );
+        this.prepareStructure(this.props.documents);
     }
 
+    prepareStructure = (documents) => {
+        let dirStructTmp = [];
+        let dirStructTmp1 = [];
+        //let docfiles = [];
+        for(let i=0; i < documents.length; i++){
+            if(documents[i].path !== null ){
+                let splitDirs = documents[i].folder.split("/");
+                let prefix = "";
+                let j;
+                for(let j=0; j < splitDirs.length; j++){
+                    let actDir = prefix+splitDirs[j];
+                    if(dirStructTmp.indexOf(actDir) === -1  ){
+                        dirStructTmp.push(actDir);
+                    }else{
+                    }
+                    prefix = actDir+"/";
+                }
+                //docfiles.push([nextProps.documents[i].folder, nextProps.documents[i].level]);
+            }else{
+                //docfiles.push(["",0]);
+            }
+        }
+        //let dirs = [...new Set(docfiles)];
+
+        for(let i=0; i < dirStructTmp.length; i++){
+            dirStructTmp1.push([dirStructTmp[i], dirStructTmp[i].split("/").length, true]);
+        }
+        console.log("dirstruct fill");
+        this.setState({
+                dirStruct: dirStructTmp1,
+            },
+        );
+
+    }
 
     /*deleteDocument = (item) => {
         this.props.deleteDocument(item)
@@ -127,6 +169,20 @@ class OrdersDetailDocuments extends Component {
         });
     }
 
+    toggleDir = (dir) => {
+        let i;
+        console.log("toggle "+dir);
+        let dirStruct = this.state.dirStruct;
+        for(i=0; i < dirStruct.length; i++){
+            if(dirStruct[i][0] === dir[0] ){
+                if (dirStruct[i][2] === true){
+                    dirStruct[i][2] = false
+                }else {dirStruct[i][2] = true}
+            }
+        }
+        this.setState({ dirStruct: dirStruct });
+    }
+
     /*closeEditDocument(item){
         this.setState({showModal: false});
         if (this.state.saved === true){
@@ -152,7 +208,7 @@ class OrdersDetailDocuments extends Component {
     }
     */
     tabItems(item, i){
-        return;
+        //return;
         let attName = item.path;
         if (attName != null && attName.length > 0){
             attName = attName.replace(new RegExp("/", "g"), "\\");
@@ -188,6 +244,7 @@ class OrdersDetailDocuments extends Component {
     }
 
     tabItemsList(documents){
+        return;
         let i;
         let docfiles = [];
         for(i=0; i < documents.length; i++){
@@ -240,24 +297,13 @@ class OrdersDetailDocuments extends Component {
     }
 
     renderList(documents, startLevel, startDirectory, locThis){
-        console.log("renderList startdir="+startDirectory+"startlevel="+startLevel);
-        console.log(documents);
+        console.log("------renderList startdir="+startDirectory+" startlevel="+startLevel);
+        //console.log(documents);
         let i;
-        let docfiles = [];
+        /*let docfiles = [];
         let dirStruct = [];
         let dirStructTmp = [];
-        let locDocuments = [];
         for(i=0; i < documents.length; i++){
-
-            //podmínka kvůli rekurzi
-            if (documents[i].level < startLevel ){
-                //continue;
-            }
-            //if (startDirectory === '' || documents[i].folder.substr(0, startDirectory.length-1) !== startDirectory ){
-            if (startDirectory !== '' && documents[i].folder.substr(0, startDirectory.length-1) !== startDirectory ){
-                //continue;
-            }
-
             if(documents[i].path !== null ){
                 let splitDirs = documents[i].folder.split("/");
                 let prefix = "";
@@ -276,46 +322,40 @@ class OrdersDetailDocuments extends Component {
             }
         }
         let dirs = [...new Set(docfiles)];
-        //console.log("dirs");
-        //console.log(dirs);
-        //console.log("dirStructTmp");
-        //console.log(dirStructTmp);
 
         for(i=0; i < dirStructTmp.length; i++){
             dirStruct.push([dirStructTmp[i], dirStructTmp[i].split("/").length]);
-        }
-        console.log("dirStruct");
-        console.log(dirStruct);
+        }*/
+        let dirStruct = this.state.dirStruct;
 
         if (startLevel === 0){
+            console.log("dirStruct");
+            console.log(dirStruct);
+            console.log(documents);
             return(
                 <List>
+                    {documents.map(function (document){
+                            if (document.level === 0){
+                                console.log("show: fn:"+document.filename);
+                                return(
+                                    <List.Item onClick={locThis.downloadDocument.bind(locThis, document)}>
+                                        <List.Icon name='file outline'/>
+                                        {document.filename}
+                                    </List.Item>
+                                )
+                            }
+                        })
+                    }
                     {dirStruct.map(function (dir) {
                         if (dir[1] === startLevel+1){
-
                             return(
                                 <List.Item>
                                     <List.Icon name='folder' />
                                     <List.Content>
-                                        <List.Header>{dir[0]}</List.Header>
-                                            {
-                                                documents.map(function (document){
-                                                    if (document.path !== null){
-                                                        if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
-                                                            return(
-                                                                <List.Item>
-                                                                    <List.icon name='file outline'/>
-                                                                    <List.Content>
-                                                                        <List.Header>{document.filename}</List.Header>
-                                                                    </List.Content>
-                                                                </List.Item>
-                                                            )
-                                                        }
-                                                    }
-                                                })
-                                            }
+                                        <List.Item onClick={locThis.toggleDir.bind(locThis, dir)}>
+                                            <b>{dir[0]}</b>
+                                        </List.Item>
                                         {locThis.renderList(documents, startLevel+1, dir[0], locThis)}
-
                                     </List.Content>
                                 </List.Item>
                             )
@@ -327,32 +367,42 @@ class OrdersDetailDocuments extends Component {
             return(
                 <List.List>
                     {dirStruct.map(function (dir) {
-                        if (dir[1] === startLevel+1){
+                        if (dir[1] === startLevel){
                             return(
                                 <List.Item>
-                                    <List.Icon name='folder' />
-                                    <List.Content>
-                                        <List.Header>{dir[0]}</List.Header>
-                                        {
-                                            documents.map(function (document){
-                                                if (document.path !== null){
-                                                    if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
-                                                        return(
-                                                            <List.Item>
-                                                            <List.icon name='file outline'/>
-                                                                <List.Content>
-                                                                    <List.Header>{document.filename}</List.Header>
-                                                                </List.Content>
-                                                            </List.Item>
-                                                        )
-                                                    }else {console.log("skip:"+dir[0]+"path:"+document.path);}
-                                                }
-                                            })
-                                        }
-                                        {locThis.renderList(documents, startLevel+1, dir[0], locThis)}
-                                    </List.Content>
+                                    {
+                                        documents.map(function (document){
+                                            if (document.path !== null){
+                                                if (document.path.substr(0, document.path.lastIndexOf("/")) === dir[0] ){
+                                                    console.log("show:"+dir[0]+" path:"+document.path+" fn:"+document.filename);
+                                                    return(
+                                                        <List.Item onClick={locThis.downloadDocument.bind(locThis, document)}>
+                                                            <List.Icon name='file outline'/>
+                                                            {document.filename}
+                                                            <Icon link name='trash' />
+                                                        </List.Item>
+                                                    )
+                                                }else {/*console.log("skip:"+dir[0]+" path:"+document.path);*/}
+                                            }
+                                        })
+                                    }
                                 </List.Item>
                             )
+                        }
+                        if (dir[1] === startLevel+1){
+                            if (dir[0].substr(0, dir[0].lastIndexOf("/")) === startDirectory){
+                                return(
+                                    <List.Item>
+                                        <List.Icon name='folder' />
+                                        <List.Content>
+                                            <List.Item onClick={locThis.toggleDir.bind(locThis, dir)}>
+                                                <b>{dir[0]}</b>
+                                            </List.Item>
+                                            {dir[2] === true && locThis.renderList(documents, startLevel+1, dir[0], locThis)}
+                                        </List.Content>
+                                    </List.Item>
+                                )
+                            }
                         }
                     })}
                 </List.List>
@@ -380,7 +430,6 @@ class OrdersDetailDocuments extends Component {
 
                         <Table.Body>
                             {this.props.documents.map(this.tabItems)}
-                            {this.tabItemsList(this.props.documents)}
                         </Table.Body>
 
                         <Table.Footer fullWidth >
@@ -461,7 +510,7 @@ class OrdersDetailDocuments extends Component {
     }
 }
 
-export default OrdersDetailDocuments;
+
 
 /*
 
